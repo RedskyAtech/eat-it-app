@@ -3,11 +3,12 @@ import React from 'react';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 
-
-import Home from '../screen/home';
 import Splash from '../screen/splash';
 import Login from '../screen/login';
+import ForgotPassword from '../screen/forgotPassword';
+import Home from '../screen/home';
 import Header from '../components/header';
+import Footer from '../components/footer';
 
 const AppStack = createStackNavigator(
 
@@ -18,8 +19,21 @@ const AppStack = createStackNavigator(
         headerShown: false,
       },
     },
+
     Login: {
       screen: Login,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
+    ForgotPassword: {
+      screen: ForgotPassword,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
+    Home: {
+      screen: Home,
       navigationOptions: {
         headerShown: false,
       },
@@ -30,13 +44,13 @@ const AppStack = createStackNavigator(
         headerShown: false,
       },
     },
-
-    Home: {
-      screen: Home,
+    Footer: {
+      screen: Footer,
       navigationOptions: {
         headerShown: false,
       },
     },
+
   },
   {
     initialRouteName: 'Login',

@@ -1,6 +1,7 @@
 import * as utlitiy from '../../utility/index';
 import * as fonts from '../../constants/fonts';
 import * as colors from '../../constants/colors';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from '../../utility/index';
 
 const styles = {
     container: {
@@ -11,17 +12,17 @@ const styles = {
         margin: 5
     },
     arrow: {
-        height: utlitiy.heightPercentageToDP(4.5),
-        width: utlitiy.heightPercentageToDP(4.5),
+        height: hp(4.5),
+        width: hp(4.5),
     },
     logo_container: {
-        marginTop: -18,
-        width: utlitiy.widthPercentageToDP(84),
+        marginTop: hp(-3),
+        width: wp(84),
         alignSelf: 'center'
     },
     logo: {
-        height: utlitiy.heightPercentageToDP(15),
-        width: utlitiy.heightPercentageToDP(15),
+        height: hp(15),
+        width: hp(15),
         alignSelf: 'flex-end'
     },
     row: {
@@ -35,41 +36,41 @@ const styles = {
     headings: {
         justifyContent: 'space-around',
         color: 'black',
-        marginTop: 40
+        marginTop: hp(6),
     },
     text: {
         fontSize: fonts.FONT_HEADING,
         fontWeight: fonts.FONT_BOLD,
     },
-    headings_color:{
-     color:colors.fieldsColor
+    headings_color: {
+        color: colors.fieldsColor
     },
     fields_container: {
-        marginVertical: 30,
-        width: utlitiy.widthPercentageToDP(88),
+        marginVertical: hp(5),
+        width: wp(86),
         alignSelf: 'center'
     },
     fields: {
         borderBottomWidth: 1.4,
         borderBottomColor: colors.fieldsColor,
-        marginVertical: 12,
-        paddingVertical: 4
+        marginVertical: hp(1.8),
+        paddingVertical: hp(0.6)
     },
 
     input_box: {
         padding: 0,
-        height: utlitiy.heightPercentageToDP(2.6),
-        width: utlitiy.widthPercentageToDP(80)
+        height: hp(2.6),
+        width: wp(80)
     },
     field_icons: {
-        height: utlitiy.heightPercentageToDP(2.4),
-        width: utlitiy.heightPercentageToDP(2.4),
-        marginRight: 10,
+        height: hp(2.4),
+        width: hp(2.4),
+        marginRight: wp(2.8),
         padding: 0
     },
     between_spacing: {
         justifyContent: 'space-between',
-        marginVertical: 14,
+        marginVertical: hp(1.8),
     },
     colored_text: {
         color: colors.primaryColor,
@@ -82,7 +83,7 @@ const styles = {
     },
     line_container: {
         alignSelf: 'center',
-        marginVertical: 12
+        marginVertical: hp(1.6),
     },
     line: {
         backgroundColor: colors.primaryColor,
@@ -91,34 +92,68 @@ const styles = {
         alignSelf: 'center',
     },
     or_text: {
-        paddingHorizontal: 14,
+        paddingHorizontal: wp(4),
         fontSize: fonts.FONT_TEXT,
         fontWeight: fonts.FONT_BOLD
     },
     social_container: {
         alignSelf: 'center',
-        width: utlitiy.widthPercentageToDP(40)
+        width: wp(40)
     },
     social_icons: {
-        height: utlitiy.heightPercentageToDP(5.8),
-        width: utlitiy.heightPercentageToDP(5.8),
+        height: hp(5.8),
+        width: hp(5.8),
     },
     bottom_container: {
-        flex: 1,
-        flexDirection: 'column',
+        flexDirection: 'row',
         justifyContent: 'space-between',
         alignSelf: 'center',
-        width: utlitiy.widthPercentageToDP(88),
-        marginBottom: 20
+        width: wp(86),
+        marginBottom: hp(3)
+    },
+    ckeckbox: {
+        marginRight: wp(5),
+        marginLeft: wp(-3),
+        borderRadius:4
     },
     forward_container: {
-        height: utlitiy.heightPercentageToDP(7.8),
-        width: utlitiy.heightPercentageToDP(7.8),
-        borderRadius: utlitiy.heightPercentageToDP(7.8) / 2,
+        height: hp(7.8),
+        width: hp(7.8),
+        borderRadius: hp(7.8) / 2,
         backgroundColor: "#FFBA09",
         justifyContent: 'center',
         alignItems: 'center',
-        alignSelf:'flex-end'
+        alignSelf: 'flex-end',
+        marginTop: hp(6)
+    },
+    profile_container: {
+        height: hp(14.5),
+        width: hp(14.5),
+        borderWidth: 1.5,
+        borderColor: colors.fieldsColor,
+        borderRadius: 4,
+        marginBottom: hp(2),
+        padding: 5
+    },
+    profile_image: {
+        height: "100%",
+        width: "100%",
+        borderRadius: 3,
+    },
+    edit_container: {
+        height: hp(5.8),
+        width: hp(5.8),
+        backgroundColor: "#FFBA09",
+        borderRadius: hp(5.8) / 2,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: hp(-2),
+        marginLeft: wp(-6),
+    },
+    edit_icon: {
+        alignSelf: 'center',
+        height: hp(3),
+        width: hp(3),
     }
 }
 export default styles

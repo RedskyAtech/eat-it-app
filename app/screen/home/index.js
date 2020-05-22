@@ -1,24 +1,26 @@
 import React, { Component } from "react";
-import { View, Text } from 'react-native';
-import styles from './style';
-import  Header  from "../../components/header";
-
+import { View, Text, Image, } from "react-native";
+import styles from "./style";
+import Footer from '../../components/footer';
 
 export default class home extends Component {
     constructor(props) {
         super(props);
-        this.state = {}
+        this.state = {
+        };
     }
+
     render() {
-        const { container } = styles
+        const { container,row, footer_container } = styles
         return (
-            <>
-            <Header></Header>
-            <View style={container}>
-                <Text >Home Screen</Text>
+            <View style={[container, row]}>
+                <View>
+                    <Text>home</Text>
+                </View>
+                <View style={footer_container}>
+                    <Footer></Footer>
+                </View>
             </View>
-            
-            </>
-        )
+        );
     }
 }
