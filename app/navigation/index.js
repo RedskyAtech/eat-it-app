@@ -7,6 +7,7 @@ import Splash from '../screen/splash';
 import Login from '../screen/login';
 import ForgotPassword from '../screen/forgotPassword';
 import Home from '../screen/home';
+import Profile from '../screen/profile';
 import Header from '../components/header';
 import Footer from '../components/footer';
 
@@ -38,6 +39,12 @@ const AppStack = createStackNavigator(
         headerShown: false,
       },
     },
+    Profile: {
+      screen: Profile,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
     Header: {
       screen: Header,
       navigationOptions: {
@@ -53,7 +60,7 @@ const AppStack = createStackNavigator(
 
   },
   {
-    initialRouteName: 'Login',
+    initialRouteName: 'Splash',
   },
 );
 
