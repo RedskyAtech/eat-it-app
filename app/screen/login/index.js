@@ -1,7 +1,8 @@
 import React, { Component } from "react";
-import { ScrollView, View, Text, Image, ImageBackground, TextInput, TouchableOpacity } from 'react-native';
+import { ScrollView, View, Text, Image, ImageBackground, TextInput,BackHandler, TouchableOpacity } from 'react-native';
 import styles from './style';
 import { CheckBox, ListItem, Body } from 'native-base';
+import HandleBack from "../../components/HandleBack";
 
 export default class login extends Component {
     constructor(props) {
@@ -30,9 +31,14 @@ export default class login extends Component {
     onLoginSubmit = async () => {
         this.props.navigation.navigate('Home');
     }
+    onBack = () => {
+        BackHandler.exitApp()
+        return true;
+    }
     render() {
         const { back_container, logo_container, profile_container, profile_image, ckeckbox, edit_container, edit_icon, headings_color, row, column, container, line_container, forward_container, bottom_container, line, or_text, social_container, social_icons, fields, box_align, field_icons, arrow, colored_text, logo, headings, text, text_style, fields_container, input_box, between_spacing } = styles
         return (
+            <HandleBack onBack={this.onBack}>
             <View style={{ flex: 1, backgroundColor: 'white' }}>
                 <ScrollView style={{ margin: 0, padding: 0 }}>
                     <ImageBackground source={require('../../assets/login_background.png')}
@@ -140,6 +146,7 @@ export default class login extends Component {
                     </ImageBackground>
                 </ScrollView>
             </View>
+            </HandleBack>
         )
     }
 }

@@ -1,9 +1,11 @@
 import React, { Component } from "react";
-import { View, Text, Image, TextInput, TouchableOpacity, Dimensions } from "react-native";
+import { View, Text, Image, TextInput, TouchableOpacity, Dimensions,BackHandler } from "react-native";
 import styles from "./style";
 import Footer from '../../components/footer';
 import { RecyclerListView, DataProvider, LayoutProvider } from "recyclerlistview";
-import { Badge } from 'react-native-elements'
+import { Badge } from 'react-native-elements';
+import HandleBack from "../../components/HandleBack";
+
 
 const ViewTypes = {
     HALF_LEFT: 1,
@@ -232,45 +234,50 @@ export default class home extends Component {
     onFollow = async () => {
         await this.setState({ forYou: false, lastSearch: false, nearYou: false, follow: true })
     }
-
+    onBack = async () => {
+        BackHandler.exitApp()
+        return true;
+    }
 
     render() {
         const { container, container_width, top_container, row, list_container, icons, center_align, badge_style, selected_color, badge_text_style, filter_text, filter_container, unselected_color, filters, column, between_spacing, around_spacing, search_icon, search_input, search_container, footer_container } = styles
         return (
-            <View style={[container, column, between_spacing]}>
+            <HandleBack onBack={this.onBack}>
+                <View style={[container, column, between_spacing]}>
 
-                <View style={top_container}>
-                    <View >
-                        <View style={[row, between_spacing, container_width]}>
-                            <Image resizeMode='contain' source={require('../../assets/location.png')} style={icons}></Image>
-                            <View style={[search_container, row, around_spacing]}>
-                                <Image resizeMode='contain' source={require('../../assets/search.png')} style={search_icon} ></Image>
-                                <TextInput placeholder="Search" style={search_input} />
+                    <View style={top_container}>
+                        <View >
+                            <View style={[row, between_spacing, container_width]}>
+                                <Image resizeMode='contain' source={require('../../assets/location.png')} style={icons}></Image>
+                                <View style={[search_container, row, around_spacing]}>
+                                    <Image resizeMode='contain' source={require('../../assets/search.png')} style={search_icon} ></Image>
+                                    <TextInput placeholder="Search" style={search_input} />
+                                </View>
+                                <View style={[row, center_align]}>
+                                    <Image resizeMode='contain' source={require('../../assets/notification_solid_yellow.png')} style={icons} ></Image>
+                                    <Badge value="1" status="success" badgeStyle={badge_style} textStyle={badge_text_style} />
+                                </View>
                             </View>
-                            <View style={[row, center_align]}>
-                                <Image resizeMode='contain' source={require('../../assets/notification_solid_yellow.png')} style={icons} ></Image>
-                                <Badge value="1" status="success" badgeStyle={badge_style} textStyle={badge_text_style} />
-                            </View>
-                        </View>
 
-                        <View style={[row, filter_container]}>
-                            <TouchableOpacity onPress={this.onForYou}><View style={this.state.forYou ? [filters, selected_color] : [filters, unselected_color]}><Text style={filter_text}>For you</Text></View></TouchableOpacity>
-                            <TouchableOpacity onPress={this.onLastSearch}><View style={this.state.lastSearch ? [filters, selected_color] : [filters, unselected_color]}><Text style={filter_text}>Last search</Text></View></TouchableOpacity>
-                            <TouchableOpacity onPress={this.onNearYou}><View style={this.state.nearYou ? [filters, selected_color] : [filters, unselected_color]}><Text style={filter_text}>Near you</Text></View></TouchableOpacity>
-                            <TouchableOpacity onPress={this.onFollow}><View style={this.state.follow ? [filters, selected_color] : [filters, unselected_color]}><Text style={filter_text}>Follow</Text></View></TouchableOpacity>
+                            <View style={[row, filter_container]}>
+                                <TouchableOpacity onPress={this.onForYou}><View style={this.state.forYou ? [filters, selected_color] : [filters, unselected_color]}><Text style={filter_text}>For you</Text></View></TouchableOpacity>
+                                <TouchableOpacity onPress={this.onLastSearch}><View style={this.state.lastSearch ? [filters, selected_color] : [filters, unselected_color]}><Text style={filter_text}>Last search</Text></View></TouchableOpacity>
+                                <TouchableOpacity onPress={this.onNearYou}><View style={this.state.nearYou ? [filters, selected_color] : [filters, unselected_color]}><Text style={filter_text}>Near you</Text></View></TouchableOpacity>
+                                <TouchableOpacity onPress={this.onFollow}><View style={this.state.follow ? [filters, selected_color] : [filters, unselected_color]}><Text style={filter_text}>Follow</Text></View></TouchableOpacity>
+                            </View>
                         </View>
                     </View>
-                </View>
 
-                <View style={list_container}>
-                    <RecyclerListView layoutProvider={this._layoutProvider} dataProvider={this.state.dataProvider} rowRenderer={this._rowRenderer} />
-                </View>
+                    <View style={list_container}>
+                        <RecyclerListView layoutProvider={this._layoutProvider} dataProvider={this.state.dataProvider} rowRenderer={this._rowRenderer} />
+                    </View>
 
-                <View style={footer_container}>
-                    <Footer></Footer>
-                </View>
+                    <View style={footer_container}>
+                        <Footer></Footer>
+                    </View>
 
-            </View>
+                </View>
+            </HandleBack>
         );
     }
 }

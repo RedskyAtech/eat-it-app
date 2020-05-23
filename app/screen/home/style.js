@@ -97,7 +97,8 @@ const styles = {
         zIndex: 10,
         marginBottom:hp(2.2),
         width: wp(94),
-        height: "6.8%",
+        // height: "6.8%",
+        height:54,
         alignSelf: 'center'
     },
     containerGridLeft: {
