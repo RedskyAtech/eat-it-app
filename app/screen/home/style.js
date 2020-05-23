@@ -90,7 +90,8 @@ const styles = {
     },
     list_container: {
         height: "75%",
-        width:"100%"
+        // width:"100%"
+        width:wp(100)
     },
     footer_container: {
         zIndex: 10,

@@ -27,7 +27,7 @@ export default class profile extends Component {
                     colors={[colors.gradientFirstColor, colors.gradientSecondColor]}
                     style={profile_container} >
                     <Image resizeMode='stretch' source={require('../../assets/settings.png')} style={settings}></Image>
-                    <Image resizeMode='cover' source={require('../../assets/profile1.png')} style={profile_image}></Image>
+                    {/* <Image resizeMode='cover' source={require('../../assets/profile1.png')} style={profile_image}></Image> */}
                 </LinearGradient>
             
                 <View style={footer_container}>

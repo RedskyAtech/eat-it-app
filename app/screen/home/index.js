@@ -57,15 +57,15 @@ export default class home extends Component {
             (type, dim) => {
                 switch (type) {
                     case ViewTypes.HALF_LEFT:
-                        dim.width = width / 3;
+                        dim.width = width / 3.02;
                         dim.height = 170;
                         break;
                     case ViewTypes.HALF_BETWEEN:
-                        dim.width = width / 3;
+                        dim.width = width / 3.02;
                         dim.height = 170;
                         break;
                     case ViewTypes.HALF_RIGHT:
-                        dim.width = width / 3;
+                        dim.width = width / 3.02;
                         dim.height = 170;
                         break;
                     default:
