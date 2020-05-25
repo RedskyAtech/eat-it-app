@@ -6,7 +6,6 @@ import { RecyclerListView, DataProvider, LayoutProvider } from "recyclerlistview
 import { Badge } from 'react-native-elements';
 import HandleBack from "../../components/HandleBack";
 
-
 const ViewTypes = {
     HALF_LEFT: 1,
     HALF_BETWEEN: 2,
@@ -198,7 +197,6 @@ export default class home extends Component {
         }
         return arr;
     }
-
     _rowRenderer(type, data) {
 
         switch (type) {
@@ -238,7 +236,6 @@ export default class home extends Component {
         BackHandler.exitApp()
         return true;
     }
-
     render() {
         const { container, container_width, top_container, row, list_container, icons, center_align, badge_style, selected_color, badge_text_style, filter_text, filter_container, unselected_color, filters, column, between_spacing, around_spacing, search_icon, search_input, search_container, footer_container } = styles
         return (
@@ -273,7 +270,7 @@ export default class home extends Component {
                     </View>
 
                     <View style={footer_container}>
-                        <Footer></Footer>
+                        <Footer navigation={this.props.navigation}></Footer>
                     </View>
 
                 </View>

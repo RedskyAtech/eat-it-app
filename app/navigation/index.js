@@ -8,6 +8,7 @@ import Login from '../screen/login';
 import ForgotPassword from '../screen/forgotPassword';
 import Home from '../screen/home';
 import Profile from '../screen/profile';
+import Search from '../screen/search';
 import Header from '../components/header';
 import Footer from '../components/footer';
 
@@ -45,6 +46,12 @@ const AppStack = createStackNavigator(
         headerShown: false,
       },
     },
+    Search: {
+      screen: Search,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
     Header: {
       screen: Header,
       navigationOptions: {
@@ -60,7 +67,7 @@ const AppStack = createStackNavigator(
 
   },
   {
-    initialRouteName: 'Splash',
+    initialRouteName: 'Home',
   },
 );
 

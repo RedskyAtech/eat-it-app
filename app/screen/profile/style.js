@@ -1,4 +1,3 @@
-import * as utlitiy from '../../utility/index';
 import * as fonts from '../../constants/fonts';
 import * as colors from '../../constants/colors';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from '../../utility/index';
@@ -36,22 +35,138 @@ const styles = {
         width: hp(4.6),
         alignSelf: 'flex-end'
     },
-    profile_image: {
-        
-        height: hp(12),
-        width: hp(12),
-        borderRadius: hp(12)/2,
-        alignSelf: 'center',
-        borderColor:'white',
-        borderWidth:2
+    menu_container: {
+        alignSelf: 'flex-end',
     },
-    
-    footer_container: {
-        zIndex: 10,
-        marginBottom: hp(2.2),
+    menu_position: {
+        marginTop: hp(5),
+    },
+    menu_background: {
+        backgroundColor: '#ECECEC'
+    },
+    profile_image: {
+        height: 94,
+        width: 94,
+        borderRadius: 94 / 2,
+        alignSelf: 'center',
+        borderColor: 'white',
+        borderWidth: 2
+    },
+    user_details: {
+        marginTop: hp(6.4),
+        marginBottom: hp(2),
+        alignItems: 'center'
+    },
+    spacing: {
+        marginVertical: hp(0.6),
+        fontSize: fonts.FONT_TEXT,
+        fontWeight: fonts.FONT_BOLD
+    },
+    colored_text: {
+        color: colors.primaryColor
+    },
+    heading_color: {
+        color: colors.greyText
+    },
+    horizontal_line: {
+        borderBottomWidth: 1,
+        borderColor: "#B5B5B5",
+        width: wp(100),
+
+    },
+    field_icons: {
+        height: hp(2.2),
+        width: hp(2.2),
+    },
+
+    list_width: {
         width: wp(94),
-        height: "6.8%",
         alignSelf: 'center'
     },
+    list_title: {
+        marginLeft: wp(2.6),
+        fontSize: fonts.FONT_TEXT,
+        fontWeight: fonts.FONT_BOLD,
+    },
+    menu_list_icons: {
+        marginLeft: wp(2),
+        height: hp(2.4),
+        width: hp(2.4),
+    },
+    menu_list_title: {
+        fontSize: fonts.FONT_TEXT,
+        fontWeight: fonts.FONT_BOLD,
+    },
+    list_item_height: {
+        height: hp(5),
+        width: wp(52)
+    },
+    rows_spacing: {
+        marginVertical: hp(1.5),
+        alignContent: 'center'
+    },
+    row_centered_text: {
+        alignItems: 'center'
+    },
+    heading_text: {
+        fontSize: fonts.FONT_HEADING,
+        fontWeight: fonts.FONT_BOLD,
+        color: 'white',
+        alignSelf: 'center',
+        marginVertical: hp(2.4)
+    },
+    slider_container: {
+        width: wp(100),
+        height: hp(50),
+        borderBottomLeftRadius: 30,
+        borderBottomRightRadius: 30,
+    },
+    slider_inner_box: {
+        width: wp(86),
+        alignSelf: 'center'  
+    },
+    fields: {
+        borderBottomWidth: 1.4,
+        borderBottomColor: 'white',
+        marginVertical: hp(1.8),
+        paddingVertical: hp(0.6)
+    },
+    input_field_icons: {
+        height: hp(2.4),
+        width: hp(2.4),
+        marginRight: wp(2.8),
+        padding: 0
+    },
+    input_box: {
+        padding: 0,
+        height: hp(2.6),
+        width: wp(80)
+    },
+    button_container: {
+        height: hp(5.4),
+        borderRadius: 20,
+        marginVertical: hp(2),
+        backgroundColor: 'white',
+        elevation: 6,
+    },
+    button_text: {
+        color: colors.primaryColor,
+        textAlign: 'center',
+    },
+    close_style: {
+        alignSelf:'center',
+        textDecorationLine: 'underline',
+        marginVertical:hp(2)  
+    },
+    footer_container: {
+        zIndex: 10,
+        marginBottom:hp(2.2),
+        marginTop:hp(0.4),
+        width: wp(94),
+        // height: "6.8%",
+        height:54,
+        alignSelf: 'center'
+    },
+
 }
 export default styles
