@@ -124,7 +124,8 @@ const styles = {
         justifyContent: 'center',
         alignItems: 'center',
         alignSelf: 'flex-end',
-        marginTop: hp(6)
+        marginTop: hp(6),
+        
     },
     profile_container: {
         height: hp(14.5),

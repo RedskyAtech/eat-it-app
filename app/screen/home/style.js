@@ -86,22 +86,23 @@ const styles = {
         backgroundColor: colors.unselectedFilter
     },
     top_container: {
-        height: "15.2%"
+        // height: "15.2%"
+        height: hp(15)
     },
     list_container: {
-        height: "75%",
-        // width:"100%"
+        // height: "75%",
+        height:hp(78),
         width:wp(100)
     },
-    footer_container: {
-        zIndex: 10,
-        marginBottom:hp(2.2),
-        marginTop:hp(0.4),
-        width: wp(94),
-        // height: "6.8%",
-        height:54,
-        alignSelf: 'center'
-    },
+    // footer_container: {
+    //     zIndex: 10,
+    //     marginBottom:hp(2.2),
+    //     marginTop:hp(0.4),
+    //     width: wp(94),
+    //     // height: "6.8%",
+    //     height:54,
+    //     alignSelf: 'center'
+    // },
     containerGridLeft: {
         justifyContent: "space-around",
         alignItems: "center",

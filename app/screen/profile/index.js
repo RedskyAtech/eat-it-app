@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { View, Text, Image, TouchableOpacity, Animated, TextInput } from 'react-native';
 import styles from './style';
-import Footer from '../../components/footer';
+// import Footer from '../../components/footer';
 import LinearGradient from 'react-native-linear-gradient';
 import * as colors from '../../constants/colors';
 import { Menu, Provider } from 'react-native-paper';
@@ -151,7 +151,7 @@ export default class profile extends Component {
 
 
                         {/* edit profile card */}
-                        <Animated.View style={{ top: this.state.top, position: 'absolute' }} >
+                        <Animated.View style={{ top: this.state.top, position: 'absolute',elevation:10 }} >
                             <LinearGradient
                                 start={{ x: 0, y: 0 }}
                                 end={{ x: 1, y: 0 }}
@@ -186,9 +186,6 @@ export default class profile extends Component {
 
                     </View>
 
-                    <View style={footer_container}>
-                        <Footer navigation={this.props.navigation}></Footer>
-                    </View>
                 </View>
             </Provider>
         )

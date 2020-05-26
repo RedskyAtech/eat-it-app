@@ -25,7 +25,10 @@ const styles = {
     },
     top_container: {
         width: wp(96),
-        marginBottom: hp(3)
+        marginBottom:hp(1.6)
+    },
+    inner_container:{
+        width: wp(96) 
     },
     search_container: {
         width: wp(83.2),
@@ -35,7 +38,16 @@ const styles = {
         borderRadius: 25,
         backgroundColor: "#ECECEC"
     },
-
+    right_icon: {
+        fontSize: 28,
+        color: colors.greyText,
+        marginRight: wp(0.8)
+    },
+    down_icon: {
+        fontSize: 26,
+        color: colors.primaryColor,
+        marginRight: wp(0.8)
+    },
     search_icon: {
         width: wp(6),
         height: hp(6)
@@ -58,17 +70,27 @@ const styles = {
         fontWeight: fonts.FONT_BOLD,
         color: colors.greyText
     },
+    colored_list_title: {
+        fontSize: fonts.FONT_TEXT,
+        fontWeight: fonts.FONT_BOLD,
+        color: colors.primaryColor
+    },
+    inner_text: {
+        fontSize: fonts.FONT_TEXT,
+        fontWeight: fonts.FONT_BOLD,
+    },
+    horizontal_line: {
+        borderBottomWidth: 1,
+        borderColor: "#B5B5B5",
+        width: "100%",
+    },
     list_spacing: {
-        marginBottom: hp(2.6)
+        marginTop: hp(0.8),
+        marginBottom: hp(0.8)
     },
-    footer_container: {
-        zIndex: 10,
-        marginBottom: hp(2.2),
-        marginTop: hp(0.4),
-        width: wp(94),
-        height: 54,
-        alignSelf: 'center'
-    },
+    inner_list_spacing:{
+        marginVertical: hp(0.8),
+    }
 
 }
 export default styles

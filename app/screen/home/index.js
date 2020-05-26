@@ -1,7 +1,6 @@
 import React, { Component } from "react";
-import { View, Text, Image, TextInput, TouchableOpacity, Dimensions,BackHandler } from "react-native";
+import { View, Text, Image, TextInput, TouchableOpacity, Dimensions, BackHandler } from "react-native";
 import styles from "./style";
-import Footer from '../../components/footer';
 import { RecyclerListView, DataProvider, LayoutProvider } from "recyclerlistview";
 import { Badge } from 'react-native-elements';
 import HandleBack from "../../components/HandleBack";
@@ -189,6 +188,7 @@ export default class home extends Component {
             dataProvider: dataProvider.cloneWithRows(this._generateArray(this.products)),
         };
     }
+    
     _generateArray(array) {
         let n = array.length
         let arr = new Array(n);
@@ -269,9 +269,9 @@ export default class home extends Component {
                         <RecyclerListView layoutProvider={this._layoutProvider} dataProvider={this.state.dataProvider} rowRenderer={this._rowRenderer} />
                     </View>
 
-                    <View style={footer_container}>
+                    {/* <View style={footer_container}>
                         <Footer navigation={this.props.navigation}></Footer>
-                    </View>
+                    </View> */}
 
                 </View>
             </HandleBack>

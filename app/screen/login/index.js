@@ -29,7 +29,8 @@ export default class login extends Component {
         this.props.navigation.navigate('ForgotPassword');
     }
     onLoginSubmit = async () => {
-        this.props.navigation.navigate('Home');
+        this.props.navigation.navigate('tab1');
+        // this.props.navigation.navigate('Home');
     }
     onBack = () => {
         BackHandler.exitApp()

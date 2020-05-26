@@ -27,8 +27,9 @@ const styles = {
         width: wp(90),
         height: hp(12),
         borderRadius: 12,
-        marginVertical: hp(2),
-        padding: 6
+        marginVertical: hp(1.4),
+        padding: 6,
+        elevation:6
     },
     settings: {
         height: hp(4.6),
@@ -50,7 +51,9 @@ const styles = {
         borderRadius: 94 / 2,
         alignSelf: 'center',
         borderColor: 'white',
-        borderWidth: 2
+        borderWidth: 2,
+        marginTop:hp(0.6),
+        // elevation:4
     },
     user_details: {
         marginTop: hp(6.4),
@@ -72,7 +75,6 @@ const styles = {
         borderBottomWidth: 1,
         borderColor: "#B5B5B5",
         width: wp(100),
-
     },
     field_icons: {
         height: hp(2.2),
@@ -117,9 +119,10 @@ const styles = {
     },
     slider_container: {
         width: wp(100),
-        height: hp(50),
+        height: hp(48),
         borderBottomLeftRadius: 30,
         borderBottomRightRadius: 30,
+        elevation:6
     },
     slider_inner_box: {
         width: wp(86),
@@ -156,17 +159,11 @@ const styles = {
     close_style: {
         alignSelf:'center',
         textDecorationLine: 'underline',
-        marginVertical:hp(2)  
+        marginTop:hp(2),
+        // marginBottom:hp(1)  
+
     },
-    footer_container: {
-        zIndex: 10,
-        marginBottom:hp(2.2),
-        marginTop:hp(0.4),
-        width: wp(94),
-        // height: "6.8%",
-        height:54,
-        alignSelf: 'center'
-    },
+    
 
 }
 export default styles

@@ -1,31 +1,56 @@
 import React, { Component } from "react";
-import { View, Text, Image, TextInput } from 'react-native';
+import { View, Text, Image, TextInput, TouchableOpacity } from 'react-native';
 import styles from './style';
-import Footer from '../../components/footer';
+import { Accordion } from "native-base";
+import Icon from "react-native-vector-icons/Feather";
+import { TouchableHighlight } from "react-native-gesture-handler";
 
 
 export default class search extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            searchList: [{
-                name: 'Langar'
-            },
-            {
-                name: 'Snakes'
-            },
-            {
-                name: 'Breakfast'
-            }, {
-                name: 'Lunch'
-            }, {
-                name: 'Dinner'
-            }, {
-                name: 'Deserts'
-            }]
+            dataArray: [
+                { title: "Langar", content: [{ item: 'Roti' }, { item: 'Daal', }] },
+                { title: "Snakes", content: [{ item: 'Tandoori' }, { item: 'Fry', }, { item: 'Others', }] },
+                { title: "Breakfast", content: [{ item: 'Roti' }, { item: 'Daal', }] },
+                { title: "Lunch", content: [{ item: 'Tandoori' }, { item: 'Fry', }, { item: 'Other', }] },
+                { title: "Dinner", content: [{ item: 'Roti' }, { item: 'Daal', }] },
+                { title: "Langar", content: [{ item: 'Roti' }, { item: 'Daal', }] },
+                { title: "Snakes", content: [{ item: 'Tandoori' }, { item: 'Fry', }, { item: 'Other', }] }
+            ]
         }
     }
-
+    _renderHeader(item, expanded) {
+        return (
+            <View style={[styles.row, styles.between_spacing, styles.inner_container, styles.list_spacing]}>
+                <Text style={expanded ? styles.colored_list_title : styles.list_title}>
+                    {" "}{item.title}
+                </Text>
+                {expanded
+                    ? <Icon style={styles.down_icon} name="chevron-down" />
+                    : <Icon style={styles.right_icon} name="chevron-right" />}
+            </View>
+        );
+    }
+    _renderContent(item) {
+        return (
+            <>
+                <View style={styles.horizontal_line}></View>
+                {item.content.map((value) => {
+                    return (
+                        <View style={[styles.row, styles.inner_container, styles.inner_list_spacing]}>
+                            <Text style={styles.inner_text}>{" "}{value.item}</Text>
+                        </View>
+                    )
+                })}
+                <View style={styles.horizontal_line}></View>
+            </>
+        );
+    }
+    onFilter = async () => {
+        this.props.navigation.navigate('Filter');
+    }
     render() {
         const { container, column, search_container, list_title, list_spacing, top_container, list_icons, row, between_spacing, around_spacing, search_input, icons, footer_container, search_icon } = styles
         return (
@@ -37,35 +62,17 @@ export default class search extends Component {
                             <Image resizeMode='contain' source={require('../../assets/search.png')} style={search_icon} ></Image>
                             <TextInput placeholder="Search" style={search_input} />
                         </View>
-                        <Image resizeMode='contain' source={require('../../assets/filter_yellow.png')} style={icons}></Image>
+                        <TouchableOpacity onPress={this.onFilter}><Image resizeMode='contain' source={require('../../assets/filter_yellow.png')} style={icons}></Image></TouchableOpacity>
                     </View>
-
-                    {/* <View style={[row, between_spacing, top_container, list_spacing]}>
-                        <Text style={list_title}>Langar</Text>
-                        <Image resizeMode='contain' source={require('../../assets/next_arrow_grey.png')} style={list_icons}></Image>
-                    </View>
-                    <View style={[row, between_spacing, top_container, list_spacing]}>
-                        <Text style={list_title}>Langar</Text>
-                        <Image resizeMode='contain' source={require('../../assets/next_arrow_grey.png')} style={list_icons}></Image>
-                    </View>
-                    <View style={[row, between_spacing, top_container, list_spacing]}>
-                        <Text style={list_title}>Langar</Text>
-                        <Image resizeMode='contain' source={require('../../assets/next_arrow_grey.png')} style={list_icons}></Image>
-                    </View> */}
-                    {this.state.searchList.map((item) => {
-                        return (
-                            <View style={[row, between_spacing, top_container, list_spacing]}>
-                                <Text style={list_title}>{item.name}</Text>
-                                <Image resizeMode='contain' source={require('../../assets/next_arrow_grey.png')} style={list_icons}></Image>
-                            </View>
-                        )
-                    })}
-
+                    <Accordion style={{ border: 'none' }}
+                        dataArray={this.state.dataArray}
+                        animation={true}
+                        expanded={true}
+                        renderHeader={this._renderHeader}
+                        renderContent={this._renderContent}
+                    />
                 </View>
 
-                <View style={footer_container}>
-                    <Footer navigation={this.props.navigation}></Footer>
-                </View>
             </View>
         )
     }
