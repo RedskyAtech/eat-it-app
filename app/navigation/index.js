@@ -5,6 +5,7 @@ import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator, BottomTabBar } from 'react-navigation-tabs';
 import { ImageBackground, Image, View } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from '../utility/index';
+import {Dialog} from 'react-native-paper';
 import * as colors from '../constants/colors';
 
 import Splash from '../screen/splash';
@@ -14,6 +15,8 @@ import Home from '../screen/home';
 import Profile from '../screen/profile';
 import Search from '../screen/search';
 import Filter from '../screen/filter';
+import AddPhotos from '../screen/addPhotos';
+import FoodDetails from '../screen/foodDetails';
 import Header from '../components/header';
 import LinearGradient from 'react-native-linear-gradient';
 
@@ -61,7 +64,7 @@ const TabNavigator = createBottomTabNavigator({
     })
   },
   tab3: {
-    screen: Login,
+    screen: AddPhotos,
     navigationOptions: {
       tabBarVisible: false,
       tabBarLabel: "",
@@ -120,26 +123,29 @@ const TabNavigator = createBottomTabNavigator({
 }, {
   initialRouteName: "tab1",
   tabBarPosition: 'bottom',
-  swipeEnabled: true,
+  swipeEnabled: false,
+  animationEnabled: false,
   tabBarComponent: (props) => {
     return (
       <LinearGradient start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
-        colors={[colors.gradientFirstColor, colors.gradientSecondColor]} style={{
+        colors={[colors.gradientFirstColor, colors.gradientSecondColor]}
+        style={{
           height: 50,
           borderTopColor: 'transparent',
           borderRadius: 40,
-          
           width: wp(94),
           alignSelf: 'center',
           marginVertical: hp(1),
           elevation: 4,
-          borderColor:'red',
-        }}>
-        <BottomTabBar {...props} style={{ backgroundColor: 'transparent',borderTopColor: 'transparent'}} />
+          borderColor: 'red',
+        }}
+      >
+        <BottomTabBar {...props} style={{ backgroundColor: 'transparent', borderTopColor: 'transparent' ,}} />
       </LinearGradient>);
   },
   tabBarOptions: {
+    keyboardHidesTabBar: true,
     activeTintColor: '#FFB534',
     activeBackgroundColor: 'FFF',
     inactiveTintColor: '#FFB534',
@@ -190,6 +196,18 @@ const AppStack = createStackNavigator(
     },
     Filter: {
       screen: Filter,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
+    AddPhotos: {
+      screen: AddPhotos,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
+    FoodDetails: {
+      screen: FoodDetails,
       navigationOptions: {
         headerShown: false,
       },

@@ -4,6 +4,8 @@ import styles from "./style";
 import { RecyclerListView, DataProvider, LayoutProvider } from "recyclerlistview";
 import { Badge } from 'react-native-elements';
 import HandleBack from "../../components/HandleBack";
+// import { heightPercentageToDP } from "react-native-responsive-screen";
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from '../../utility/index';
 
 const ViewTypes = {
     HALF_LEFT: 1,
@@ -15,14 +17,21 @@ class CellContainer extends React.Component {
     constructor(args) {
         super(args);
         this.state = {}
+        console.log('jhfgjf:', this.props)
+    }
+    showDetail = async () => {
+        this.props.navigation.navigate('FoodDetails');
     }
     render() {
-        const { heading_text, row, heading_container, column, between_spacing, colored_text, grey_text, image } = styles
+        const { heading_text, row, heading_container,containerGridLeft, column, between_spacing, colored_text, grey_text, image } = styles
         return (
             <>
-                <View {...this.props}>
-                    <Image resizeMode='stretch' source={this.props.data.image} style={image} ></Image>
+                <View {...this.props} >
+                    <TouchableOpacity onPress={this.showDetail}>
+                        <Image resizeMode='stretch' source={this.props.data.image} style={image} ></Image>
+                    </TouchableOpacity>
                 </View>
+    
                 <View style={[heading_container, column]}>
                     <Text style={heading_text} numberOfLines={1}>{this.props.data.name}</Text>
                     <View style={[row, between_spacing]}>
@@ -188,7 +197,7 @@ export default class home extends Component {
             dataProvider: dataProvider.cloneWithRows(this._generateArray(this.products)),
         };
     }
-    
+
     _generateArray(array) {
         let n = array.length
         let arr = new Array(n);
@@ -202,17 +211,17 @@ export default class home extends Component {
         switch (type) {
             case ViewTypes.HALF_LEFT:
                 return (
-                    <CellContainer style={styles.containerGridLeft} data={data}>
+                    <CellContainer style={styles.containerGridLeft} data={data} navigation={this.props.navigation}>
                     </CellContainer>
                 );
             case ViewTypes.HALF_BETWEEN:
                 return (
-                    <CellContainer style={styles.containerGridLeft} data={data}>
+                    <CellContainer style={styles.containerGridLeft} data={data} navigation={this.props.navigation}>
                     </CellContainer>
                 );
             case ViewTypes.HALF_RIGHT:
                 return (
-                    <CellContainer style={styles.containerGridLeft} data={data}>
+                    <CellContainer style={styles.containerGridLeft} data={data} navigation={this.props.navigation}>
                     </CellContainer>
                 );
 
@@ -268,10 +277,6 @@ export default class home extends Component {
                     <View style={list_container}>
                         <RecyclerListView layoutProvider={this._layoutProvider} dataProvider={this.state.dataProvider} rowRenderer={this._rowRenderer} />
                     </View>
-
-                    {/* <View style={footer_container}>
-                        <Footer navigation={this.props.navigation}></Footer>
-                    </View> */}
 
                 </View>
             </HandleBack>

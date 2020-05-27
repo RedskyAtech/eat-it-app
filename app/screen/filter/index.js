@@ -1,8 +1,7 @@
 import React, { Component } from "react";
-import { View, Image, Text, TouchableOpacity } from 'react-native';
+import { View, Image, Text, TouchableOpacity, TextInput } from 'react-native';
 import styles from './style';
-import { ProgressBar, Colors } from 'react-native-paper';
-
+import { Slider } from 'react-native-elements';
 
 
 export default class filter extends Component {
@@ -14,7 +13,8 @@ export default class filter extends Component {
             veg: true,
             nonVeg: false,
             homeMade: false,
-            restaurant: false
+            restaurant: false,
+            value: 10
         }
     }
     onFree = async () => {
@@ -59,11 +59,11 @@ export default class filter extends Component {
         this.props.navigation.navigate('tab2');
     }
     render() {
-        const { container, inner_container, bottom_container, forward_container, km_text, price_container, price_text, percentage, inner_heading, progress_bar, filter_box, row, filter_text, arrow, filter_container, filters, column, selected_color, unselected_color, heading_text, between_spacing } = styles
+        const { container, inner_container, thumb_style,spacing, bottom_container, input_box, forward_container, km_text, price_container, price_text, percentage, inner_heading, progress_bar, filter_box, row, filter_text, arrow, filter_container, filters, column, selected_color, unselected_color, heading_text, between_spacing } = styles
         return (
             <View style={[container, column, between_spacing]}>
                 <View>
-                    <View style={[inner_container, row, between_spacing]}>
+                    <View style={[inner_container, row, between_spacing,spacing]}>
                         <TouchableOpacity onPress={this.onBack}><Image resizeMode='contain' source={require('../../assets/back_arrow.png')} style={arrow}></Image></TouchableOpacity>
                         <Text style={heading_text}>Filters</Text>
                         <View><Text>     </Text></View>
@@ -89,10 +89,20 @@ export default class filter extends Component {
 
                     <View style={[column, filter_box]}>
                         <Text style={inner_heading}>Distance</Text>
-                        <ProgressBar progress={0.4} color={'#FFBA09'} style={progress_bar} />
+                        <Slider
+                            value={this.state.value}
+                            thumbTintColor={'#FFBA09'}
+                            maximumTrackTintColor={'grey'}
+                            minimumTrackTintColor={'#FFBA09'}
+                            minimumValue={0}
+                            maximumValue={50}
+                            trackStyle={progress_bar}
+                            thumbStyle={thumb_style}
+                            onValueChange={value => this.setState({value: value})}
+                        />
                         <View style={[row, between_spacing,]}>
                             <Text style={km_text}>0 km</Text>
-                            <Text style={[km_text, percentage]}>10 km</Text>
+                            <Text style={[km_text, percentage]}>{this.state.value.toFixed(0)} km</Text>
                             <Text style={km_text}>50 km</Text>
                         </View>
                     </View>
@@ -102,10 +112,10 @@ export default class filter extends Component {
                             <Text style={inner_heading}>Cost</Text>
                             <View style={[row, filter_container]}>
                                 <View style={price_container}>
-                                    <Text style={price_text}>Min. cost</Text>
+                                    <TextInput keyboardType="numeric" placeholder="Min. cost" placeholderTextColor={'#6A6A6A'} style={input_box} />
                                 </View>
                                 <View style={price_container}>
-                                    <Text style={price_text}>Max. cost</Text>
+                                    <TextInput keyboardType="numeric" placeholder="Max. cost" placeholderTextColor={'#6A6A6A'} style={input_box} />
                                 </View>
                             </View>
                         </View>

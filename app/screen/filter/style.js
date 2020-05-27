@@ -19,6 +19,8 @@ const styles = {
     heading_text: {
         fontSize: fonts.FONT_HEADING,
         fontWeight: fonts.FONT_BOLD,
+    },
+    spacing:{
         marginTop: hp(2.4),
         marginBottom: hp(3.8)
     },
@@ -69,9 +71,15 @@ const styles = {
         backgroundColor: colors.unselectedFilter
     },
     progress_bar: {
-        height: 2.6,
+        height: 2.5,
         marginVertical: hp(2.2),
-        backgroundColor: colors.greyText
+        backgroundColor: '#FFBA09',
+        color: '#FFBA09'
+    },
+    thumb_style: {
+        width: 24,
+        height: 24,
+        borderRadius: 24 / 2
     },
     km_text: {
         fontSize: fonts.FONT_NORMAL
@@ -80,19 +88,26 @@ const styles = {
         color: colors.primaryColor
     },
     price_container: {
-      borderWidth:1,
-      borderColor:colors.greyText,
-      backgroundColor:"#ECECEC",
-      paddingVertical:hp(1),
-      paddingHorizontal:wp(2),
-      width:wp(26),
-      marginRight:wp(6),
-      borderRadius:3
+        borderWidth: 1,
+        borderColor: colors.greyText,
+        backgroundColor: "#ECECEC",
+        paddingVertical: hp(1),
+        paddingHorizontal: wp(2),
+        width: wp(26),
+        marginRight: wp(6),
+        borderRadius: 3
     },
-    price_text:{
-        color:colors.greyText,
-        fontSize:12,
-        fontWeight:fonts.FONT_BOLD
+    price_text: {
+        color: colors.greyText,
+        fontSize: 12,
+        fontWeight: fonts.FONT_BOLD
+    },
+    input_box: {
+        padding: 0,
+        height: hp(2.4),
+        color: colors.greyText,
+        fontSize: 12,
+        fontWeight: fonts.FONT_BOLD
     },
     bottom_container: {
         flexDirection: 'row',
@@ -110,7 +125,7 @@ const styles = {
         alignItems: 'center',
         alignSelf: 'flex-end',
         marginTop: hp(6),
-        elevation:4
+        elevation: 4
     },
 }
 export default styles

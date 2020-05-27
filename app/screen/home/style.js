@@ -105,7 +105,7 @@ const styles = {
     // },
     containerGridLeft: {
         justifyContent: "space-around",
-        alignItems: "center",
+        // alignItems: "center",
         flex: 1,
         borderWidth: 1.5,
         borderColor: colors.primaryColor,
