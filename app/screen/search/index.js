@@ -3,7 +3,6 @@ import { View, Text, Image, TextInput, TouchableOpacity } from 'react-native';
 import styles from './style';
 import { Accordion } from "native-base";
 import Icon from "react-native-vector-icons/Feather";
-import { TouchableHighlight } from "react-native-gesture-handler";
 
 
 export default class search extends Component {

@@ -47,7 +47,7 @@ export default class login extends Component {
                         <Image resizeMode='contain' source={require('../../assets/back_arrow.png')} style={[back_container, arrow]}></Image>
 
                         <View style={logo_container}>
-                            <Image resizeMode='stretch' source={require('../../assets/logo.png')} style={logo}></Image>
+                            <Image resizeMode='stretch' source={require('../../assets/eatit_logo.png')} style={logo}></Image>
                         </View>
 
                         <View style={[headings, row]}>

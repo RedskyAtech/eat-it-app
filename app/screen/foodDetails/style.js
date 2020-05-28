@@ -45,7 +45,7 @@ const styles = {
         alignItems: 'center',
     },
     detail_container: {
-        width: wp(84),
+        width: wp(85),
         alignSelf: 'center'
     },
     scroll_container: {

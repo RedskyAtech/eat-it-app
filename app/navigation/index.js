@@ -3,9 +3,8 @@ import React from 'react';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator, BottomTabBar } from 'react-navigation-tabs';
-import { ImageBackground, Image, View } from 'react-native';
+import { ImageBackground, Image, View, TouchableOpacity } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from '../utility/index';
-import {Dialog} from 'react-native-paper';
 import * as colors from '../constants/colors';
 
 import Splash from '../screen/splash';
@@ -17,11 +16,34 @@ import Search from '../screen/search';
 import Filter from '../screen/filter';
 import AddPhotos from '../screen/addPhotos';
 import FoodDetails from '../screen/foodDetails';
+import MyFood from '../screen/myFood';
+import SearchName from '../screen/searchName';
+import Dialog from '../screen/dialog';
+import ShareFoodDialog from "../screen/shareFoodDialog";
 import Header from '../components/header';
 import LinearGradient from 'react-native-linear-gradient';
 
+const ShareStack = createStackNavigator(
+  {
+    ShareFoodDialog: {
+      screen: ShareFoodDialog,
+      navigationOptions: {
+        headerShown: false,
+      },
+    }
+  }, {
+  initialRouteName: 'ShareFoodDialog',
+  headerMode: 'none',
+  mode: 'modal'
+})
+
+const showDialog = () => {
+  console.log('bvdvnvnxvfhxd');
+  <ShareFoodDialog/>
+}
 
 const TabNavigator = createBottomTabNavigator({
+
   tab1: {
     screen: Home,
     navigationOptions: ({ navigation }) => ({
@@ -51,7 +73,6 @@ const TabNavigator = createBottomTabNavigator({
         let icon
         if (navigation.state.routeName === "tab2") {
           icon = focused ? require('../assets/search_selected.png') : require('../assets/search.png')
-
         }
         return <Image
           source={icon}
@@ -64,22 +85,32 @@ const TabNavigator = createBottomTabNavigator({
     })
   },
   tab3: {
-    screen: AddPhotos,
-    navigationOptions: {
-      tabBarVisible: false,
+    screen: Home,
+    navigationOptions: ({ navigation }) => ({
+      tabBarVisible: true,
       tabBarLabel: "",
-      tabBarIcon:
-        <ImageBackground
-          source={require('../assets/share_icon.png')}
-          style={{
-            height: hp(8),
-            width: hp(8),
-            marginTop: hp(-4.8),
-          }}></ImageBackground>
-    }
+      tabBarOnPress: (props) => { showDialog() },
+
+      tabBarIcon: ({ focused, tintColor }) => {
+        let icon
+        if (navigation.state.routeName === "tab3") {
+          navigation.state.from = "tab3"
+          icon = require('../assets/share_icon.png')
+        }
+        return (
+          <>
+            <TouchableOpacity>
+              <Image source={icon}
+                style={{ height: hp(8), width: hp(8), marginTop: hp(-4.8) }}>
+              </Image>
+            </TouchableOpacity>
+          </>
+        )
+      }
+    })
   },
   tab4: {
-    screen: Profile,
+    screen: MyFood,
     navigationOptions: ({ navigation }) => ({
       tabBarVisible: true,
       tabBarLabel: "",
@@ -87,7 +118,6 @@ const TabNavigator = createBottomTabNavigator({
         let icon
         if (navigation.state.routeName === "tab4") {
           icon = focused ? require('../assets/my_food_selected.png') : require('../assets/my_food.png')
-
         }
         return <Image
           source={icon}
@@ -108,7 +138,6 @@ const TabNavigator = createBottomTabNavigator({
         let icon
         if (navigation.state.routeName === "tab5") {
           icon = focused ? require('../assets/profile_selected.png') : require('../assets/profile.png')
-
         }
         return <Image
           source={icon}
@@ -141,9 +170,10 @@ const TabNavigator = createBottomTabNavigator({
           borderColor: 'red',
         }}
       >
-        <BottomTabBar {...props} style={{ backgroundColor: 'transparent', borderTopColor: 'transparent' ,}} />
+        <BottomTabBar {...props} style={{ backgroundColor: 'transparent', borderTopColor: 'transparent', }} />
       </LinearGradient>);
   },
+
   tabBarOptions: {
     keyboardHidesTabBar: true,
     activeTintColor: '#FFB534',
@@ -212,6 +242,30 @@ const AppStack = createStackNavigator(
         headerShown: false,
       },
     },
+    MyFood: {
+      screen: MyFood,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
+    SearchName: {
+      screen: SearchName,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
+    Dialog: {
+      screen: Dialog,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
+    ShareFoodDialog: {
+      screen: ShareFoodDialog,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
     Header: {
       screen: Header,
       navigationOptions: {
@@ -226,10 +280,11 @@ const AppStack = createStackNavigator(
     }
   },
   {
-    initialRouteName: 'Splash',
+    initialRouteName: 'BottomTab',
+    headerMode: 'none',
+    mode: 'modal'
   },
 );
-
 
 
 const Routes = createAppContainer(

@@ -4,9 +4,7 @@ import styles from "./style";
 import { RecyclerListView, DataProvider, LayoutProvider } from "recyclerlistview";
 import { Badge } from 'react-native-elements';
 import HandleBack from "../../components/HandleBack";
-// import { heightPercentageToDP } from "react-native-responsive-screen";
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from '../../utility/index';
-
+import ShareFoodDialog from "../../screen/shareFoodDialog";
 const ViewTypes = {
     HALF_LEFT: 1,
     HALF_BETWEEN: 2,
@@ -17,13 +15,12 @@ class CellContainer extends React.Component {
     constructor(args) {
         super(args);
         this.state = {}
-        console.log('jhfgjf:', this.props)
     }
     showDetail = async () => {
         this.props.navigation.navigate('FoodDetails');
     }
     render() {
-        const { heading_text, row, heading_container,containerGridLeft, column, between_spacing, colored_text, grey_text, image } = styles
+        const { heading_text, row, heading_container, containerGridLeft, column, between_spacing, colored_text, grey_text, image } = styles
         return (
             <>
                 <View {...this.props} >
@@ -31,7 +28,7 @@ class CellContainer extends React.Component {
                         <Image resizeMode='stretch' source={this.props.data.image} style={image} ></Image>
                     </TouchableOpacity>
                 </View>
-    
+
                 <View style={[heading_container, column]}>
                     <Text style={heading_text} numberOfLines={1}>{this.props.data.name}</Text>
                     <View style={[row, between_spacing]}>
@@ -195,9 +192,18 @@ export default class home extends Component {
             nearYou: false,
             follow: false,
             dataProvider: dataProvider.cloneWithRows(this._generateArray(this.products)),
+            // isVisible: false
         };
     }
-
+    // componentDidMount = async () => {
+    //     console.log("naviiiiii:",this.props.navigation.state.from)
+    //     if (this.props.navigation.state.from === "tab3") {
+    //         await this.setState({ isVisible: true })
+    //     }else{
+    //         await this.setState({ isVisible: false })
+            
+    //     }
+    // }
     _generateArray(array) {
         let n = array.length
         let arr = new Array(n);
@@ -245,6 +251,12 @@ export default class home extends Component {
         BackHandler.exitApp()
         return true;
     }
+    onSearch = async () => {
+        this.props.navigation.navigate('SearchName')
+    }
+    closeDialog = async () => {
+        this.setState({ isVisible: false })
+    }
     render() {
         const { container, container_width, top_container, row, list_container, icons, center_align, badge_style, selected_color, badge_text_style, filter_text, filter_container, unselected_color, filters, column, between_spacing, around_spacing, search_icon, search_input, search_container, footer_container } = styles
         return (
@@ -255,10 +267,13 @@ export default class home extends Component {
                         <View >
                             <View style={[row, between_spacing, container_width]}>
                                 <Image resizeMode='contain' source={require('../../assets/location.png')} style={icons}></Image>
-                                <View style={[search_container, row, around_spacing]}>
-                                    <Image resizeMode='contain' source={require('../../assets/search.png')} style={search_icon} ></Image>
-                                    <TextInput placeholder="Search" style={search_input} />
-                                </View>
+                                <TouchableOpacity onPress={this.onSearch}>
+                                    <View style={[search_container, row, around_spacing]}>
+                                        <Image resizeMode='contain' source={require('../../assets/search.png')} style={search_icon} ></Image>
+                                        <TextInput placeholder="Search" style={search_input} />
+                                    </View>
+                                </TouchableOpacity>
+
                                 <View style={[row, center_align]}>
                                     <Image resizeMode='contain' source={require('../../assets/notification_solid_yellow.png')} style={icons} ></Image>
                                     <Badge value="1" status="success" badgeStyle={badge_style} textStyle={badge_text_style} />
@@ -273,7 +288,11 @@ export default class home extends Component {
                             </View>
                         </View>
                     </View>
-
+                    {/* {this.state.isVisible ?
+                        <ShareFoodDialog visible={this.state.isDialogVisible} closeDialog={this.closeDialog} />
+                        :
+                        <View></View>
+                    } */}
                     <View style={list_container}>
                         <RecyclerListView layoutProvider={this._layoutProvider} dataProvider={this.state.dataProvider} rowRenderer={this._rowRenderer} />
                     </View>
