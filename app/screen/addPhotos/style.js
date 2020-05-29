@@ -1,4 +1,3 @@
-import * as utlitiy from '../../utility/index';
 import * as fonts from '../../constants/fonts';
 import * as colors from '../../constants/colors';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from '../../utility/index';
@@ -46,7 +45,9 @@ const styles = {
     },
     row_list: {
         flexWrap: 'wrap',
-        // height:hp(20)
+    },
+    list_height: {
+        height: hp(70)
     },
     photo_continer: {
         height: hp(14.6),
@@ -74,7 +75,7 @@ const styles = {
         backgroundColor: colors.primaryColor,
         marginLeft: wp(-6.4),
         marginTop: hp(-1.2),
-        elevation:6
+        elevation: 6
     },
     cross_icon: {
         height: hp(2.2),

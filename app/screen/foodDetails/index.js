@@ -1,9 +1,10 @@
 import React, { Component } from "react";
-import { View, ScrollView, Image, Text, TouchableOpacity, TextInput } from 'react-native';
+import { View, Image, Text, TouchableOpacity } from 'react-native';
 import styles from './style';
 import LinearGradient from 'react-native-linear-gradient';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from '../../utility/index';
+import { widthPercentageToDP as wp } from '../../utility/index';
+import * as colors from '../../constants/colors';
 
 export default class addPhotos extends Component {
 
@@ -39,10 +40,14 @@ export default class addPhotos extends Component {
             <Image style={styles.images} source={item.source} />
         );
     }
+   
     render() {
-        const { container, inner_container, button_container, button_text, centered_text, scroll_container, colored_text, timing_heading_style, timing_value_style, non_veg_icon, type_text, price, address_style, bottom_spacing, like_icon, product_name, vertical_spacing, detail_container, images, bottom_container, spacing, by_container, row, arrow, column, heading_text, between_spacing, } = styles
+        const { inner_container, button_container, content_container_style,
+            button_text, centered_text, scroll_container, colored_text, timing_heading_style,
+            non_veg_icon, type_text, price, address_style, bottom_spacing,
+            like_icon, product_name, detail_container, bottom_container,
+            spacing, row, arrow, heading_text, between_spacing, } = styles
         return (
-            // <View style={[container, column, between_spacing]}>
             <View>
                 <View style={[inner_container, row, between_spacing, spacing]}>
                     <TouchableOpacity onPress={this.onBack}><Image resizeMode='contain' source={require('../../assets/back_arrow.png')} style={arrow}></Image></TouchableOpacity>
@@ -60,7 +65,7 @@ export default class addPhotos extends Component {
                     autoplay={true}
                     onSnapToItem={(index) => this.setState({ activeSlide: index })}
                     containerCustomStyle={scroll_container}
-                    contentContainerStyle={{ justifyContent: 'space-around', alignItems: 'center' }}
+                    contentContainerStyle={content_container_style}
                 />
                 {this.pagination}
 
@@ -100,19 +105,17 @@ export default class addPhotos extends Component {
 
                     <View style={[bottom_container, bottom_spacing]}>
                         <Text></Text>
-                        <LinearGradient
-                            start={{ x: 0, y: 0 }}
-                            end={{ x: 1, y: 0 }}
-                            colors={['#F8B614', '#B49579']}
-                            style={[button_container, centered_text]} >
-                            <Text style={button_text}>Buy food</Text>
-                        </LinearGradient>
+                            <LinearGradient
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 0 }}
+                                colors={[colors.gradientFirstColor, colors.gradientSecondColor]}
+                                style={[button_container, centered_text]} >
+                                <Text style={button_text}>Buy food</Text>
+                            </LinearGradient>
                     </View>
 
                 </View>
-
             </View>
-            // </View>
         )
     }
 }

@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import { View, Image, ImageBackground } from 'react-native';
 import styles from './style';
-import { NavigationActions, StackActions } from 'react-navigation';
-
 
 export default class splash extends Component {
     constructor(props) {
@@ -27,7 +25,8 @@ export default class splash extends Component {
             <View>
                 <ImageBackground source={require('../../assets/background.png')}
                     style={container} resizeMode="cover" >
-                    <Image resizeMode='contain' source={require('../../assets/eatit_logo.png')} style={logo} ></Image>
+                    <Image resizeMode='contain'
+                        source={require('../../assets/eatit_logo.png')} style={logo} ></Image>
                 </ImageBackground>
             </View>
         )

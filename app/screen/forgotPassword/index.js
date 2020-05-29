@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { View, Text, Image, ImageBackground, TextInput, TouchableOpacity } from 'react-native';
 import styles from './style';
 import LinearGradient from 'react-native-linear-gradient';
+import * as colors from '../../constants/colors';
 
 
 export default class ForgotPassword extends Component {
@@ -48,14 +49,25 @@ export default class ForgotPassword extends Component {
     onSubmit = async () => {
         this.props.navigation.navigate('Login');
     }
+    onTopBackButton = async () => {
+        if (!this.state.sendOtp) {
+            this.props.navigation.navigate('Login')
+        } else {
+            await this.setState({ sendOtp: false })
+        }
+    }
     render() {
-        const { back_container, logo_container, colored_text, otp_fields, primary_color, otp_input_box, background_theme_color, button_container, button_text, centered_text, fields, row, field_icons, column, container, arrow, logo, headings, text, fields_container, input_box } = styles
+        const { back_container, logo_container, colored_text, otp_fields, primary_color, otp_input_box,
+            background_theme_color, button_container, button_text, centered_text, fields, row, field_icons,
+            column, container, arrow, logo, headings, text, fields_container, input_box } = styles
         return (
             <View style={{ flex: 1, backgroundColor: 'white' }}>
                 <ImageBackground source={require('../../assets/login_background.png')}
                     style={container} resizeMode="cover">
-                    <Image resizeMode='contain' source={require('../../assets/back_arrow.png')} style={[back_container, arrow]}></Image>
 
+                    <TouchableOpacity onPress={this.onTopBackButton}>
+                        <Image resizeMode='contain' source={require('../../assets/back_arrow.png')} style={[back_container, arrow]}></Image>
+                    </TouchableOpacity>
                     <View style={logo_container}>
                         <Image resizeMode='stretch' source={require('../../assets/eatit_logo.png')} style={logo}></Image>
                     </View>
@@ -67,7 +79,9 @@ export default class ForgotPassword extends Component {
                     <View style={[column, fields_container]}>
 
                         <View style={[row, centered_text]}>
-                            <Text style={[colored_text, primary_color]}> {this.state.sendOtp ? 'Enter four digit OTP that has been sent to your email/phone' : 'Please enter your email or phone and we will send an OTP'}</Text>
+                            <Text style={[colored_text, primary_color]}>
+                                {this.state.sendOtp ? 'Enter four digit OTP that has been sent to your email/phone' : 'Please enter your email or phone and we will send an OTP'}
+                            </Text>
                         </View>
 
                         {!this.state.sendOtp ?
@@ -113,7 +127,7 @@ export default class ForgotPassword extends Component {
                                             <LinearGradient
                                                 start={{ x: 0, y: 0 }}
                                                 end={{ x: 1, y: 0 }}
-                                                colors={['#F8B614', '#B49579']}
+                                                colors={[colors.gradientFirstColor, colors.gradientSecondColor]}
                                                 style={[button_container, centered_text]} >
                                                 <Text style={button_text}>Submit</Text>
                                             </LinearGradient>

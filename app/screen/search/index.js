@@ -51,19 +51,20 @@ export default class search extends Component {
         this.props.navigation.navigate('Filter');
     }
     render() {
-        const { container, column, search_container, list_title, list_spacing, top_container, list_icons, row, between_spacing, around_spacing, search_input, icons, footer_container, search_icon } = styles
+        const { container, column, search_container, accordian_style, top_container, row, between_spacing, around_spacing, search_input, icons, search_icon } = styles
         return (
             <View style={[container, column, between_spacing]}>
                 <View >
-
                     <View style={[row, between_spacing, top_container]}>
                         <View style={[search_container, row, around_spacing]}>
                             <Image resizeMode='contain' source={require('../../assets/search.png')} style={search_icon} ></Image>
                             <TextInput placeholder="Search" style={search_input} />
                         </View>
-                        <TouchableOpacity onPress={this.onFilter}><Image resizeMode='contain' source={require('../../assets/filter_yellow.png')} style={icons}></Image></TouchableOpacity>
+                        <TouchableOpacity onPress={this.onFilter}>
+                            <Image resizeMode='contain' source={require('../../assets/filter_yellow.png')} style={icons}></Image>
+                        </TouchableOpacity>
                     </View>
-                    <Accordion style={{ border: 'none' }}
+                    <Accordion style={accordian_style}
                         dataArray={this.state.dataArray}
                         animation={true}
                         expanded={true}

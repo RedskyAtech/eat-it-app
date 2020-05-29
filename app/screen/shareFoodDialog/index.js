@@ -11,23 +11,26 @@ export default class shareFoodDialog extends Component {
         }
     }
     componentDidMount = async () => {
-        // await this.setState({ isVisible: this.props.visible })
+        await this.setState({ isVisible: this.props.visible })
     }
 
     close = async () => {
-        this.props.closeDialog()
+        await this.setState({ isVisible: !this.state.isVisible })
+        this.props.navigation.navigate('tab1');
     }
+
     forward = async () => {
-        this.props.onAddPhotos();
+        await this.setState({ isVisible: !this.state.isVisible })
     }
 
     render() {
-        const { container, column, row, arrow, forward_container, cancel_style, button_container, bottom_margin, vertical_margin, dialog_container, text_style } = styles
+        const { container, column, row, arrow, forward_container, around_spacing, cancel_style,
+            button_container, bottom_margin, vertical_margin, dialog_container, text_style } = styles
         return (
-            <Modal backdropOpacity={1} backdropColor={'grey'} isVisible={true}
+            <Modal backdropOpacity={1} backdropColor={'grey'} isVisible={this.state.isVisible}
                 hasBackdrop={false}>
 
-                <View style={[container, column, { justifyContent: 'space-around' }]}>
+                <View style={[container, column, around_spacing]}>
 
                     <View style={[dialog_container, vertical_margin, column]}>
 
@@ -43,9 +46,7 @@ export default class shareFoodDialog extends Component {
                                     <Image resizeMode='contain' source={require('../../assets/next_button_arrow.png')} style={arrow}></Image>
                                 </View>
                             </TouchableOpacity>
-
                         </View>
-
                     </View>
 
                 </View >

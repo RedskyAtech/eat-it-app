@@ -4,7 +4,7 @@ import styles from "./style";
 import { RecyclerListView, DataProvider, LayoutProvider } from "recyclerlistview";
 import { Badge } from 'react-native-elements';
 import HandleBack from "../../components/HandleBack";
-import ShareFoodDialog from "../../screen/shareFoodDialog";
+
 const ViewTypes = {
     HALF_LEFT: 1,
     HALF_BETWEEN: 2,
@@ -20,7 +20,7 @@ class CellContainer extends React.Component {
         this.props.navigation.navigate('FoodDetails');
     }
     render() {
-        const { heading_text, row, heading_container, containerGridLeft, column, between_spacing, colored_text, grey_text, image } = styles
+        const { heading_text, row, heading_container, column, between_spacing, colored_text, grey_text, image } = styles
         return (
             <>
                 <View {...this.props} >
@@ -192,18 +192,9 @@ export default class home extends Component {
             nearYou: false,
             follow: false,
             dataProvider: dataProvider.cloneWithRows(this._generateArray(this.products)),
-            // isVisible: false
         };
     }
-    // componentDidMount = async () => {
-    //     console.log("naviiiiii:",this.props.navigation.state.from)
-    //     if (this.props.navigation.state.from === "tab3") {
-    //         await this.setState({ isVisible: true })
-    //     }else{
-    //         await this.setState({ isVisible: false })
-            
-    //     }
-    // }
+
     _generateArray(array) {
         let n = array.length
         let arr = new Array(n);
@@ -212,8 +203,8 @@ export default class home extends Component {
         }
         return arr;
     }
-    _rowRenderer(type, data) {
 
+    _rowRenderer(type, data) {
         switch (type) {
             case ViewTypes.HALF_LEFT:
                 return (
@@ -230,11 +221,11 @@ export default class home extends Component {
                     <CellContainer style={styles.containerGridLeft} data={data} navigation={this.props.navigation}>
                     </CellContainer>
                 );
-
             default:
                 return null;
         }
     }
+
     onForYou = async () => {
         await this.setState({ forYou: true, lastSearch: false, nearYou: false, follow: false })
     }
@@ -258,7 +249,9 @@ export default class home extends Component {
         this.setState({ isVisible: false })
     }
     render() {
-        const { container, container_width, top_container, row, list_container, icons, center_align, badge_style, selected_color, badge_text_style, filter_text, filter_container, unselected_color, filters, column, between_spacing, around_spacing, search_icon, search_input, search_container, footer_container } = styles
+        const { container, container_width, top_container, row, list_container, icons, center_align,
+            badge_style, selected_color, badge_text_style, filter_text, filter_container, unselected_color,
+            filters, column, between_spacing, around_spacing, search_icon, search_input, search_container, } = styles
         return (
             <HandleBack onBack={this.onBack}>
                 <View style={[container, column, between_spacing]}>
@@ -281,18 +274,30 @@ export default class home extends Component {
                             </View>
 
                             <View style={[row, filter_container]}>
-                                <TouchableOpacity onPress={this.onForYou}><View style={this.state.forYou ? [filters, selected_color] : [filters, unselected_color]}><Text style={filter_text}>For you</Text></View></TouchableOpacity>
-                                <TouchableOpacity onPress={this.onLastSearch}><View style={this.state.lastSearch ? [filters, selected_color] : [filters, unselected_color]}><Text style={filter_text}>Last search</Text></View></TouchableOpacity>
-                                <TouchableOpacity onPress={this.onNearYou}><View style={this.state.nearYou ? [filters, selected_color] : [filters, unselected_color]}><Text style={filter_text}>Near you</Text></View></TouchableOpacity>
-                                <TouchableOpacity onPress={this.onFollow}><View style={this.state.follow ? [filters, selected_color] : [filters, unselected_color]}><Text style={filter_text}>Follow</Text></View></TouchableOpacity>
+                                <TouchableOpacity onPress={this.onForYou}>
+                                    <View style={this.state.forYou ? [filters, selected_color] : [filters, unselected_color]}>
+                                        <Text style={filter_text}>For you</Text>
+                                    </View>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={this.onLastSearch}>
+                                    <View style={this.state.lastSearch ? [filters, selected_color] : [filters, unselected_color]}>
+                                        <Text style={filter_text}>Last search</Text>
+                                    </View>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={this.onNearYou}>
+                                    <View style={this.state.nearYou ? [filters, selected_color] : [filters, unselected_color]}>
+                                        <Text style={filter_text}>Near you</Text>
+                                    </View>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={this.onFollow}>
+                                    <View style={this.state.follow ? [filters, selected_color] : [filters, unselected_color]}>
+                                        <Text style={filter_text}>Follow</Text>
+                                    </View>
+                                </TouchableOpacity>
                             </View>
                         </View>
                     </View>
-                    {/* {this.state.isVisible ?
-                        <ShareFoodDialog visible={this.state.isDialogVisible} closeDialog={this.closeDialog} />
-                        :
-                        <View></View>
-                    } */}
+
                     <View style={list_container}>
                         <RecyclerListView layoutProvider={this._layoutProvider} dataProvider={this.state.dataProvider} rowRenderer={this._rowRenderer} />
                     </View>

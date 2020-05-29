@@ -1,4 +1,3 @@
-import * as utlitiy from '../../utility/index';
 import * as fonts from '../../constants/fonts';
 import * as colors from '../../constants/colors';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from '../../utility/index';
@@ -125,7 +124,7 @@ const styles = {
         alignItems: 'center',
         alignSelf: 'flex-end',
         marginTop: hp(6),
-        elevation: 4
     },
+    wrap_container:{ flexWrap: 'wrap' }
 }
 export default styles

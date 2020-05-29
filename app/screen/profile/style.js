@@ -53,7 +53,6 @@ const styles = {
         borderColor: 'white',
         borderWidth: 2,
         marginTop:hp(0.6),
-        // elevation:4
     },
     user_details: {
         marginTop: hp(6.4),
@@ -160,8 +159,6 @@ const styles = {
         alignSelf:'center',
         textDecorationLine: 'underline',
         marginTop:hp(2),
-        // marginBottom:hp(1)  
-
     },
     
 

@@ -15,6 +15,9 @@ const styles = {
         display: "flex",
         flexDirection: 'column',
     },
+    around_spacing: {
+        justifyContent: 'space-around'
+    },
     between_spacing: {
         alignItems: 'center',
         justifyContent: 'space-between'
@@ -33,10 +36,10 @@ const styles = {
     dialog_container: {
         width: wp(92),
         elevation: 6,
-        backgroundColor: '#F2F2F2',
+        backgroundColor: '#ECECEC',
         alignSelf: 'center',
         alignItems: 'center',
-        borderRadius:5
+        borderRadius: 5
     },
     text_style: {
         fontSize: fonts.FONT_TEXT,
@@ -100,8 +103,9 @@ const styles = {
         alignSelf: 'center',
         textDecorationLine: 'underline',
         marginTop: hp(2),
-        color:colors.primaryColor,
-        fontWeight:fonts.FONT_BOLD
+        color: colors.primaryColor,
+        fontWeight: fonts.FONT_BOLD,
+        fontSize:fonts.FONT_TEXT
     },
 }
 export default styles

@@ -1,4 +1,3 @@
-import * as utlitiy from '../../utility/index';
 import * as fonts from '../../constants/fonts';
 import * as colors from '../../constants/colors';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from '../../utility/index';

@@ -3,9 +3,10 @@ import React from 'react';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator, BottomTabBar } from 'react-navigation-tabs';
-import { ImageBackground, Image, View, TouchableOpacity } from 'react-native';
+import { Image } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from '../utility/index';
 import * as colors from '../constants/colors';
+import LinearGradient from 'react-native-linear-gradient';
 
 import Splash from '../screen/splash';
 import Login from '../screen/login';
@@ -21,26 +22,7 @@ import SearchName from '../screen/searchName';
 import Dialog from '../screen/dialog';
 import ShareFoodDialog from "../screen/shareFoodDialog";
 import Header from '../components/header';
-import LinearGradient from 'react-native-linear-gradient';
 
-const ShareStack = createStackNavigator(
-  {
-    ShareFoodDialog: {
-      screen: ShareFoodDialog,
-      navigationOptions: {
-        headerShown: false,
-      },
-    }
-  }, {
-  initialRouteName: 'ShareFoodDialog',
-  headerMode: 'none',
-  mode: 'modal'
-})
-
-const showDialog = () => {
-  console.log('bvdvnvnxvfhxd');
-  <ShareFoodDialog/>
-}
 
 const TabNavigator = createBottomTabNavigator({
 
@@ -60,7 +42,6 @@ const TabNavigator = createBottomTabNavigator({
             height: hp(3.6),
             width: hp(3.6)
           }}></Image>
-
       }
     })
   },
@@ -80,17 +61,19 @@ const TabNavigator = createBottomTabNavigator({
             height: hp(3.6),
             width: hp(3.6)
           }}></Image>
-
       }
     })
   },
   tab3: {
-    screen: Home,
+    screen: AddPhotos,
     navigationOptions: ({ navigation }) => ({
       tabBarVisible: true,
       tabBarLabel: "",
-      tabBarOnPress: (props) => { showDialog() },
-
+      tabBarOnPress: ({ navigation }) => {
+        if (navigation.state.routeName === "tab3") {
+          navigation.navigate('AddPhotos');
+        }
+      },
       tabBarIcon: ({ focused, tintColor }) => {
         let icon
         if (navigation.state.routeName === "tab3") {
@@ -98,13 +81,9 @@ const TabNavigator = createBottomTabNavigator({
           icon = require('../assets/share_icon.png')
         }
         return (
-          <>
-            <TouchableOpacity>
-              <Image source={icon}
-                style={{ height: hp(8), width: hp(8), marginTop: hp(-4.8) }}>
-              </Image>
-            </TouchableOpacity>
-          </>
+          <Image source={icon}
+            style={{ height: hp(8), width: hp(8), marginTop: hp(-4.8) }}>
+          </Image>
         )
       }
     })
@@ -125,7 +104,6 @@ const TabNavigator = createBottomTabNavigator({
             height: hp(3.6),
             width: hp(3.6)
           }}></Image>
-
       }
     })
   },
@@ -145,7 +123,6 @@ const TabNavigator = createBottomTabNavigator({
             height: hp(3.6),
             width: hp(3.6)
           }}></Image>
-
       }
     })
   },
@@ -168,12 +145,10 @@ const TabNavigator = createBottomTabNavigator({
           marginVertical: hp(1),
           elevation: 4,
           borderColor: 'red',
-        }}
-      >
+        }}>
         <BottomTabBar {...props} style={{ backgroundColor: 'transparent', borderTopColor: 'transparent', }} />
       </LinearGradient>);
   },
-
   tabBarOptions: {
     keyboardHidesTabBar: true,
     activeTintColor: '#FFB534',
@@ -200,6 +175,7 @@ const AppStack = createStackNavigator(
         headerShown: false,
       },
     },
+
     ForgotPassword: {
       screen: ForgotPassword,
       navigationOptions: {
@@ -280,12 +256,11 @@ const AppStack = createStackNavigator(
     }
   },
   {
-    initialRouteName: 'BottomTab',
+    initialRouteName: 'Splash',
     headerMode: 'none',
     mode: 'modal'
   },
 );
-
 
 const Routes = createAppContainer(
   createSwitchNavigator({
@@ -293,4 +268,5 @@ const Routes = createAppContainer(
     BottomTab: TabNavigator
   }),
 );
+
 export default Routes;

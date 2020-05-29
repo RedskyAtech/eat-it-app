@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, Image, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, Image, TouchableOpacity } from 'react-native';
 import styles from './style';
 import { RadioButton } from 'react-native-paper';
 import * as colors from '../../constants/colors';
@@ -52,20 +52,31 @@ export default class dialog extends Component {
         await this.setState({ starFive: !this.state.starFive });
     }
     render() {
-        const { container, column, row, like_container, button, centered_text, cancel_style, button_container, button_text, radio_button_list, star_container, radio_text_selected, radio_text_unselected, row_centered, bottom_margin, vertical_margin, between_spacing, like_icon, dialog_container, text_style } = styles
+        const { container, column, row, like_container, button, centered_text, cancel_style,
+            button_container, button_text, radio_button_list, star_container, radio_text_selected,
+            radio_text_unselected, row_centered, bottom_margin, vertical_margin,
+            like_icon, dialog_container, text_style, around_spacing } = styles
         return (
             <Modal backdropOpacity={1} backdropColor={'grey'} isVisible={this.props.visible}
                 hasBackdrop={false}>
 
-                <View style={[container, column, { justifyContent: 'space-around' }]}>
+                <View style={[container, column, around_spacing]}>
 
                     <View style={[dialog_container, vertical_margin, column]}>
 
                         <Text style={[text_style, bottom_margin]}>Want to like or dislike food ?</Text>
 
                         <View style={[row, like_container, bottom_margin]}>
-                            <TouchableOpacity onPress={this.onLike}><Image resizeMode='stretch' source={this.state.like ? require('../../assets/like.png') : require('../../assets/like_blank.png')} style={like_icon} ></Image></TouchableOpacity>
-                            <TouchableOpacity onPress={this.onDisLike}><Image resizeMode='stretch' source={this.state.dislike ? require('../../assets/dislike.png') : require('../../assets/dislike_blank.png')} style={like_icon} ></Image></TouchableOpacity>
+                            <TouchableOpacity onPress={this.onLike}>
+                                <Image resizeMode='stretch'
+                                    source={this.state.like ? require('../../assets/like.png') : require('../../assets/like_blank.png')} style={like_icon} >
+                                </Image>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={this.onDisLike}>
+                                <Image resizeMode='stretch'
+                                    source={this.state.dislike ? require('../../assets/dislike.png') : require('../../assets/dislike_blank.png')} style={like_icon} >
+                                </Image>
+                            </TouchableOpacity>
                         </View>
                         {this.state.like == true ?
                             < >
@@ -91,11 +102,26 @@ export default class dialog extends Component {
                                 </View>
 
                                 <View style={[row, bottom_margin, star_container]}>
-                                    <TouchableOpacity onPress={this.onFirst}><Image resizeMode='stretch' source={this.state.starOne ? require('../../assets/star.png') : require('../../assets/star_unselected.png')} style={like_icon} ></Image></TouchableOpacity>
-                                    <TouchableOpacity onPress={this.onSecond}><Image resizeMode='stretch' source={this.state.starTwo ? require('../../assets/star.png') : require('../../assets/star_unselected.png')} style={like_icon} ></Image></TouchableOpacity>
-                                    <TouchableOpacity onPress={this.onThird}><Image resizeMode='stretch' source={this.state.starThree ? require('../../assets/star.png') : require('../../assets/star_unselected.png')} style={like_icon} ></Image></TouchableOpacity>
-                                    <TouchableOpacity onPress={this.onFourth}><Image resizeMode='stretch' source={this.state.starFour ? require('../../assets/star.png') : require('../../assets/star_unselected.png')} style={like_icon} ></Image></TouchableOpacity>
-                                    <TouchableOpacity onPress={this.onFifth}><Image resizeMode='stretch' source={this.state.starFive ? require('../../assets/star.png') : require('../../assets/star_unselected.png')} style={like_icon} ></Image></TouchableOpacity>
+                                    <TouchableOpacity onPress={this.onFirst}>
+                                        <Image resizeMode='stretch'
+                                            source={this.state.starOne ? require('../../assets/star.png') : require('../../assets/star_unselected.png')} style={like_icon} >
+                                        </Image>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={this.onSecond}>
+                                        <Image resizeMode='stretch' source={this.state.starTwo ? require('../../assets/star.png') : require('../../assets/star_unselected.png')} style={like_icon} >
+                                        </Image></TouchableOpacity>
+                                    <TouchableOpacity onPress={this.onThird}>
+                                        <Image resizeMode='stretch' source={this.state.starThree ? require('../../assets/star.png') : require('../../assets/star_unselected.png')} style={like_icon} >
+                                        </Image>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={this.onFourth}>
+                                        <Image resizeMode='stretch' source={this.state.starFour ? require('../../assets/star.png') : require('../../assets/star_unselected.png')} style={like_icon} >
+                                        </Image>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={this.onFifth}>
+                                        <Image resizeMode='stretch' source={this.state.starFive ? require('../../assets/star.png') : require('../../assets/star_unselected.png')} style={like_icon} >
+                                        </Image>
+                                    </TouchableOpacity>
                                 </View>
 
                                 <View style={[row, bottom_margin, button_container, { alignItems: 'center' }]}>
@@ -105,9 +131,11 @@ export default class dialog extends Component {
                                     <LinearGradient
                                         start={{ x: 0, y: 0 }}
                                         end={{ x: 1, y: 0 }}
-                                        colors={['#F8B614', '#B49579']}
+                                        colors={[colors.gradientFirstColor, colors.gradientSecondColor]}
                                         style={[button, centered_text]} >
-                                        <TouchableOpacity onPress={() => this.close()}><Text style={button_text}>Done</Text></TouchableOpacity>
+                                        <TouchableOpacity onPress={() => this.close()}>
+                                            <Text style={button_text}>Done</Text>
+                                        </TouchableOpacity>
                                     </LinearGradient>
                                 </View>
                             </>

@@ -18,7 +18,7 @@ const styles = {
     dialog_container: {
         width: wp(74),
         elevation: 6,
-        backgroundColor: '#F2F2F2',
+        backgroundColor: '#ECECEC',
         alignSelf: 'center',
         alignItems: 'center',
         borderRadius: 5
@@ -64,9 +64,9 @@ const styles = {
         fontSize: fonts.FONT_TEXT
     },
     forward_container: {
-        height: hp(7.8),
-        width: hp(7.8),
-        borderRadius: hp(7.8) / 2,
+        height: hp(7.6),
+        width: hp(7.6),
+        borderRadius: hp(7.6) / 2,
         backgroundColor: "#FFBA09",
         justifyContent: 'center',
         alignItems: 'center',
@@ -75,5 +75,6 @@ const styles = {
         height: hp(4.5),
         width: hp(4.5),
     },
+    around_spacing: { justifyContent: 'space-around' }
 }
 export default styles

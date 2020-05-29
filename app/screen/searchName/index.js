@@ -1,8 +1,6 @@
 import React, { Component } from "react";
-import { View, Text, Image, TextInput, TouchableOpacity,ScrollView } from 'react-native';
+import { View, Text, Image, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import styles from './style';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from '../../utility/index';
-
 
 export default class searchName extends Component {
     constructor(props) {
@@ -96,7 +94,10 @@ export default class searchName extends Component {
         this.props.navigation.navigate('Filter');
     }
     render() {
-        const { container, column, search_container,list_height, top_container,price_text, address_text, text_style, column_between_spacing,clock, non_veg_icon, green_color, red_color, row_center_align, product_heading, list_image_continer, list_image, row, inner_list_spacing, between_spacing, around_spacing, search_input, icons, search_icon } = styles
+        const { container, column, search_container, list_height, top_container, price_text,
+            address_text, text_style, column_between_spacing, clock, non_veg_icon, green_color,
+            red_color, row_center_align, product_heading, list_image_continer, list_image, row,
+            inner_list_spacing, between_spacing, around_spacing, search_input, icons, search_icon } = styles
         return (
             <View style={[container, column, between_spacing]}>
                 <View >
@@ -106,7 +107,9 @@ export default class searchName extends Component {
                             <Image resizeMode='contain' source={require('../../assets/search.png')} style={search_icon} ></Image>
                             <TextInput placeholder="Search" style={search_input} />
                         </View>
-                        <TouchableOpacity onPress={this.onFilter}><Image resizeMode='contain' source={require('../../assets/filter_yellow.png')} style={icons}></Image></TouchableOpacity>
+                        <TouchableOpacity onPress={this.onFilter}>
+                            <Image resizeMode='contain' source={require('../../assets/filter_yellow.png')} style={icons}></Image>
+                        </TouchableOpacity>
                     </View>
 
                     <View style={list_height}>

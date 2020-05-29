@@ -1,11 +1,10 @@
 import React, { Component } from "react";
 import { View, Text, Image, TouchableOpacity, Animated, TextInput } from 'react-native';
 import styles from './style';
-// import Footer from '../../components/footer';
 import LinearGradient from 'react-native-linear-gradient';
 import * as colors from '../../constants/colors';
 import { Menu, Provider } from 'react-native-paper';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from '../../utility/index';
+import { heightPercentageToDP as hp } from '../../utility/index';
 
 
 export default class profile extends Component {
@@ -37,7 +36,12 @@ export default class profile extends Component {
         await this.props.navigation.navigate('Login')
     }
     render() {
-        const { container, column, row, around_spacing, close_style, heading_text, button_container, button_text, slider_inner_box, input_box, menu_container, fields, input_field_icons, slider_container, menu_position, menu_background, menu_list_title, menu_list_icons, list_item_height, row_centered_text, list_width, rows_spacing, field_icons, list_title, horizontal_line, heading_color, colored_text, user_details, spacing, between_spacing, settings, profile_image, profile_container, profile, footer_container } = styles
+        const { container, column, row, around_spacing, close_style, heading_text, button_container,
+            button_text, slider_inner_box, input_box, menu_container, fields, input_field_icons,
+            slider_container, menu_position, menu_background, menu_list_title, menu_list_icons,
+            list_item_height, row_centered_text, list_width, rows_spacing, field_icons, list_title,
+            horizontal_line, heading_color, colored_text, user_details, spacing, between_spacing,
+            settings, profile_image, profile_container, profile } = styles
         return (
             <Provider>
                 <View style={[container, column, between_spacing]}>
@@ -51,7 +55,9 @@ export default class profile extends Component {
                                 <View style={menu_container}>
                                     <Menu style={menu_position} contentStyle={menu_background} visible={this.state.visible} onDismiss={this.closeMenu}
                                         anchor={
-                                            <TouchableOpacity onPress={this.openMenu}><Image resizeMode='stretch' source={require('../../assets/settings.png')} style={settings}></Image></TouchableOpacity>
+                                            <TouchableOpacity onPress={this.openMenu}>
+                                                <Image resizeMode='stretch' source={require('../../assets/settings.png')} style={settings}></Image>
+                                            </TouchableOpacity>
                                         }>
                                         <View style={[row, { alignItems: 'center' }]} >
                                             <Image source={require('../../assets/edit_profile.png')} style={menu_list_icons}></Image>
@@ -150,8 +156,8 @@ export default class profile extends Component {
                         </View>
 
 
-                        {/* edit profile card */}
-                        <Animated.View style={{ top: this.state.top, position: 'absolute',elevation:10 }} >
+                        {/* change  password card */}
+                        <Animated.View style={{ top: this.state.top, position: 'absolute', elevation: 10 }} >
                             <LinearGradient
                                 start={{ x: 0, y: 0 }}
                                 end={{ x: 1, y: 0 }}
@@ -178,7 +184,9 @@ export default class profile extends Component {
                                         <Text style={button_text}>Update</Text>
                                     </View>
 
-                                    <TouchableOpacity onPress={this.hideCard}><Text style={close_style}>Close</Text></TouchableOpacity>
+                                    <TouchableOpacity onPress={this.hideCard}>
+                                        <Text style={close_style}>Close</Text>
+                                    </TouchableOpacity>
                                 </View>
 
                             </LinearGradient>

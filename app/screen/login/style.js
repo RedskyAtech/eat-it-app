@@ -1,4 +1,3 @@
-import * as utlitiy from '../../utility/index';
 import * as fonts from '../../constants/fonts';
 import * as colors from '../../constants/colors';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from '../../utility/index';
@@ -88,7 +87,7 @@ const styles = {
     line: {
         backgroundColor: colors.primaryColor,
         height: 1.5,
-        width: utlitiy.widthPercentageToDP(16),
+        width: wp(16),
         alignSelf: 'center',
     },
     or_text: {

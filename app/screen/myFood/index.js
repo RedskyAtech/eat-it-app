@@ -213,14 +213,16 @@ export default class myFood extends Component {
         this.props.navigation.navigate('tab1');
     }
     render() {
-        const { container, inner_container, spacing, centered_text, row, arrow, column, heading_text, between_spacing, } = styles
+        const { container, inner_container, spacing, row, arrow, column, heading_text, between_spacing, } = styles
         return (
             <View style={[container, column, between_spacing]}>
                 <View>
                     <View style={[inner_container, row, between_spacing, spacing]}>
-                        <TouchableOpacity onPress={this.onBack}><Image resizeMode='contain' source={require('../../assets/back_arrow.png')} style={arrow}></Image></TouchableOpacity>
+                        <TouchableOpacity onPress={this.onBack}>
+                            <Image resizeMode='contain' source={require('../../assets/back_arrow.png')} style={arrow}></Image>
+                        </TouchableOpacity>
                         <Text style={heading_text}>My food</Text>
-                        <View><Text>     </Text></View>
+                        <View><Text>       </Text></View>
                     </View>
 
                     <Accordion style={{ border: 'none' }}

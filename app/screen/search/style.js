@@ -25,10 +25,10 @@ const styles = {
     },
     top_container: {
         width: wp(96),
-        marginBottom:hp(1.6)
+        marginBottom: hp(1.6)
     },
-    inner_container:{
-        width: wp(96) 
+    inner_container: {
+        width: wp(96)
     },
     search_container: {
         width: wp(83.2),
@@ -88,9 +88,9 @@ const styles = {
         marginTop: hp(0.8),
         marginBottom: hp(0.8)
     },
-    inner_list_spacing:{
+    inner_list_spacing: {
         marginVertical: hp(0.8),
-    }
-
+    },
+    accordian_style: { border: 'none' }
 }
 export default styles

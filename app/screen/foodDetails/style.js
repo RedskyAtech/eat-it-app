@@ -1,4 +1,3 @@
-import * as utlitiy from '../../utility/index';
 import * as fonts from '../../constants/fonts';
 import * as colors from '../../constants/colors';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from '../../utility/index';
@@ -53,7 +52,6 @@ const styles = {
         borderWidth: 1.6,
         borderRadius: 8,
         alignSelf: 'center',
-        // padding: 10,
         height: hp(30)
     },
     dot_style: {
@@ -61,11 +59,11 @@ const styles = {
         height: 15,
         borderRadius: 15 / 2,
         backgroundColor: colors.primaryColor,
-        marginTop: hp(-2.2),
+        marginTop: hp(-2.1),
     },
     inactive_dot_styles: {
         backgroundColor: '#696969',
-         width: 22,
+        width: 22,
         height: 22,
         borderRadius: 22 / 2,
     },
@@ -132,6 +130,7 @@ const styles = {
     },
     button_text: {
         color: 'white'
-    }
+    },
+    content_container_style: { justifyContent: 'space-around', alignItems: 'center' }
 }
 export default styles

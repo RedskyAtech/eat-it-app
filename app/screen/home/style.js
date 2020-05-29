@@ -1,4 +1,3 @@
-import * as utlitiy from '../../utility/index';
 import * as fonts from '../../constants/fonts';
 import * as colors from '../../constants/colors';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from '../../utility/index';
@@ -7,7 +6,6 @@ const styles = {
     container: {
         height: "100%",
         width: "100%",
-        // marginVertical: hp(0.8)
     },
     container_width: {
         width: wp(100),
@@ -86,26 +84,15 @@ const styles = {
         backgroundColor: colors.unselectedFilter
     },
     top_container: {
-        // height: "15.2%"
         height: hp(15)
     },
     list_container: {
-        // height: "75%",
         height:hp(78),
         width:wp(100)
     },
-    // footer_container: {
-    //     zIndex: 10,
-    //     marginBottom:hp(2.2),
-    //     marginTop:hp(0.4),
-    //     width: wp(94),
-    //     // height: "6.8%",
-    //     height:54,
-    //     alignSelf: 'center'
-    // },
+
     containerGridLeft: {
         justifyContent: "space-around",
-        // alignItems: "center",
         flex: 1,
         borderWidth: 1.5,
         borderColor: colors.primaryColor,
