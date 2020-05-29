@@ -6,16 +6,12 @@
  * @flow strict-local
  */
 
-import React, { Component } from 'react';
-import Routes from './app/navigation/index'
+import React, {Component} from 'react';
+import Routes from './app/navigation/index';
 
 export default class App extends Component {
   render() {
     console.disableYellowBox = true;
-    return (
-      <Routes />
-    );
+    return <Routes />;
   }
 }
-
-

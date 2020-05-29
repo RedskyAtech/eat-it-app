@@ -1,10 +1,12 @@
-
 import React from 'react';
-import { createAppContainer, createSwitchNavigator } from 'react-navigation';
-import { createStackNavigator } from 'react-navigation-stack';
-import { createBottomTabNavigator, BottomTabBar } from 'react-navigation-tabs';
-import { Image } from 'react-native';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from '../utility/index';
+import {createAppContainer, createSwitchNavigator} from 'react-navigation';
+import {createStackNavigator} from 'react-navigation-stack';
+import {createBottomTabNavigator, BottomTabBar} from 'react-navigation-tabs';
+import {Image, View} from 'react-native';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from '../utility/index';
 import * as colors from '../constants/colors';
 import LinearGradient from 'react-native-linear-gradient';
 
@@ -15,152 +17,193 @@ import Home from '../screen/home';
 import Profile from '../screen/profile';
 import Search from '../screen/search';
 import Filter from '../screen/filter';
-import AddPhotos from '../screen/addPhotos';
+import AttatchFoodPhotos from '../screen/attatchFoodPhotos';
 import FoodDetails from '../screen/foodDetails';
 import MyFood from '../screen/myFood';
 import SearchName from '../screen/searchName';
-import Dialog from '../screen/dialog';
-import ShareFoodDialog from "../screen/shareFoodDialog";
+import LikeDislikeFood from '../screen/likeDislikeFood';
+import ShareFood from '../screen/shareFood';
 import Header from '../components/header';
 
-
-const TabNavigator = createBottomTabNavigator({
-
-  tab1: {
-    screen: Home,
-    navigationOptions: ({ navigation }) => ({
-      tabBarVisible: true,
-      tabBarLabel: "",
-      tabBarIcon: ({ focused, tintColor }) => {
-        let icon
-        if (navigation.state.routeName === "tab1") {
-          icon = focused ? require('../assets/home_selected.png') : require('../assets/home.png')
-        }
-        return <Image
-          source={icon}
+const TabNavigator = createBottomTabNavigator(
+  {
+    tab1: {
+      screen: Home,
+      navigationOptions: ({navigation}) => ({
+        tabBarVisible: true,
+        tabBarLabel: '',
+        tabBarIcon: ({focused, tintColor}) => {
+          let icon;
+          if (navigation.state.routeName === 'tab1') {
+            icon = focused
+              ? require('../assets/home_selected.png')
+              : require('../assets/home.png');
+          }
+          return (
+            <Image
+              source={icon}
+              style={{
+                height: hp(3.6),
+                width: hp(3.6),
+              }}
+            />
+          );
+        },
+      }),
+    },
+    tab2: {
+      screen: Search,
+      navigationOptions: ({navigation}) => ({
+        tabBarVisible: true,
+        tabBarLabel: '',
+        tabBarIcon: ({focused, tintColor}) => {
+          let icon;
+          if (navigation.state.routeName === 'tab2') {
+            icon = focused
+              ? require('../assets/search_selected.png')
+              : require('../assets/search.png');
+          }
+          return (
+            <Image
+              source={icon}
+              style={{
+                height: hp(3.6),
+                width: hp(3.6),
+              }}
+            />
+          );
+        },
+      }),
+    },
+    tab3: {
+      screen: AttatchFoodPhotos,
+      navigationOptions: ({navigation}) => ({
+        tabBarVisible: true,
+        tabBarLabel: '',
+        tabBarOnPress: ({navigation}) => {
+          if (navigation.state.routeName === 'tab3') {
+            navigation.navigate('AttatchFoodPhotos');
+          }
+        },
+        tabBarIcon: ({focused, tintColor}) => {
+          let icon;
+          if (navigation.state.routeName === 'tab3') {
+            icon = require('../assets/share_icon.png');
+          }
+          return (
+            <View
+              style={{
+                height: hp(8),
+                width: hp(8),
+                elevation: 10,
+                borderRadius: hp(8) / 2,
+                marginTop: hp(-4.8),
+              }}>
+              <Image
+                source={icon}
+                style={{
+                  height: hp(8),
+                  width: hp(8),
+                  // marginTop: hp(-4.8),
+                }}
+              />
+            </View>
+          );
+        },
+      }),
+    },
+    tab4: {
+      screen: MyFood,
+      navigationOptions: ({navigation}) => ({
+        tabBarVisible: true,
+        tabBarLabel: '',
+        tabBarIcon: ({focused, tintColor}) => {
+          let icon;
+          if (navigation.state.routeName === 'tab4') {
+            icon = focused
+              ? require('../assets/my_food_selected.png')
+              : require('../assets/my_food.png');
+          }
+          return (
+            <Image
+              source={icon}
+              style={{
+                height: hp(3.6),
+                width: hp(3.6),
+              }}
+            />
+          );
+        },
+      }),
+    },
+    tab5: {
+      screen: Profile,
+      navigationOptions: ({navigation}) => ({
+        tabBarVisible: true,
+        tabBarLabel: '',
+        tabBarIcon: ({focused, tintColor}) => {
+          let icon;
+          if (navigation.state.routeName === 'tab5') {
+            icon = focused
+              ? require('../assets/profile_selected.png')
+              : require('../assets/profile.png');
+          }
+          return (
+            <Image
+              source={icon}
+              style={{
+                height: hp(3.6),
+                width: hp(3.6),
+              }}
+            />
+          );
+        },
+      }),
+    },
+  },
+  {
+    initialRouteName: 'tab1',
+    tabBarPosition: 'bottom',
+    swipeEnabled: false,
+    animationEnabled: false,
+    tabBarComponent: props => {
+      return (
+        <LinearGradient
+          start={{x: 0, y: 0}}
+          end={{x: 1, y: 0}}
+          colors={[colors.gradientFirstColor, colors.gradientSecondColor]}
           style={{
-            height: hp(3.6),
-            width: hp(3.6)
-          }}></Image>
-      }
-    })
+            height: 50,
+            borderTopColor: 'transparent',
+            borderRadius: 40,
+            width: wp(94),
+            alignSelf: 'center',
+            marginVertical: hp(1),
+            elevation: 4,
+            borderColor: 'red',
+          }}>
+          <BottomTabBar
+            {...props}
+            style={{
+              backgroundColor: 'transparent',
+              borderTopColor: 'transparent',
+            }}
+          />
+        </LinearGradient>
+      );
+    },
+    tabBarOptions: {
+      keyboardHidesTabBar: true,
+      activeTintColor: '#FFB534',
+      activeBackgroundColor: 'FFF',
+      inactiveTintColor: '#FFB534',
+      showIcon: true,
+      showLabel: false,
+    },
   },
-  tab2: {
-    screen: Search,
-    navigationOptions: ({ navigation }) => ({
-      tabBarVisible: true,
-      tabBarLabel: "",
-      tabBarIcon: ({ focused, tintColor }) => {
-        let icon
-        if (navigation.state.routeName === "tab2") {
-          icon = focused ? require('../assets/search_selected.png') : require('../assets/search.png')
-        }
-        return <Image
-          source={icon}
-          style={{
-            height: hp(3.6),
-            width: hp(3.6)
-          }}></Image>
-      }
-    })
-  },
-  tab3: {
-    screen: AddPhotos,
-    navigationOptions: ({ navigation }) => ({
-      tabBarVisible: true,
-      tabBarLabel: "",
-      tabBarOnPress: ({ navigation }) => {
-        if (navigation.state.routeName === "tab3") {
-          navigation.navigate('AddPhotos');
-        }
-      },
-      tabBarIcon: ({ focused, tintColor }) => {
-        let icon
-        if (navigation.state.routeName === "tab3") {
-          navigation.state.from = "tab3"
-          icon = require('../assets/share_icon.png')
-        }
-        return (
-          <Image source={icon}
-            style={{ height: hp(8), width: hp(8), marginTop: hp(-4.8) }}>
-          </Image>
-        )
-      }
-    })
-  },
-  tab4: {
-    screen: MyFood,
-    navigationOptions: ({ navigation }) => ({
-      tabBarVisible: true,
-      tabBarLabel: "",
-      tabBarIcon: ({ focused, tintColor }) => {
-        let icon
-        if (navigation.state.routeName === "tab4") {
-          icon = focused ? require('../assets/my_food_selected.png') : require('../assets/my_food.png')
-        }
-        return <Image
-          source={icon}
-          style={{
-            height: hp(3.6),
-            width: hp(3.6)
-          }}></Image>
-      }
-    })
-  },
-  tab5: {
-    screen: Profile,
-    navigationOptions: ({ navigation }) => ({
-      tabBarVisible: true,
-      tabBarLabel: "",
-      tabBarIcon: ({ focused, tintColor }) => {
-        let icon
-        if (navigation.state.routeName === "tab5") {
-          icon = focused ? require('../assets/profile_selected.png') : require('../assets/profile.png')
-        }
-        return <Image
-          source={icon}
-          style={{
-            height: hp(3.6),
-            width: hp(3.6)
-          }}></Image>
-      }
-    })
-  },
-}, {
-  initialRouteName: "tab1",
-  tabBarPosition: 'bottom',
-  swipeEnabled: false,
-  animationEnabled: false,
-  tabBarComponent: (props) => {
-    return (
-      <LinearGradient start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        colors={[colors.gradientFirstColor, colors.gradientSecondColor]}
-        style={{
-          height: 50,
-          borderTopColor: 'transparent',
-          borderRadius: 40,
-          width: wp(94),
-          alignSelf: 'center',
-          marginVertical: hp(1),
-          elevation: 4,
-          borderColor: 'red',
-        }}>
-        <BottomTabBar {...props} style={{ backgroundColor: 'transparent', borderTopColor: 'transparent', }} />
-      </LinearGradient>);
-  },
-  tabBarOptions: {
-    keyboardHidesTabBar: true,
-    activeTintColor: '#FFB534',
-    activeBackgroundColor: 'FFF',
-    inactiveTintColor: '#FFB534',
-    showIcon: true,
-    showLabel: false
-  }
-});
+);
 
 const AppStack = createStackNavigator(
-
   {
     Splash: {
       screen: Splash,
@@ -206,8 +249,8 @@ const AppStack = createStackNavigator(
         headerShown: false,
       },
     },
-    AddPhotos: {
-      screen: AddPhotos,
+    AttatchFoodPhotos: {
+      screen: AttatchFoodPhotos,
       navigationOptions: {
         headerShown: false,
       },
@@ -230,14 +273,14 @@ const AppStack = createStackNavigator(
         headerShown: false,
       },
     },
-    Dialog: {
-      screen: Dialog,
+    LikeDislikeFood: {
+      screen: LikeDislikeFood,
       navigationOptions: {
         headerShown: false,
       },
     },
-    ShareFoodDialog: {
-      screen: ShareFoodDialog,
+    ShareFood: {
+      screen: ShareFood,
       navigationOptions: {
         headerShown: false,
       },
@@ -253,19 +296,19 @@ const AppStack = createStackNavigator(
       navigationOptions: {
         headerShown: false,
       },
-    }
+    },
   },
   {
-    initialRouteName: 'Splash',
+    initialRouteName: 'BottomTab',
     headerMode: 'none',
-    mode: 'modal'
+    mode: 'modal',
   },
 );
 
 const Routes = createAppContainer(
   createSwitchNavigator({
     App: AppStack,
-    BottomTab: TabNavigator
+    BottomTab: TabNavigator,
   }),
 );
 
