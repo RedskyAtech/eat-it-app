@@ -49,7 +49,7 @@ const styles = {
     },
     scroll_container: {
         borderColor: colors.primaryColor,
-        borderWidth: 1.6,
+        borderWidth: 1.8,
         borderRadius: 8,
         alignSelf: 'center',
         height: hp(30)
@@ -69,9 +69,10 @@ const styles = {
     },
     images: {
         height: "100%",
-        width: "100%",
+        width: "98.8%",
         borderRadius: 6,
         alignSelf: 'center',
+        marginLeft:wp(-1)
     },
     product_name: {
         fontSize: 20,

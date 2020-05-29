@@ -37,7 +37,7 @@ export default class addPhotos extends Component {
     }
     _renderItem = ({ item, index }) => {
         return (
-            <Image style={styles.images} source={item.source} />
+            <Image resizeMode='cover'  style={styles.images} source={item.source} />
         );
     }
    
