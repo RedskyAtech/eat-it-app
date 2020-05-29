@@ -9,7 +9,8 @@ export default class login extends Component {
         super(props);
         this.state = {
             isLogin: true,
-            checked: false
+            checked: false,
+            regChecked: false
         }
     }
     onChecked = async () => {
@@ -17,6 +18,13 @@ export default class login extends Component {
             await this.setState({ checked: false })
         } else {
             await this.setState({ checked: true })
+        }
+    }
+    onRegChecked = async () => {
+        if (this.state.regChecked) {
+            await this.setState({ regChecked: false })
+        } else {
+            await this.setState({ regChecked: true })
         }
     }
     onLogin = async () => {
@@ -48,7 +56,7 @@ export default class login extends Component {
             profile_image, ckeckbox, edit_container, edit_icon, headings_color,
             row, column, container, line_container, forward_container, bottom_container,
             line, or_text, social_container, social_icons, fields, box_align, field_icons, arrow,
-            colored_text, logo, headings, text, text_style,
+            colored_text, logo, headings, text, text_style, vertical_spacing,centered_row,
             fields_container, input_box, between_spacing } = styles
         return (
             <HandleBack onBack={this.onBack}>
@@ -88,8 +96,11 @@ export default class login extends Component {
                                         </View>
 
                                         <View style={[row, between_spacing]}>
-                                            <View style={row}>
-                                                <CheckBox checked={this.state.checked} color="grey" onPress={this.onChecked} style={ckeckbox} />
+                                            <View style={[row,centered_row]}>
+                                                <CheckBox checked={this.state.checked}
+                                                    color="grey"
+                                                    onPress={this.onChecked}
+                                                    style={ckeckbox}/>
                                                 <Text style={text_style}>Rembember me</Text>
                                             </View>
                                             <Text style={colored_text} onPress={this.onForgotPassword}>Forgot password?</Text>
@@ -135,6 +146,10 @@ export default class login extends Component {
                                         <View style={[row, fields]}>
                                             <Image source={require('../../assets/password.png')} style={field_icons}></Image>
                                             <TextInput placeholder="Confirm password" style={input_box} />
+                                        </View>
+                                        <View style={[row, vertical_spacing,centered_row]}>
+                                            <CheckBox checked={this.state.regChecked} color="grey" onPress={this.onRegChecked} style={ckeckbox} />
+                                            <Text style={text_style}>I agree with terms and conditions</Text>
                                         </View>
                                     </View>
                                 }

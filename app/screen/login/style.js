@@ -113,7 +113,12 @@ const styles = {
     ckeckbox: {
         marginRight: wp(5),
         marginLeft: wp(-3),
-        borderRadius:4
+        borderRadius: 4,
+        height: hp(2.6),
+        width: hp(2.6)
+    },
+    centered_row: {
+        alignItems: 'center'
     },
     forward_container: {
         height: hp(7.8),
@@ -124,7 +129,7 @@ const styles = {
         alignItems: 'center',
         alignSelf: 'flex-end',
         marginTop: hp(6),
-        
+
     },
     profile_container: {
         height: hp(14.5),
@@ -154,6 +159,9 @@ const styles = {
         alignSelf: 'center',
         height: hp(3),
         width: hp(3),
+    },
+    vertical_spacing: {
+        marginVertical: hp(1.8)
     }
 }
 export default styles
