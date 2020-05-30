@@ -95,9 +95,11 @@ const TabNavigator = createBottomTabNavigator(
               style={{
                 height: hp(8),
                 width: hp(8),
-                elevation: 10,
                 borderRadius: hp(8) / 2,
-                marginTop: hp(-4.8),
+                elevation: 6,
+                borderRadius: hp(8) / 2,
+                marginTop: hp(-5),
+                // paddingTop: 3,
               }}>
               <Image
                 source={icon}
@@ -299,7 +301,7 @@ const AppStack = createStackNavigator(
     },
   },
   {
-    initialRouteName: 'BottomTab',
+    initialRouteName: 'Splash',
     headerMode: 'none',
     mode: 'modal',
   },

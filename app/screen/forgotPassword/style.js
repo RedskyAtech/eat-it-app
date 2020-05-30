@@ -106,6 +106,7 @@ const styles = {
     height: hp(5.4),
     borderRadius: 20,
     marginTop: hp(2),
+    elevation:6
   },
   button_text: {
     color: 'white',

@@ -328,11 +328,11 @@ export default class profile extends Component {
                       style={input_box}
                     />
                   </View>
-
-                  <View style={[button_container, around_spacing]}>
-                    <Text style={button_text}>Update</Text>
-                  </View>
-
+                  <TouchableOpacity activeOpacity={0.8}>
+                    <View style={[button_container, around_spacing]}>
+                      <Text style={button_text}>Update</Text>
+                    </View>
+                  </TouchableOpacity>
                   <TouchableOpacity onPress={this.hideCard}>
                     <Text style={close_style}>Close</Text>
                   </TouchableOpacity>

@@ -274,7 +274,7 @@ export default class login extends Component {
                     </View>
                   </View>
                 )}
-                <TouchableOpacity onPress={this.onLoginSubmit}>
+                <TouchableOpacity activeOpacity={1}  onPress={this.onLoginSubmit}>
                   <View style={forward_container}>
                     <Image
                       resizeMode="contain"
@@ -292,13 +292,4 @@ export default class login extends Component {
   }
 }
 
-{
-  /* <View style={row}>
-                                        <View style={profile_container}>
-                                            <Image resizeMode='stretch' source={require('../../assets/profile.png')} style={profile_image}></Image>
-                                        </View>
-                                        <View style={edit_container}>
-                                            <Image resizeMode='stretch' source={require('../../assets/edit.png')} style={edit_icon}></Image>
-                                        </View>
-                                    </View> */
-}
+

@@ -112,7 +112,7 @@ export default class attatchFoodPhotos extends Component {
                     />
                   </View>
                   <View style={[cross_container, centered_text]}>
-                    <TouchableOpacity onPress={() => this.onRemove(item)}>
+                    <TouchableOpacity activeOpacity={1} onPress={() => this.onRemove(item)}>
                       <Image
                         resizeMode="cover"
                         source={require('../../assets/cross.png')}
@@ -137,13 +137,15 @@ export default class attatchFoodPhotos extends Component {
 
         <View style={bottom_container}>
           <Text />
-          <View style={forward_container}>
-            <Image
-              resizeMode="contain"
-              source={require('../../assets/next_button_arrow.png')}
-              style={arrow}
-            />
-          </View>
+          <TouchableOpacity activeOpacity={1}>
+            <View style={forward_container}>
+              <Image
+                resizeMode="contain"
+                source={require('../../assets/next_button_arrow.png')}
+                style={arrow}
+              />
+            </View>
+          </TouchableOpacity>
         </View>
       </View>
     );

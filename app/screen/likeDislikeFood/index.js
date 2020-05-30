@@ -248,18 +248,19 @@ export default class likeDislikeFood extends Component {
                   <TouchableOpacity onPress={() => this.close()}>
                     <Text style={cancel_style}>Cancel</Text>
                   </TouchableOpacity>
-                  <LinearGradient
-                    start={{x: 0, y: 0}}
-                    end={{x: 1, y: 0}}
-                    colors={[
-                      colors.gradientFirstColor,
-                      colors.gradientSecondColor,
-                    ]}
-                    style={[button, centered_text]}>
-                    <TouchableOpacity onPress={() => this.close()}>
+
+                  <TouchableOpacity activeOpacity={0.7} onPress={() => this.close()}>
+                    <LinearGradient
+                      start={{x: 0, y: 0}}
+                      end={{x: 1, y: 0}}
+                      colors={[
+                        colors.gradientFirstColor,
+                        colors.gradientSecondColor,
+                      ]}
+                      style={[button, centered_text]}>
                       <Text style={button_text}>Done</Text>
-                    </TouchableOpacity>
-                  </LinearGradient>
+                    </LinearGradient>
+                  </TouchableOpacity>
                 </View>
               </>
             ) : (

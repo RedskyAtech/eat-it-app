@@ -228,7 +228,7 @@ export default class filter extends Component {
 
         <View style={bottom_container}>
           <Text />
-          <TouchableOpacity onPress={this.onNext}>
+          <TouchableOpacity activeOpacity={1} onPress={this.onNext}>
             <View style={forward_container}>
               <Image
                 resizeMode="contain"

@@ -55,7 +55,7 @@ export default class shareFood extends Component {
                 <Text style={cancel_style}>Cancel</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => this.forward()}>
+              <TouchableOpacity activeOpacity={1} onPress={() => this.forward()}>
                 <View style={forward_container}>
                   <Image
                     resizeMode="contain"

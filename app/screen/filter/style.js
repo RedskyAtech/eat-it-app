@@ -127,6 +127,7 @@ const styles = {
     alignItems: 'center',
     alignSelf: 'flex-end',
     marginTop: hp(6),
+    elevation:6
   },
   wrap_container: {flexWrap: 'wrap'},
 };

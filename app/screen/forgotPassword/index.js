@@ -140,7 +140,7 @@ export default class ForgotPassword extends Component {
                   />
                 </View>
 
-                <TouchableOpacity onPress={this.sendOtp}>
+                <TouchableOpacity activeOpacity={0.7} onPress={this.sendOtp}>
                   <LinearGradient
                     start={{x: 0, y: 0}}
                     end={{x: 1, y: 0}}
@@ -223,7 +223,7 @@ export default class ForgotPassword extends Component {
                       />
                     </View>
 
-                    <TouchableOpacity onPress={this.onSubmit}>
+                    <TouchableOpacity activeOpacity={0.7} onPress={this.onSubmit}>
                       <LinearGradient
                         start={{x: 0, y: 0}}
                         end={{x: 1, y: 0}}

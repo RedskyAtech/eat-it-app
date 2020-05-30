@@ -73,6 +73,7 @@ const styles = {
     backgroundColor: '#FFBA09',
     justifyContent: 'center',
     alignItems: 'center',
+    elevation:6
   },
   arrow: {
     height: hp(4.5),
