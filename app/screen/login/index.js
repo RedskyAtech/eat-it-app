@@ -8,18 +8,37 @@ import {
   TextInput,
   BackHandler,
   TouchableOpacity,
+  Settings,
 } from 'react-native';
 import styles from './style';
 import {CheckBox} from 'native-base';
 import HandleBack from '../../components/HandleBack';
+import * as utility from '../../utility/index';
+import * as Url from '../../constants/urls';
+import * as Service from '../../api/services';
+import ImagePicker from 'react-native-image-picker';
 
 export default class login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLogin: true,
+      isLogin: false,
       checked: false,
       regChecked: false,
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      password: '',
+      confirmPassword: '',
+      isImagePicked: false,
+      fileUri: '',
+      image: {
+        url: '',
+        thumbnail: '',
+        resize_url: '',
+        resize_thumbnail: '',
+      },
     };
   }
   onChecked = async () => {
@@ -59,6 +78,135 @@ export default class login extends Component {
     } else {
       await this.setState({isLogin: true});
     }
+  };
+
+  onRegisteration = async () => {
+    if (utility.isFieldEmpty(this.state.firstName)) {
+      alert('FirstName is required');
+      return;
+    } else if (utility.isFieldEmpty(this.state.lastName)) {
+      alert('LastName is required');
+      return;
+    } else if (utility.isFieldEmpty(this.state.email)) {
+      alert('Email is required');
+      return;
+    } else if (utility.isFieldEmpty(this.state.phone)) {
+      alert('Phone number is required');
+      return;
+    } else if (utility.isFieldEmpty(this.state.password)) {
+      alert('Password is required');
+      return;
+    } else if (utility.isFieldEmpty(this.state.confirmPassword)) {
+      alert('ConfirmPassword is required');
+      return;
+    } else if (
+      utility.isValidComparedPassword(
+        this.state.password,
+        this.state.confirmPassword,
+      )
+    ) {
+      alert('Password and confirm password should be same');
+      return;
+    } else if (!this.state.regChecked) {
+      alert('Please agree terms and conditions');
+      return;
+    } else {
+      let body = {
+        loginType: 'app',
+        firstName: this.state.firstName,
+        lastName: this.state.lastName,
+        email: this.state.email,
+        phone: this.state.phone,
+        password: this.state.password,
+        image: this.state.image,
+      };
+      try {
+        let response = Service.postDataApi(Url.BASE_URL + 'users', body, '');
+        response
+          .then(res => {
+            if (res.data) {
+              alert('success');
+              this.props.navigation.navigate('BottomBar');
+            } else {
+              alert(res.error);
+            }
+          })
+          .catch(error => {
+            alert(error.error);
+          });
+      } catch (err) {
+        alert('try:', err);
+      }
+    }
+  };
+  onUploadImage = file => {
+    var formData = new FormData();
+    let fileData = {
+      uri: file.uri,
+      name: file.fileName,
+      type: file.type,
+    };
+    formData.append('file', fileData);
+    const headers = {
+      'Content-Type': 'multipart/form-data',
+      Accept: 'application/json',
+    };
+    try {
+      let response = Service.uploadImageApi(
+        Url.BASE_URL + 'files',
+        formData,
+        headers,
+      );
+      response
+        .then(res => {
+          if (res.data) {
+            if (res.data != null) {
+              console.log('success')
+              this.setState({
+                isImagePicked: true,
+                fileUri: res.data.image.resize_url,
+                image: {
+                  url: res.data.image.url,
+                  thumbnail: res.data.image.thumbnail,
+                  resize_url: res.data.image.resize_url,
+                  resize_thumbnail: res.data.image.resize_thumbnail,
+                },
+              });
+            }
+          } else {
+            alert('errrr', res.error);
+          }
+        })
+        .catch(error => {
+          alert(error.error);
+        });
+    } catch (err) {
+      this.setState({isVisibleLoading: false});
+      console.log('another problem:', err);
+      alert(err);
+    }
+  };
+  onLaunchCamera = () => {
+    let options = {
+      cameraType: 'front',
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+      },
+    };
+    ImagePicker.showImagePicker(options, response => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+        alert(response.customButton);
+      } else {
+        const source = {uri: response.uri};
+        this.onUploadImage(response);
+      }
+    });
   };
   render() {
     const {
@@ -198,35 +346,60 @@ export default class login extends Component {
                         source={require('../../assets/username.png')}
                         style={field_icons}
                       />
-                      <TextInput placeholder="Firstname" style={input_box} />
+                      <TextInput
+                        placeholder="Firstname"
+                        style={input_box}
+                        onChangeText={firstName => this.setState({firstName})}
+                        value={this.state.firstName}
+                      />
                     </View>
                     <View style={[row, fields]}>
                       <Image
                         source={require('../../assets/username.png')}
                         style={field_icons}
                       />
-                      <TextInput placeholder="Lastname" style={input_box} />
+                      <TextInput
+                        placeholder="Lastname"
+                        style={input_box}
+                        onChangeText={lastName => this.setState({lastName})}
+                        value={this.state.lastName}
+                      />
                     </View>
                     <View style={[row, fields]}>
                       <Image
                         source={require('../../assets/email.png')}
                         style={field_icons}
                       />
-                      <TextInput placeholder="Email" style={input_box} />
+                      <TextInput
+                        placeholder="Email"
+                        style={input_box}
+                        onChangeText={email => this.setState({email})}
+                        value={this.state.email}
+                      />
                     </View>
                     <View style={[row, fields]}>
                       <Image
                         source={require('../../assets/phone.png')}
                         style={field_icons}
                       />
-                      <TextInput placeholder="Phone" style={input_box} />
+                      <TextInput
+                        placeholder="Phone"
+                        style={input_box}
+                        onChangeText={phone => this.setState({phone})}
+                        value={this.state.phone}
+                      />
                     </View>
                     <View style={[row, fields]}>
                       <Image
                         source={require('../../assets/password.png')}
                         style={field_icons}
                       />
-                      <TextInput placeholder="Password" style={input_box} />
+                      <TextInput
+                        placeholder="Password"
+                        style={input_box}
+                        onChangeText={password => this.setState({password})}
+                        value={this.state.password}
+                      />
                     </View>
                     <View style={[row, fields]}>
                       <Image
@@ -236,6 +409,10 @@ export default class login extends Component {
                       <TextInput
                         placeholder="Confirm password"
                         style={input_box}
+                        onChangeText={confirmPassword =>
+                          this.setState({confirmPassword})
+                        }
+                        value={this.state.confirmPassword}
                       />
                     </View>
                     <View style={[row, vertical_spacing, centered_row]}>
@@ -261,20 +438,28 @@ export default class login extends Component {
                     <View style={profile_container}>
                       <Image
                         resizeMode="stretch"
-                        source={require('../../assets/profile.png')}
+                        source={
+                          this.state.isImagePicked
+                            ? {uri: this.state.fileUri}
+                            : require('../../assets/profile.png')
+                        }
                         style={profile_image}
                       />
                     </View>
-                    <View style={edit_container}>
-                      <Image
-                        resizeMode="stretch"
-                        source={require('../../assets/edit.png')}
-                        style={edit_icon}
-                      />
-                    </View>
+                    <TouchableOpacity onPress={this.onLaunchCamera}>
+                      <View style={edit_container}>
+                        <Image
+                          resizeMode="stretch"
+                          source={require('../../assets/edit.png')}
+                          style={edit_icon}
+                        />
+                      </View>
+                    </TouchableOpacity>
                   </View>
                 )}
-                <TouchableOpacity activeOpacity={1}  onPress={this.onLoginSubmit}>
+                <TouchableOpacity
+                  activeOpacity={1}
+                  onPress={this.onRegisteration}>
                   <View style={forward_container}>
                     <Image
                       resizeMode="contain"
@@ -291,5 +476,3 @@ export default class login extends Component {
     );
   }
 }
-
-
