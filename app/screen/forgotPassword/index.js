@@ -10,6 +10,9 @@ import {
 import styles from './style';
 import LinearGradient from 'react-native-linear-gradient';
 import * as colors from '../../constants/colors';
+import * as utility from '../../utility/index';
+import * as Url from '../../constants/urls';
+import * as Service from '../../api/services';
 
 export default class ForgotPassword extends Component {
   constructor(props) {
@@ -21,11 +24,83 @@ export default class ForgotPassword extends Component {
       thirdDigit: '',
       fourthDigit: '',
       fill: false,
+      email: '',
+      otp: '',
+      password: '',
+      confirmPassword: '',
+      minutes: 0,
+      seconds: 20,
     };
   }
-  sendOtp = async () => {
-    await this.setState({sendOtp: true});
+  timer = async () => {
+    this.myInterval = setInterval(() => {
+      const {seconds, minutes} = this.state;
+
+      if (seconds > 0) {
+        this.setState(({seconds}) => ({
+          seconds: seconds - 1,
+        }));
+      }
+      if (seconds === 0) {
+        if (minutes === 0) {
+          clearInterval(this.myInterval);
+        } else {
+          this.setState(({minutes}) => ({
+            minutes: minutes - 1,
+            seconds: 59,
+          }));
+        }
+      }
+    }, 1000);
   };
+
+  onTopBackButton = async () => {
+    if (!this.state.sendOtp) {
+      this.props.navigation.navigate('Login');
+    } else {
+      await this.setState({sendOtp: false});
+    }
+  };
+  onSendOtp = () => {
+    // validation
+    if (utility.isFieldEmpty(this.state.email)) {
+      alert('Email is required');
+      return;
+    } else if (utility.isValidEmail(this.state.email)) {
+      alert('Email is not valid');
+      return;
+    } else {
+      let body = {
+        email: this.state.email,
+      };
+      try {
+        let response = Service.postDataApi(
+          Url.BASE_URL + 'users/forgotPassword',
+          body,
+          '',
+        );
+        response
+          .then(res => {
+            if (res.data) {
+              alert(res.data);
+              this.setState({sendOtp: true});
+              this.timer();
+            } else {
+              console.log('if no data in response:', res.error);
+              alert(res.error);
+            }
+          })
+          .catch(error => {
+            console.log('api problem:', error.error);
+            alert(error.error);
+          });
+      } catch (err) {
+        console.log('another problem:', err);
+        alert(err);
+      }
+    }
+  };
+
   onFirstChange = async value => {
     await this.setState({firstDigit: value});
     if (value) {
@@ -52,21 +127,69 @@ export default class ForgotPassword extends Component {
       this.state.thirdDigit != '' &&
       this.state.fourthDigit != ''
     ) {
-      await this.setState({fill: true});
+      await this.setState({
+        fill: true,
+        otp:
+          this.state.firstDigit +
+          this.state.secondDigit +
+          this.state.thirdDigit +
+          this.state.fourthDigit,
+      });
     } else {
       await this.setState({fill: false});
     }
   };
-  onSubmit = async () => {
-    this.props.navigation.navigate('Login');
-  };
-  onTopBackButton = async () => {
-    if (!this.state.sendOtp) {
-      this.props.navigation.navigate('Login');
+
+  onSubmitResetPassword = () => {
+    if (
+      utility.isFieldEmpty(
+        this.state.otp && this.state.password && this.state.confirmPassword,
+      )
+    ) {
+      alert('All fields are required');
+      return;
+    }
+    if (
+      utility.isValidComparedPassword(
+        this.state.password,
+        this.state.confirmPassword,
+      )
+    ) {
+      alert('Password and confirm password should be same');
+      return;
     } else {
-      await this.setState({sendOtp: false});
+      let body = {
+        email: this.state.email,
+        otp: this.state.otp,
+        newPassword: this.state.password,
+      };
+      try {
+        let response = Service.postDataApi(
+          Url.BASE_URL + 'users/resetPassword',
+          body,
+          '',
+        );
+        response
+          .then(res => {
+            if (res.data) {
+              alert(res.data);
+              this.props.navigation.navigate('Login');
+            } else {
+              console.log('if no data in response:', res.error);
+              alert(res.error);
+            }
+          })
+          .catch(error => {
+            console.log('api problem:', error.error);
+            alert(error.error);
+          });
+      } catch (err) {
+        console.log('another problem:', err);
+        alert(err);
+      }
     }
   };
+
   render() {
     const {
       back_container,
@@ -137,10 +260,12 @@ export default class ForgotPassword extends Component {
                   <TextInput
                     placeholder="Enter registered mobile / email"
                     style={input_box}
+                    onChangeText={email => this.setState({email})}
+                    value={this.state.email}
                   />
                 </View>
 
-                <TouchableOpacity activeOpacity={0.7} onPress={this.sendOtp}>
+                <TouchableOpacity activeOpacity={0.7} onPress={this.onSendOtp}>
                   <LinearGradient
                     start={{x: 0, y: 0}}
                     end={{x: 1, y: 0}}
@@ -200,7 +325,22 @@ export default class ForgotPassword extends Component {
                 {!this.state.fill ? (
                   <View style={[row, centered_text]}>
                     <Text>
-                      OTP expires in <Text style={primary_color}>03:30</Text>
+                      {this.state.minutes == 0 && this.state.seconds == 0 ? (
+                        'Resend otp'
+                      ) : (
+                        <>
+                          'OTP expires in'
+                          <Text style={primary_color}>
+                            {this.state.minutes < 10
+                              ? `0${this.state.minutes}`
+                              : this.state.minutes}
+                            {':'}
+                            {this.state.seconds < 10
+                              ? `0${this.state.seconds}`
+                              : this.state.seconds}
+                          </Text>
+                        </>
+                      )}
                     </Text>
                   </View>
                 ) : (
@@ -210,7 +350,12 @@ export default class ForgotPassword extends Component {
                         source={require('../../assets/password.png')}
                         style={field_icons}
                       />
-                      <TextInput placeholder="New password" style={input_box} />
+                      <TextInput
+                        placeholder="New password"
+                        style={input_box}
+                        onChangeText={password => this.setState({password})}
+                        value={this.state.password}
+                      />
                     </View>
                     <View style={[row, fields]}>
                       <Image
@@ -220,10 +365,16 @@ export default class ForgotPassword extends Component {
                       <TextInput
                         placeholder="Confirm new password"
                         style={input_box}
+                        onChangeText={confirmPassword =>
+                          this.setState({confirmPassword})
+                        }
+                        value={this.state.confirmPassword}
                       />
                     </View>
 
-                    <TouchableOpacity activeOpacity={0.7} onPress={this.onSubmit}>
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={this.onSubmitResetPassword}>
                       <LinearGradient
                         start={{x: 0, y: 0}}
                         end={{x: 1, y: 0}}

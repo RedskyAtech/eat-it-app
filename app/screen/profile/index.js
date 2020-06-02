@@ -12,6 +12,9 @@ import LinearGradient from 'react-native-linear-gradient';
 import * as colors from '../../constants/colors';
 import {Menu, Provider} from 'react-native-paper';
 import {heightPercentageToDP as hp} from '../../utility/index';
+import * as Service from '../../api/services';
+import * as utility from '../../utility/index';
+import * as Url from '../../constants/urls';
 
 export default class profile extends Component {
   constructor(props) {
@@ -19,8 +22,99 @@ export default class profile extends Component {
     this.state = {
       visible: false,
       top: new Animated.Value(-hp(50)),
+      userToken: '',
+      userId: '',
+      name: '',
+      email: '',
+      phone: '',
+      password: '',
+      newPassword: '',
+      confirmPassword: '',
     };
   }
+  componentDidMount = async () => {
+    const token = await utility.getToken('token');
+    const userId = await utility.getItem('userId');
+    this.setState({userToken: token, userId: userId});
+    this.getUser();
+  };
+
+  getUser = async () => {
+    try {
+      let response = Service.getDataApi(
+        Url.BASE_URL + `users/${this.state.userId}`,
+        this.state.userToken,
+      );
+      response
+        .then(res => {
+          if (res.data) {
+            this.setState({
+              name: res.data.firstName + ' ' + res.data.lastName,
+              email: res.data.email,
+              phone: res.data.phone,
+            });
+          } else {
+            alert(res.error);
+          }
+        })
+        .catch(error => {
+          this.props.navigation.navigate('Login');
+          console.log('api problem:', error.error);
+          alert(error.error);
+        });
+    } catch (err) {
+      console.log('another problem:', err);
+      alert(err);
+    }
+  };
+  changePassword = async () => {
+    if (
+      utility.isFieldEmpty(
+        this.state.password && this.state.newPassword && this.state.oldPassword,
+      )
+    ) {
+      alert('All fields are required');
+      return;
+    } else if (
+      utility.isValidComparedPassword(
+        this.state.newPassword,
+        this.state.confirmPassword,
+      )
+    ) {
+      alert('New password and confirm password should be same');
+      return;
+    } else {
+      let body = {
+        password: this.state.password,
+        newPassword: this.state.newPassword,
+      };
+      try {
+        let response = Service.postDataApi(
+          Url.BASE_URL + 'users/changePassword',
+          body,
+          this.state.userToken,
+        );
+        response
+          .then(res => {
+            if (res.data) {
+              alert(res.data);
+              this.hideCard();
+            } else {
+              alert(res.error);
+            }
+          })
+          .catch(error => {
+            this.props.navigation.navigate('Login');
+            console.log('api problem:', error.error);
+            alert(error.error);
+          });
+      } catch (err) {
+        console.log('another problem:', err);
+        alert(err);
+      }
+    }
+  };
+
   openMenu = () => this.setState({visible: true});
 
   closeMenu = () => this.setState({visible: false});
@@ -38,8 +132,34 @@ export default class profile extends Component {
       duration: 700,
     }).start();
   };
-  logOut = async () => {
-    await this.props.navigation.navigate('Login');
+
+  onLogOutSubmit = async () => {
+    let body = {};
+    try {
+      let response = Service.postDataApi(
+        Url.BASE_URL + 'users/logOut',
+        body,
+        this.state.userToken,
+      );
+      response
+        .then(res => {
+          if (res.message) {
+            alert(res.message);
+            utility.setToken('token', '');
+            this.props.navigation.navigate('Login');
+          } else {
+            alert(res.error);
+          }
+        })
+        .catch(error => {
+          this.props.navigation.navigate('Login');
+          console.log('api problem:', error.error);
+          alert(error.error);
+        });
+    } catch (err) {
+      console.log('another problem:', err);
+      alert(err);
+    }
   };
   render() {
     const {
@@ -146,7 +266,7 @@ export default class profile extends Component {
                       <Menu.Item
                         titleStyle={[menu_list_title, heading_color]}
                         style={list_item_height}
-                        onPress={this.logOut}
+                        onPress={this.onLogOutSubmit}
                         title="Logout"
                       />
                     </View>
@@ -160,11 +280,9 @@ export default class profile extends Component {
               </LinearGradient>
 
               <View style={user_details}>
-                <Text style={[spacing, heading_color]}>Merry Smith</Text>
-                <Text style={[spacing, colored_text]}>
-                  merry.smith@gmail.com
-                </Text>
-                <Text style={[spacing, heading_color]}>8792345678</Text>
+                <Text style={[spacing, heading_color]}>{this.state.name}</Text>
+                <Text style={[spacing, colored_text]}>{this.state.email}</Text>
+                <Text style={[spacing, heading_color]}>{this.state.phone}</Text>
               </View>
             </View>
 
@@ -303,6 +421,8 @@ export default class profile extends Component {
                       placeholder="Old password"
                       placeholderTextColor="white"
                       style={input_box}
+                      onChangeText={password => this.setState({password})}
+                      value={this.state.password}
                     />
                   </View>
 
@@ -315,6 +435,8 @@ export default class profile extends Component {
                       placeholder="New password"
                       placeholderTextColor="white"
                       style={input_box}
+                      onChangeText={newPassword => this.setState({newPassword})}
+                      value={this.state.newPassword}
                     />
                   </View>
                   <View style={[row, fields]}>
@@ -326,9 +448,15 @@ export default class profile extends Component {
                       placeholder="Confirm new password"
                       placeholderTextColor="white"
                       style={input_box}
+                      onChangeText={confirmPassword =>
+                        this.setState({confirmPassword})
+                      }
+                      value={this.state.confirmPassword}
                     />
                   </View>
-                  <TouchableOpacity activeOpacity={0.8}>
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    onPress={this.changePassword}>
                     <View style={[button_container, around_spacing]}>
                       <Text style={button_text}>Update</Text>
                     </View>

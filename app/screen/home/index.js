@@ -12,6 +12,9 @@ import styles from './style';
 import {RecyclerListView, DataProvider, LayoutProvider} from 'recyclerlistview';
 import {Badge} from 'react-native-elements';
 import HandleBack from '../../components/HandleBack';
+import * as Service from '../../api/services';
+import * as utility from '../../utility/index';
+import * as Url from '../../constants/urls';
 
 const ViewTypes = {
   HALF_LEFT: 1,
@@ -297,6 +300,11 @@ export default class home extends Component {
     });
   };
   onBack = async () => {
+    const rembemberMe = await utility.getItem('rembemberMe');
+    console.log('meeeeeeeeeeeeeeeee:', rembemberMe);
+    if (rembemberMe == false) {
+      await utility.setToken('token', '');
+    }
     BackHandler.exitApp();
     return true;
   };

@@ -9,6 +9,7 @@ import {
   BackHandler,
   TouchableOpacity,
   Settings,
+  ActivityIndicator,
 } from 'react-native';
 import styles from './style';
 import {CheckBox} from 'native-base';
@@ -22,7 +23,8 @@ export default class login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLogin: false,
+      isVisibleLoading: false,
+      isLogin: true,
       checked: false,
       regChecked: false,
       firstName: '',
@@ -64,9 +66,6 @@ export default class login extends Component {
   onForgotPassword = async () => {
     this.props.navigation.navigate('ForgotPassword');
   };
-  onLoginSubmit = async () => {
-    this.props.navigation.navigate('tab1');
-  };
   onBack = () => {
     BackHandler.exitApp();
     return true;
@@ -79,67 +78,9 @@ export default class login extends Component {
       await this.setState({isLogin: true});
     }
   };
-
-  onRegisteration = async () => {
-    if (utility.isFieldEmpty(this.state.firstName)) {
-      alert('FirstName is required');
-      return;
-    } else if (utility.isFieldEmpty(this.state.lastName)) {
-      alert('LastName is required');
-      return;
-    } else if (utility.isFieldEmpty(this.state.email)) {
-      alert('Email is required');
-      return;
-    } else if (utility.isFieldEmpty(this.state.phone)) {
-      alert('Phone number is required');
-      return;
-    } else if (utility.isFieldEmpty(this.state.password)) {
-      alert('Password is required');
-      return;
-    } else if (utility.isFieldEmpty(this.state.confirmPassword)) {
-      alert('ConfirmPassword is required');
-      return;
-    } else if (
-      utility.isValidComparedPassword(
-        this.state.password,
-        this.state.confirmPassword,
-      )
-    ) {
-      alert('Password and confirm password should be same');
-      return;
-    } else if (!this.state.regChecked) {
-      alert('Please agree terms and conditions');
-      return;
-    } else {
-      let body = {
-        loginType: 'app',
-        firstName: this.state.firstName,
-        lastName: this.state.lastName,
-        email: this.state.email,
-        phone: this.state.phone,
-        password: this.state.password,
-        image: this.state.image,
-      };
-      try {
-        let response = Service.postDataApi(Url.BASE_URL + 'users', body, '');
-        response
-          .then(res => {
-            if (res.data) {
-              alert('success');
-              this.props.navigation.navigate('BottomBar');
-            } else {
-              alert(res.error);
-            }
-          })
-          .catch(error => {
-            alert(error.error);
-          });
-      } catch (err) {
-        alert('try:', err);
-      }
-    }
-  };
   onUploadImage = file => {
+    this.setState({isVisibleLoading: true});
+
     var formData = new FormData();
     let fileData = {
       uri: file.uri,
@@ -161,23 +102,28 @@ export default class login extends Component {
         .then(res => {
           if (res.data) {
             if (res.data != null) {
-              console.log('success')
-              this.setState({
-                isImagePicked: true,
-                fileUri: res.data.image.resize_url,
-                image: {
-                  url: res.data.image.url,
-                  thumbnail: res.data.image.thumbnail,
-                  resize_url: res.data.image.resize_url,
-                  resize_thumbnail: res.data.image.resize_thumbnail,
-                },
-              });
+              alert('success');
+              if (res.data.image != null) {
+                this.setState({
+                  isImagePicked: true,
+                  fileUri: file.uri,
+                  image: {
+                    url: res.data.image.url,
+                    thumbnail: res.data.image.thumbnail,
+                    resize_url: res.data.image.resize_url,
+                    resize_thumbnail: res.data.image.resize_thumbnail,
+                  },
+                });
+                this.setState({isVisibleLoading: false});
+              }
             }
           } else {
+            this.setState({isVisibleLoading: false});
             alert('errrr', res.error);
           }
         })
         .catch(error => {
+          this.setState({isVisibleLoading: false});
           alert(error.error);
         });
     } catch (err) {
@@ -207,6 +153,121 @@ export default class login extends Component {
         this.onUploadImage(response);
       }
     });
+  };
+  onRegisteration = async () => {
+    if (
+      utility.isFieldEmpty(
+        this.state.firstName &&
+          this.state.lastName &&
+          this.state.email &&
+          this.state.phone &&
+          this.state.password &&
+          this.state.confirmPassword,
+      )
+    ) {
+      alert('All fields are required');
+      return;
+    } else if (utility.isValidEmail(this.state.email)) {
+      alert('Please enter valid email address');
+      return;
+    } else if (
+      utility.isValidComparedPassword(
+        this.state.password,
+        this.state.confirmPassword,
+      )
+    ) {
+      alert('Password and confirm password should be same');
+      return;
+    } else if (!this.state.regChecked) {
+      alert('Please agree terms and conditions');
+      return;
+    } else if (!this.state.isImagePicked) {
+      alert('Profile is required');
+      return;
+    } else {
+      this.setState({isVisibleLoading: true});
+
+      let body = {
+        loginType: 'app',
+        firstName: this.state.firstName,
+        lastName: this.state.lastName,
+        email: this.state.email,
+        phone: this.state.phone,
+        password: this.state.password,
+        image: this.state.image,
+      };
+      try {
+        let response = Service.postDataApi(Url.BASE_URL + 'users', body, '');
+        response
+          .then(res => {
+            if (res.data) {
+              alert('Registered successfully');
+              this.props.navigation.navigate('Login');
+              this.setState({isVisibleLoading: false, email: '', password: ''});
+            } else {
+              alert(res.error);
+              this.setState({isVisibleLoading: false});
+            }
+          })
+          .catch(error => {
+            alert(error.error);
+            this.setState({isVisibleLoading: false});
+          });
+      } catch (err) {
+        alert('try:', err);
+      }
+    }
+  };
+  onLoginSubmit = async () => {
+    if (utility.isFieldEmpty(this.state.email && this.state.password)) {
+      alert('All fields are required');
+      return;
+    } else if (utility.isValidEmail(this.state.email)) {
+      alert('Please enter valid email address');
+      return;
+    } else {
+      this.setState({isVisibleLoading: true});
+
+      let body = {
+        email: this.state.email,
+        password: this.state.password,
+      };
+
+      try {
+        let response = Service.postDataApi(
+          Url.BASE_URL + 'users/login',
+          body,
+          '',
+        );
+        response
+          .then(res => {
+            if (res.data) {
+              alert('Successfully logged in');
+              if (this.state.checked) {
+                utility.setItem('rembemberMe', true);
+              } else {
+                utility.setItem('rembemberMe', false);
+              }
+              utility.setToken('token', res.data.token);
+              utility.setItem('userId', res.data._id);
+
+              this.props.navigation.navigate('tab1');
+              this.setState({isVisibleLoading: false, email: '', password: ''});
+            } else {
+              alert(res.error);
+              console.log('errorrr:', res.error);
+              this.setState({isVisibleLoading: false});
+            }
+          })
+          .catch(error => {
+            alert(error.error);
+            console.log('errorrr:', error.error);
+            this.setState({isVisibleLoading: false});
+          });
+      } catch (err) {
+        alert('try:', err);
+      }
+    }
   };
   render() {
     const {
@@ -290,7 +351,12 @@ export default class login extends Component {
                         source={require('../../assets/email.png')}
                         style={field_icons}
                       />
-                      <TextInput placeholder="Email" style={input_box} />
+                      <TextInput
+                        placeholder="Email"
+                        style={input_box}
+                        onChangeText={email => this.setState({email})}
+                        value={this.state.email}
+                      />
                     </View>
 
                     <View style={[row, fields]}>
@@ -298,7 +364,13 @@ export default class login extends Component {
                         source={require('../../assets/password.png')}
                         style={field_icons}
                       />
-                      <TextInput placeholder="Password" style={input_box} />
+                      <TextInput
+                        placeholder="Password"
+                        style={input_box}
+                        onChangeText={password => this.setState({password})}
+                        value={this.state.password}
+                        secureTextEntry={true}
+                      />
                     </View>
 
                     <View style={[row, between_spacing]}>
@@ -399,6 +471,7 @@ export default class login extends Component {
                         style={input_box}
                         onChangeText={password => this.setState({password})}
                         value={this.state.password}
+                        secureTextEntry={true}
                       />
                     </View>
                     <View style={[row, fields]}>
@@ -413,6 +486,7 @@ export default class login extends Component {
                           this.setState({confirmPassword})
                         }
                         value={this.state.confirmPassword}
+                        secureTextEntry={true}
                       />
                     </View>
                     <View style={[row, vertical_spacing, centered_row]}>
@@ -459,7 +533,11 @@ export default class login extends Component {
                 )}
                 <TouchableOpacity
                   activeOpacity={1}
-                  onPress={this.onRegisteration}>
+                  onPress={
+                    this.state.isLogin
+                      ? this.onLoginSubmit
+                      : this.onRegisteration
+                  }>
                   <View style={forward_container}>
                     <Image
                       resizeMode="contain"
@@ -468,6 +546,14 @@ export default class login extends Component {
                     />
                   </View>
                 </TouchableOpacity>
+              </View>
+              <View
+                style={{position: 'absolute', top: '50%', right: 0, left: 0}}>
+                <ActivityIndicator
+                  animating={this.state.isVisibleLoading}
+                  size="large"
+                  color="#0000ff"
+                />
               </View>
             </ImageBackground>
           </ScrollView>

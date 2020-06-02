@@ -1,5 +1,6 @@
 export const postDataApi = (url, body, token) => {
   let headers;
+  console.log('body',body)
   if (token == null || token == undefined || token == '') {
     headers = {
       Accept: 'application/json',
@@ -9,7 +10,7 @@ export const postDataApi = (url, body, token) => {
     headers = {
       Accept: 'application/json',
       'Content-Type': 'application/json',
-      'x-access-token': accessToken,
+      'x-access-token': token,
     };
   }
   let data = JSON.stringify(body);
@@ -36,6 +37,7 @@ export const postDataApi = (url, body, token) => {
       })
       .catch(error => {
         reject(error);
+        console.log('postAPIError', error);
       });
   });
 };

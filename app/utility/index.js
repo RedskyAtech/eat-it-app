@@ -61,7 +61,7 @@ export let isValidOtp = otp => {
 };
 
 export const isValidPhoneNumber = phoneNo => {
-  if (phoneNo.length < 8) {
+  if (phoneNo.length < 11) {
     return false;
   }
   return true;
@@ -123,6 +123,22 @@ export const getToken = async key => {
     return token ? JSON.parse(token) : null;
   } catch (err) {
     console.log('getToken Error', err);
+  }
+};
+export const setItem = async (key, value) => {
+  try {
+    const res = await AsyncStorage.setItem(key, JSON.stringify(value));
+    // console.log('setToken', res);
+  } catch (err) {
+    console.log('setItem Error', err);
+  }
+};
+export const getItem = async key => {
+  try {
+    const token = await AsyncStorage.getItem(key);
+    return token ? JSON.parse(token) : null;
+  } catch (err) {
+    console.log('getItem Error', err);
   }
 };
 export const setInLocalStorge = async (key, token) => {

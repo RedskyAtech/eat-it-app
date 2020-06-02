@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {View, Image, ImageBackground} from 'react-native';
 import styles from './style';
+import * as utility from '../../utility/index';
 
 export default class splash extends Component {
   constructor(props) {
@@ -14,8 +15,19 @@ export default class splash extends Component {
   }
 
   retrieveData = async () => {
-    this.props.navigation.navigate('Login');
+    try {
+      var token = await utility.getToken('token');
+      console.log('Splash', token);
+      if (token == null || token == '' || token == undefined) {
+        this.props.navigation.navigate('Login');
+      } else {
+        this.props.navigation.navigate('tab1');
+      }
+    } catch (error) {
+      alert(error);
+    }
   };
+
   componentWillUnmount() {
     clearTimeout(this.timeoutHandle);
   }
