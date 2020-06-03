@@ -74,6 +74,7 @@ export default class home extends Component {
   constructor(props) {
     super(props);
     let {width} = Dimensions.get('window');
+
     let dataProvider = new DataProvider((r1, r2) => {
       return r1 !== r2;
     });
@@ -110,112 +111,10 @@ export default class home extends Component {
     );
 
     this._rowRenderer = this._rowRenderer.bind(this);
-    this.products = [
-      {
-        id: 1,
-        name: 'Vision Resort',
-        price: '50',
-        time: '06:00 pm',
-        address: 'Amrit Sweets, Phase 5, Mohali',
-        image: require('../../assets/food.jpg'),
-      },
-      {
-        id: 2,
-        name: 'Vision Resort',
-        price: '50',
-        time: '06:00 pm',
-        address: 'Amrit Sweets, Phase 5, Mohali',
-        image: require('../../assets/burger.jpg'),
-      },
-      {
-        id: 3,
-        name: 'Vision Resort',
-        price: '50',
-        time: '07:00 pm',
-        address: 'Amrit Sweets, Phase 5, Mohali',
-        image: require('../../assets/sweet.jpg'),
-      },
-      {
-        id: 4,
-        name: 'Vision Resort',
-        price: '50',
-        time: '06:00 pm',
-        address: 'Amrit Sweets, Phase 5, Mohali',
-        image: require('../../assets/burger.jpg'),
-      },
-      {
-        id: 5,
-        name: 'Vision Resort',
-        price: '50',
-        time: '08:00 pm',
-        address: 'Amrit Sweets, Phase 5, Mohali',
-        image: require('../../assets/sweet.jpg'),
-      },
-      {
-        id: 6,
-        name: 'Vision Resort',
-        price: '50',
-        time: '09:00 pm',
-        address: 'Amrit Sweets, Phase 5, Mohali',
-        image: require('../../assets/food.jpg'),
-      },
-      {
-        id: 7,
-        name: 'Vision Resort',
-        price: '50',
-        time: '10:00 pm',
-        address: 'Amrit Sweets, Phase 5, Mohali',
-        image: require('../../assets/food.jpg'),
-      },
-      {
-        id: 8,
-        name: 'Vision Resort',
-        price: '50',
-        time: '06:00 pm',
-        address: 'Amrit Sweets, Phase 5, Mohali',
-        image: require('../../assets/sweet.jpg'),
-      },
-      {
-        id: 9,
-        name: 'Vision Resort',
-        price: '50',
-        time: '06:00 pm',
-        address: 'Amrit Sweets, Phase 5, Mohali',
-        image: require('../../assets/burger.jpg'),
-      },
-      {
-        id: 10,
-        name: 'Vision Resort',
-        price: '50',
-        time: '06:00 pm',
-        address: 'Amrit Sweets, Phase 5, Mohali',
-        image: require('../../assets/food.jpg'),
-      },
-      {
-        id: 11,
-        name: 'Vision Resort',
-        price: '50',
-        time: '06:00 pm',
-        address: 'Amrit Sweets, Phase 5, Mohali',
-        image: require('../../assets/sweet.jpg'),
-      },
-      {
-        id: 11,
-        name: 'Vision Resort',
-        price: '50',
-        time: '06:00 pm',
-        address: 'Amrit Sweets, Phase 5, Mohali',
-        image: require('../../assets/burger.jpg'),
-      },
-      {
-        id: 12,
-        name: 'Vision Resort',
-        price: '50',
-        time: '06:00 pm',
-        address: 'Amrit Sweets, Phase 5, Mohali',
-        image: require('../../assets/food.jpg'),
-      },
-    ];
+
+    this.products = [];
+    this.getFood();
+
     this.state = {
       forYou: true,
       lastSearch: false,
@@ -226,8 +125,47 @@ export default class home extends Component {
       ),
     };
   }
+  getFood = async () => {
+    this.products = [];
+    try {
+      let response = Service.getDataApi(Url.BASE_URL + 'foods', '');
+      response
+        .then(res => {
+          if (res.data) {
+            if (res.data.length != 0) {
+              for (let i = 0; i < res.data.length; i++) {
+                let image;
+                if (res.data[i].images) {
+                  image = res.data[i].images[0].url;
+                }
+                this.products.push({
+                  id: res.data[i]._id,
+                  name: res.data[i].name,
+                  price: res.data[i].price,
+                  time: res.data[i].cookingTime,
+                  address: res.data[i].address,
+                  image: image,
+                });
+              }
+              console.log('foodsssssssssssssssssss:::::', this.products);
+            }
+          } else {
+            console.log('if no data in response:', res.error);
+            alert(res.error);
+          }
+        })
+        .catch(error => {
+          console.log('api problem:', error.error);
+          alert(error.error);
+        });
+    } catch (err) {
+      console.log('another problem:', err);
+      alert(err);
+    }
+  };
 
   _generateArray(array) {
+    console.log('arrayyyyyyyyy:', array);
     let n = array.length;
     let arr = new Array(n);
     for (let i = 0; i < n; i++) {
@@ -314,6 +252,7 @@ export default class home extends Component {
   closeDialog = async () => {
     this.setState({isVisible: false});
   };
+
   render() {
     const {
       container,

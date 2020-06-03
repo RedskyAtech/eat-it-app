@@ -29,9 +29,10 @@ export default class ForgotPassword extends Component {
       password: '',
       confirmPassword: '',
       minutes: 0,
-      seconds: 20,
+      seconds: 10,
     };
   }
+
   timer = async () => {
     this.myInterval = setInterval(() => {
       const {seconds, minutes} = this.state;
@@ -58,11 +59,11 @@ export default class ForgotPassword extends Component {
     if (!this.state.sendOtp) {
       this.props.navigation.navigate('Login');
     } else {
-      await this.setState({sendOtp: false});
+      await this.setState({sendOtp: false, minutes: 0, seconds: 10, email: ''});
     }
   };
+
   onSendOtp = () => {
-    // validation
     if (utility.isFieldEmpty(this.state.email)) {
       alert('Email is required');
       return;
@@ -83,7 +84,12 @@ export default class ForgotPassword extends Component {
           .then(res => {
             if (res.data) {
               alert(res.data);
-              this.setState({sendOtp: true});
+              this.setState({
+                sendOtp: true,
+                minutes: 0,
+                seconds: 10,
+              });
+              this.refs.first.focus();
               this.timer();
             } else {
               console.log('if no data in response:', res.error);
@@ -285,6 +291,7 @@ export default class ForgotPassword extends Component {
                         : otp_input_box
                     }
                     maxLength={1}
+                    ref="first"
                     keyboardType="numeric"
                     onChangeText={this.onFirstChange}
                   />
@@ -324,12 +331,14 @@ export default class ForgotPassword extends Component {
                 </View>
                 {!this.state.fill ? (
                   <View style={[row, centered_text]}>
-                    <Text>
+                    <View style={row}>
                       {this.state.minutes == 0 && this.state.seconds == 0 ? (
-                        'Resend otp'
+                        <TouchableOpacity onPress={this.onSendOtp}>
+                          <Text style={primary_color}>Resend otp?</Text>
+                        </TouchableOpacity>
                       ) : (
                         <>
-                          'OTP expires in'
+                          <Text>OTP expires in </Text>
                           <Text style={primary_color}>
                             {this.state.minutes < 10
                               ? `0${this.state.minutes}`
@@ -341,7 +350,7 @@ export default class ForgotPassword extends Component {
                           </Text>
                         </>
                       )}
-                    </Text>
+                    </View>
                   </View>
                 ) : (
                   <View>

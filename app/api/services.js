@@ -1,6 +1,5 @@
 export const postDataApi = (url, body, token) => {
   let headers;
-  console.log('body',body)
   if (token == null || token == undefined || token == '') {
     headers = {
       Accept: 'application/json',
@@ -42,15 +41,24 @@ export const postDataApi = (url, body, token) => {
   });
 };
 
-export const getDataApi = (url, accessToken) => {
+export const getDataApi = (url, token) => {
+  let headers;
+  if (token == null || token == undefined || token == '') {
+    headers = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    };
+  } else {
+    headers = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      'x-access-token': token,
+    };
+  }
   return new Promise((resolve, reject) => {
     fetch(url, {
       method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        'x-access-token': accessToken,
-      },
+      headers,
     })
       .then(response => response.json())
       .then(response => {
