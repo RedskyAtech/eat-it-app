@@ -13,6 +13,7 @@ export default class searchName extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      name: '',
       products: [
         {
           heading: 'Bolognese Baked Potato',
@@ -105,6 +106,50 @@ export default class searchName extends Component {
       ],
     };
   }
+  getFood = async(name) => {
+    this.products = [];
+    let query='name='
+    try {
+      let response = Service.getDataApi(Url.BASE_URL + 'foods', '');
+      response
+        .then(res => {
+          if (res.data) {
+            if (res.data.length != 0) {
+              for (let i = 0; i < res.data.length; i++) {
+                let image;
+                if (res.data[i].images) {
+                  image = res.data[i].images[0].url;
+                }
+                this.products.push({
+                  id: res.data[i]._id,
+                  name: res.data[i].name,
+                  price: res.data[i].price,
+                  time: res.data[i].cookingTime,
+                  address: res.data[i].address,
+                  image: image,
+                });
+              }
+              this.setState({
+                dataProvider: this.dataProvider.cloneWithRows(
+                  this._generateArray(this.products),
+                ),
+              });
+              console.log('foodsssssssssssssssssss:::::', this.products);
+            }
+          } else {
+            console.log('if no data in response:', res.error);
+            alert(res.error);
+          }
+        })
+        .catch(error => {
+          console.log('api problem:', error.error);
+          alert(error.error);
+        });
+    } catch (err) {
+      console.log('another problem:', err);
+      alert(err);
+    }
+  };
 
   onFilter = async () => {
     this.props.navigation.navigate('Filter');
@@ -140,13 +185,20 @@ export default class searchName extends Component {
       <View style={[container, column, between_spacing]}>
         <View>
           <View style={[row, between_spacing, top_container]}>
-            <View style={[search_container, row, around_spacing]}>
+            <View
+              style={[search_container, row, around_spacing]}
+              onPress={this.getFood(this.state.name)}>
               <Image
                 resizeMode="contain"
                 source={require('../../assets/search.png')}
                 style={search_icon}
               />
-              <TextInput placeholder="Search" style={search_input} />
+              <TextInput
+                placeholder="Search"
+                style={search_input}
+                onChangeText={name => this.setState({name})}
+                value={this.state.name}
+              />
             </View>
             <TouchableOpacity onPress={this.onFilter}>
               <Image

@@ -76,7 +76,7 @@ export default class ForgotPassword extends Component {
       };
       try {
         let response = Service.postDataApi(
-          Url.BASE_URL + 'users/forgotPassword',
+          Url.BASE_URL + Url.FORGOT_PASSWORD,
           body,
           '',
         );
@@ -171,7 +171,7 @@ export default class ForgotPassword extends Component {
       };
       try {
         let response = Service.postDataApi(
-          Url.BASE_URL + 'users/resetPassword',
+          Url.BASE_URL + Url.RESET_PASSWORD,
           body,
           '',
         );
@@ -364,6 +364,7 @@ export default class ForgotPassword extends Component {
                         style={input_box}
                         onChangeText={password => this.setState({password})}
                         value={this.state.password}
+                        secureTextEntry={true}
                       />
                     </View>
                     <View style={[row, fields]}>
@@ -378,6 +379,7 @@ export default class ForgotPassword extends Component {
                           this.setState({confirmPassword})
                         }
                         value={this.state.confirmPassword}
+                        secureTextEntry={true}
                       />
                     </View>
 

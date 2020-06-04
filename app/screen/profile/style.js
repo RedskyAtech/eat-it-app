@@ -56,7 +56,7 @@ const styles = {
     borderColor: 'white',
     borderWidth: 2,
     marginTop: hp(0.6),
-    elevation:4
+    elevation: 4,
   },
   user_details: {
     marginTop: hp(6.4),
@@ -67,6 +67,9 @@ const styles = {
     marginVertical: hp(0.6),
     fontSize: fonts.FONT_TEXT,
     fontWeight: fonts.FONT_BOLD,
+  },
+  capitalize_text: {
+    textTransform: 'capitalize',
   },
   colored_text: {
     color: colors.primaryColor,

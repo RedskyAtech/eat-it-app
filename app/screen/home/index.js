@@ -28,7 +28,7 @@ class CellContainer extends React.Component {
     this.state = {};
   }
   showDetail = async () => {
-    this.props.navigation.navigate('FoodDetails');
+    this.props.navigation.navigate('FoodDetails', {foodId: this.props.data.id});
   };
   render() {
     const {
@@ -47,12 +47,11 @@ class CellContainer extends React.Component {
           <TouchableOpacity onPress={this.showDetail}>
             <Image
               resizeMode="stretch"
-              source={this.props.data.image}
+              source={{uri: this.props.data.image}}
               style={image}
             />
           </TouchableOpacity>
         </View>
-
         <View style={[heading_container, column]}>
           <Text style={heading_text} numberOfLines={1}>
             {this.props.data.name}
@@ -75,7 +74,7 @@ export default class home extends Component {
     super(props);
     let {width} = Dimensions.get('window');
 
-    let dataProvider = new DataProvider((r1, r2) => {
+    this.dataProvider = new DataProvider((r1, r2) => {
       return r1 !== r2;
     });
 
@@ -120,7 +119,7 @@ export default class home extends Component {
       lastSearch: false,
       nearYou: false,
       follow: false,
-      dataProvider: dataProvider.cloneWithRows(
+      dataProvider: this.dataProvider.cloneWithRows(
         this._generateArray(this.products),
       ),
     };
@@ -128,7 +127,7 @@ export default class home extends Component {
   getFood = async () => {
     this.products = [];
     try {
-      let response = Service.getDataApi(Url.BASE_URL + 'foods', '');
+      let response = Service.getDataApi(Url.BASE_URL + Url.GET_FOODS, '');
       response
         .then(res => {
           if (res.data) {
@@ -147,7 +146,11 @@ export default class home extends Component {
                   image: image,
                 });
               }
-              console.log('foodsssssssssssssssssss:::::', this.products);
+              this.setState({
+                dataProvider: this.dataProvider.cloneWithRows(
+                  this._generateArray(this.products),
+                ),
+              });
             }
           } else {
             console.log('if no data in response:', res.error);
@@ -165,7 +168,6 @@ export default class home extends Component {
   };
 
   _generateArray(array) {
-    console.log('arrayyyyyyyyy:', array);
     let n = array.length;
     let arr = new Array(n);
     for (let i = 0; i < n; i++) {

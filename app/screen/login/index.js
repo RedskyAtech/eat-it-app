@@ -94,7 +94,7 @@ export default class login extends Component {
     };
     try {
       let response = Service.uploadImageApi(
-        Url.BASE_URL + 'files',
+        Url.BASE_URL + Url.UPLOAD_IMAGE,
         formData,
         headers,
       );
@@ -197,7 +197,7 @@ export default class login extends Component {
         image: this.state.image,
       };
       try {
-        let response = Service.postDataApi(Url.BASE_URL + 'users', body, '');
+        let response = Service.postDataApi(Url.BASE_URL + Url.REGISTRATION_URL, body, '');
         response
           .then(res => {
             if (res.data) {
@@ -235,7 +235,7 @@ export default class login extends Component {
 
       try {
         let response = Service.postDataApi(
-          Url.BASE_URL + 'users/login',
+          Url.BASE_URL + Url.LOGIN_URL,
           body,
           '',
         );

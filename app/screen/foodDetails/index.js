@@ -5,19 +5,73 @@ import LinearGradient from 'react-native-linear-gradient';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
 import {widthPercentageToDP as wp} from '../../utility/index';
 import * as colors from '../../constants/colors';
+import * as Service from '../../api/services';
+import * as Url from '../../constants/urls';
 
 export default class addPhotos extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      foodId: '',
+      name: '',
+      address: '',
+      price: '',
+      type: '',
+      cookingTime: '',
+      pickupTime: '',
+      deliveryPrice: '',
+      totalAmount: '',
       images: [
-        {source: require('../../assets/food.jpg')},
-        {source: require('../../assets/burger.jpg')},
-        {source: require('../../assets/food.jpg')},
-        {source: require('../../assets/burger.jpg')},
+        // {source: require('../../assets/food.jpg')},
+        // {source: require('../../assets/burger.jpg')},
+        // {source: require('../../assets/food.jpg')},
+        // {source: require('../../assets/burger.jpg')},
       ],
     };
   }
+  componentDidMount = async () => {
+    let foodId;
+    if (this.props.navigation.state.params.foodId) {
+      foodId = this.props.navigation.state.params.foodId;
+    }
+    await this.setState({foodId: foodId});
+    await this.getFoodDetail();
+  };
+
+  getFoodDetail = async () => {
+    try {
+      let response = Service.getDataApi(
+        Url.BASE_URL + `foods/${this.state.foodId}`,
+        '',
+      );
+      response
+        .then(res => {
+          if (res.data) {
+            this.setState({
+              name: res.data.name,
+              address: res.data.address,
+              price: res.data.price,
+              type: res.data.type,
+              cookingTime: res.data.cookingTime,
+              pickupTime: res.data.pickupTime,
+              deliveryPrice: res.data.homeDeliveryPrice,
+              totalAmount: '70',
+              images: res.data.images,
+            });
+          } else {
+            console.log('if no data in response:', res.error);
+            alert(res.error);
+          }
+        })
+        .catch(error => {
+          console.log('api problem:', error.error);
+          alert(error.error);
+        });
+    } catch (err) {
+      console.log('another problem:', err);
+      alert(err);
+    }
+  };
 
   onBack = async () => {
     this.props.navigation.navigate('tab1');
@@ -35,9 +89,7 @@ export default class addPhotos extends Component {
     );
   }
   _renderItem = ({item, index}) => {
-    return (
-      <Image resizeMode="cover" style={styles.images} source={item.source} />
-    );
+    return <Image resizeMode="cover" style={styles.images} source={{uri:item.url}} />;
   };
 
   render() {
@@ -64,6 +116,8 @@ export default class addPhotos extends Component {
       arrow,
       heading_text,
       between_spacing,
+      type_icon,
+      veg_icon,
     } = styles;
     return (
       <View>
@@ -99,7 +153,7 @@ export default class addPhotos extends Component {
 
         <View style={[detail_container]}>
           <View style={[row, between_spacing, bottom_spacing]}>
-            <Text style={product_name}>Bolognese Baked Potato</Text>
+            <Text style={product_name}>{this.state.name}</Text>
             <Image
               resizeMode="cover"
               style={like_icon}
@@ -108,32 +162,40 @@ export default class addPhotos extends Component {
           </View>
 
           <Text style={[address_style, bottom_spacing]}>
-            Amrit Sweets, Phase 5, Mohali
+            {this.state.address}
           </Text>
 
           <View style={[row, between_spacing, bottom_spacing]}>
-            <Text style={[price, colored_text]}>Rs 50</Text>
+            <Text style={[price, colored_text]}>Rs {this.state.price}</Text>
             <View style={[row, {alignItems: 'center'}]}>
-              <View style={non_veg_icon} />
-              <Text style={type_text}>Non-veg</Text>
+              <View
+                style={
+                  this.state.type == 'veg'
+                    ? [type_icon, veg_icon]
+                    : [type_icon, non_veg_icon]
+                }
+              />
+              <Text style={type_text}>{this.state.type}</Text>
             </View>
           </View>
 
           <View style={[row, bottom_spacing]}>
             <Text style={timing_heading_style}>Cooking time : </Text>
-            <Text style={address_style}>6 pm</Text>
+            <Text style={address_style}>{this.state.cookingTime}</Text>
           </View>
           <View style={[row, bottom_spacing]}>
             <Text style={timing_heading_style}>Pickup time : </Text>
-            <Text style={address_style}>6 pm - 10 pm</Text>
+            <Text style={address_style}>{this.state.pickupTime}</Text>
           </View>
           <View style={[row, bottom_spacing]}>
             <Text style={timing_heading_style}>Home delivery price : </Text>
-            <Text style={address_style}>Rs 20</Text>
+            <Text style={address_style}>Rs {this.state.deliveryPrice}</Text>
           </View>
           <View style={[row, bottom_spacing]}>
             <Text style={timing_heading_style}>Total payable amount : </Text>
-            <Text style={[address_style, colored_text]}>Rs 70</Text>
+            <Text style={[address_style, colored_text]}>
+              Rs {this.state.totalAmount}
+            </Text>
           </View>
 
           <View style={[bottom_container, bottom_spacing]}>

@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Animated,
   TextInput,
+  ActivityIndicator,
 } from 'react-native';
 import styles from './style';
 import LinearGradient from 'react-native-linear-gradient';
@@ -30,6 +31,7 @@ export default class profile extends Component {
       password: '',
       newPassword: '',
       confirmPassword: '',
+      isVisibleLoading: false,
     };
   }
   componentDidMount = async () => {
@@ -40,6 +42,8 @@ export default class profile extends Component {
   };
 
   getUser = async () => {
+    await this.setState({isVisibleLoading: true});
+
     try {
       let response = Service.getDataApi(
         Url.BASE_URL + `users/${this.state.userId}`,
@@ -53,16 +57,20 @@ export default class profile extends Component {
               email: res.data.email,
               phone: res.data.phone,
             });
+            this.setState({isVisibleLoading: false});
           } else {
+            this.setState({isVisibleLoading: false});
             alert(res.error);
           }
         })
         .catch(error => {
+          this.setState({isVisibleLoading: false});
           this.props.navigation.navigate('Login');
           console.log('api problem:', error.error);
           alert(error.error);
         });
     } catch (err) {
+      this.setState({isVisibleLoading: false});
       console.log('another problem:', err);
       alert(err);
     }
@@ -196,7 +204,7 @@ export default class profile extends Component {
       settings,
       profile_image,
       profile_container,
-      profile,
+      capitalize_text
     } = styles;
     return (
       <Provider>
@@ -280,7 +288,7 @@ export default class profile extends Component {
               </LinearGradient>
 
               <View style={user_details}>
-                <Text style={[spacing, heading_color]}>{this.state.name}</Text>
+                <Text style={[spacing, heading_color,capitalize_text]}>{this.state.name}</Text>
                 <Text style={[spacing, colored_text]}>{this.state.email}</Text>
                 <Text style={[spacing, heading_color]}>{this.state.phone}</Text>
               </View>
@@ -437,6 +445,7 @@ export default class profile extends Component {
                       style={input_box}
                       onChangeText={newPassword => this.setState({newPassword})}
                       value={this.state.newPassword}
+                      secureTextEntry={true}
                     />
                   </View>
                   <View style={[row, fields]}>
@@ -452,6 +461,7 @@ export default class profile extends Component {
                         this.setState({confirmPassword})
                       }
                       value={this.state.confirmPassword}
+                      secureTextEntry={true}
                     />
                   </View>
                   <TouchableOpacity
@@ -467,6 +477,13 @@ export default class profile extends Component {
                 </View>
               </LinearGradient>
             </Animated.View>
+            <View style={{position: 'absolute', top: '50%', right: 0, left: 0}}>
+              <ActivityIndicator
+                animating={this.state.isVisibleLoading}
+                size="large"
+                color="#0000ff"
+              />
+            </View>
           </View>
         </View>
       </Provider>

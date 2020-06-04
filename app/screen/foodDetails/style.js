@@ -80,6 +80,7 @@ const styles = {
   product_name: {
     fontSize: 20,
     fontWeight: fonts.FONT_BOLD,
+    textTransform: 'capitalize',
   },
   like_icon: {
     height: hp(3),
@@ -98,16 +99,22 @@ const styles = {
   colored_text: {
     color: colors.primaryColor,
   },
-  non_veg_icon: {
+  type_icon: {
     height: hp(2),
     width: hp(2),
     borderRadius: hp(2) / 2,
-    backgroundColor: 'red',
     marginRight: hp(1),
+  },
+  non_veg_icon: {
+    backgroundColor: 'red',
+  },
+  veg_icon: {
+    backgroundColor: '#12FF01',
   },
   type_text: {
     color: colors.greyText,
     fontSize: 12,
+    textTransform: 'capitalize',
   },
   address_style: {
     fontSize: fonts.FONT_TEXT,

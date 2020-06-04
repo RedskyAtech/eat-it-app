@@ -92,6 +92,7 @@ const styles = {
   list_container: {
     height: hp(78),
     width: wp(100),
+    paddingBottom:hp(4)
   },
 
   containerGridLeft: {
@@ -114,6 +115,7 @@ const styles = {
     fontWeight: fonts.FONT_BOLD,
     width: wp(28),
     textWrap: 'wrap',
+    textTransform: 'capitalize'
   },
   colored_text: {
     fontSize: 12,
