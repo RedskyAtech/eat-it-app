@@ -80,6 +80,7 @@ const styles = {
   product_heading: {
     fontSize: fonts.FONT_TEXT,
     fontWeight: fonts.FONT_BOLD,
+    textTransform: 'capitalize'
   },
   like_dislike_icon: {
     height: hp(3),

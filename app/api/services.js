@@ -1,5 +1,9 @@
+import * as Url from '../constants/urls';
+
 export const postDataApi = (url, body, token) => {
   let headers;
+  let completeUrl = Url.BASE_URL + url;
+
   if (token == null || token == undefined || token == '') {
     headers = {
       Accept: 'application/json',
@@ -14,7 +18,7 @@ export const postDataApi = (url, body, token) => {
   }
   let data = JSON.stringify(body);
   return new Promise((resolve, reject) => {
-    fetch(url, {
+    fetch(completeUrl, {
       method: 'POST',
       headers,
       body: data,
@@ -43,6 +47,8 @@ export const postDataApi = (url, body, token) => {
 
 export const getDataApi = (url, token) => {
   let headers;
+  let completeUrl = Url.BASE_URL + url;
+
   if (token == null || token == undefined || token == '') {
     headers = {
       Accept: 'application/json',
@@ -56,13 +62,13 @@ export const getDataApi = (url, token) => {
     };
   }
   return new Promise((resolve, reject) => {
-    fetch(url, {
+    fetch(completeUrl, {
       method: 'GET',
       headers,
     })
       .then(response => response.json())
       .then(response => {
-        console.log('Get Api data response', response);
+        // console.log('Get Api data response', response);
         if (response !== null) {
           let data = response;
           if (data !== null && Object.keys(data).length !== 0) {
@@ -82,9 +88,11 @@ export const getDataApi = (url, token) => {
 };
 
 export const putDataApi = (url, body, authToken) => {
+  let completeUrl = Url.BASE_URL + url;
   let data = JSON.stringify(body);
+
   return new Promise((resolve, reject) => {
-    fetch(url, {
+    fetch(completeUrl, {
       method: 'PUT',
       headers: {
         Accept: 'application/json',
@@ -115,8 +123,10 @@ export const putDataApi = (url, body, authToken) => {
 };
 
 export const uploadImageApi = (url, body, headers) => {
+  let completeUrl = Url.BASE_URL + url;
+
   return new Promise((resolve, reject) => {
-    fetch(url, {
+    fetch(completeUrl, {
       method: 'POST',
       headers,
       body: body,

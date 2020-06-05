@@ -8,133 +8,65 @@ import {
   ScrollView,
 } from 'react-native';
 import styles from './style';
+import * as Service from '../../api/services';
+import * as utility from '../../utility/index';
+import * as Url from '../../constants/urls';
 
 export default class searchName extends Component {
   constructor(props) {
     super(props);
     this.state = {
       name: '',
-      products: [
-        {
-          heading: 'Bolognese Baked Potato',
-          address: 'Amrit Sweets, Phase 5, Mohali',
-          isLiked: false,
-          isVeg: true,
-          time: '06:00 pm',
-          image: require('../../assets/food.jpg'),
-        },
-        {
-          heading: 'Lamb Stuffed Sweet Potato',
-          address: 'Amrit Sweets, Phase 5, Mohali',
-          isLiked: true,
-          isVeg: false,
-          time: '06:00 pm',
-          image: require('../../assets/burger.jpg'),
-        },
-        {
-          heading: 'Merlin Super Jumbo',
-          address: 'Amrit Sweets, Phase 5, Mohali',
-          isLiked: true,
-          time: '06:00 pm',
-          isVeg: true,
-          image: require('../../assets/sweet.jpg'),
-        },
-        {
-          heading: 'Lamb Stuffed Sweet Potato',
-          address: 'Amrit Sweets, Phase 5, Mohali',
-          isLiked: 'none',
-          time: '06:00 pm',
-          isVeg: true,
-          image: require('../../assets/food.jpg'),
-        },
-        {
-          heading: 'Merlin Super Jumbo',
-          address: 'Amrit Sweets, Phase 5, Mohali',
-          isLiked: true,
-          isVeg: false,
-          time: '06:00 pm',
-          image: require('../../assets/burger.jpg'),
-        },
-        {
-          heading: 'Bolognese Baked Potato',
-          address: 'Amrit Sweets, Phase 5, Mohali',
-          isLiked: false,
-          time: '06:00 pm',
-          isVeg: true,
-          image: require('../../assets/sweet.jpg'),
-        },
-        {
-          heading: 'Lamb Stuffed Sweet Potato',
-          address: 'Amrit Sweets, Phase 5, Mohali',
-          isLiked: 'none',
-          isVeg: false,
-          time: '06:00 pm',
-          image: require('../../assets/burger.jpg'),
-        },
-        {
-          heading: 'Bolognese Baked Potato',
-          address: 'Amrit Sweets, Phase 5, Mohali',
-          isLiked: true,
-          isVeg: true,
-          time: '06:00 pm',
-          image: require('../../assets/sweet.jpg'),
-        },
-        {
-          heading: 'Bolognese Baked Potato',
-          address: 'Amrit Sweets, Phase 5, Mohali',
-          isLiked: false,
-          time: '06:00 pm',
-          isVeg: true,
-          image: require('../../assets/sweet.jpg'),
-        },
-        {
-          heading: 'Lamb Stuffed Sweet Potato',
-          address: 'Amrit Sweets, Phase 5, Mohali',
-          isLiked: 'none',
-          isVeg: false,
-          time: '06:00 pm',
-          image: require('../../assets/burger.jpg'),
-        },
-        {
-          heading: 'Bolognese Baked Potato',
-          address: 'Amrit Sweets, Phase 5, Mohali',
-          isLiked: true,
-          isVeg: true,
-          time: '06:00 pm',
-          image: require('../../assets/sweet.jpg'),
-        },
-      ],
+      products: [],
     };
   }
-  getFood = async(name) => {
-    this.products = [];
-    let query='name='
+  componentDidMount = async () => {
+    let name;
+    if (this.props.navigation.state.params.name) {
+      name = this.props.navigation.state.params.name;
+    }
+    if (name != '') {
+      await this.setState({name: name});
+      await this.getFood();
+    }
+  };
+
+  onNameChange(name) {
+    if (name == '') {
+      this.setState({products: [], name});
+    } else {
+      this.setState({name});
+      this.getFood();
+    }
+  }
+
+  getFood = async () => {
+    await this.setState({products: []});
+
+    let query = `name=${this.state.name}&searchType=food`;
     try {
-      let response = Service.getDataApi(Url.BASE_URL + 'foods', '');
+      let response = Service.getDataApi(Url.SEARCH_FOOD + `?${query}`, '');
       response
         .then(res => {
           if (res.data) {
             if (res.data.length != 0) {
+              let tempProducts = [];
               for (let i = 0; i < res.data.length; i++) {
                 let image;
                 if (res.data[i].images) {
                   image = res.data[i].images[0].url;
                 }
-                this.products.push({
+                tempProducts.push({
                   id: res.data[i]._id,
                   name: res.data[i].name,
                   price: res.data[i].price,
                   time: res.data[i].cookingTime,
                   address: res.data[i].address,
                   image: image,
+                  type: res.data[i].type,
                 });
               }
-              this.setState({
-                dataProvider: this.dataProvider.cloneWithRows(
-                  this._generateArray(this.products),
-                ),
-              });
-              console.log('foodsssssssssssssssssss:::::', this.products);
+              this.setState({products: tempProducts});
             }
           } else {
             console.log('if no data in response:', res.error);
@@ -185,18 +117,18 @@ export default class searchName extends Component {
       <View style={[container, column, between_spacing]}>
         <View>
           <View style={[row, between_spacing, top_container]}>
-            <View
-              style={[search_container, row, around_spacing]}
-              onPress={this.getFood(this.state.name)}>
-              <Image
-                resizeMode="contain"
-                source={require('../../assets/search.png')}
-                style={search_icon}
-              />
+            <View style={[search_container, row, around_spacing]}>
+              <TouchableOpacity>
+                <Image
+                  resizeMode="contain"
+                  source={require('../../assets/search.png')}
+                  style={search_icon}
+                />
+              </TouchableOpacity>
               <TextInput
                 placeholder="Search"
                 style={search_input}
-                onChangeText={name => this.setState({name})}
+                onChangeText={name => this.onNameChange(name)}
                 value={this.state.name}
               />
             </View>
@@ -224,7 +156,7 @@ export default class searchName extends Component {
                       <View style={list_image_continer}>
                         <Image
                           resizeMode="cover"
-                          source={value.image}
+                          source={{uri: value.image}}
                           style={list_image}
                         />
                       </View>
@@ -232,7 +164,7 @@ export default class searchName extends Component {
                       <View style={[column, column_between_spacing]}>
                         <View>
                           <View style={[row]}>
-                            <Text style={product_heading}>{value.heading}</Text>
+                            <Text style={product_heading}>{value.name}</Text>
                           </View>
                           <Text style={address_text}>{value.address}</Text>
                         </View>
@@ -241,12 +173,14 @@ export default class searchName extends Component {
                           <View style={[row, row_center_align]}>
                             <View
                               style={
-                                value.isVeg
+                                value.type == 'veg'
                                   ? [non_veg_icon, green_color]
                                   : [non_veg_icon, red_color]
                               }
                             />
-                            <Text style={text_style}>Non-veg</Text>
+                            <Text style={text_style}>
+                              {value.type == 'veg' ? 'Veg' : 'Non-veg'}
+                            </Text>
                           </View>
                           <View style={[row, row_center_align]}>
                             <Image
@@ -254,14 +188,14 @@ export default class searchName extends Component {
                               source={require('../../assets/clock.png')}
                               style={clock}
                             />
-                            <Text style={text_style}>06:00 pm</Text>
+                            <Text style={text_style}>{value.time}</Text>
                           </View>
                         </View>
                       </View>
                     </View>
                     <View style={[column, column_between_spacing]}>
                       <View />
-                      <Text style={price_text}>Rs 50</Text>
+                      <Text style={price_text}>Rs {value.price}</Text>
                     </View>
                   </View>
                 );
@@ -273,3 +207,94 @@ export default class searchName extends Component {
     );
   }
 }
+
+// products: [
+//   {
+//     heading: 'Bolognese Baked Potato',
+//     address: 'Amrit Sweets, Phase 5, Mohali',
+//     isLiked: false,
+//     isVeg: true,
+//     time: '06:00 pm',
+//     image: require('../../assets/food.jpg'),
+//   },
+//   {
+//     heading: 'Lamb Stuffed Sweet Potato',
+//     address: 'Amrit Sweets, Phase 5, Mohali',
+//     isLiked: true,
+//     isVeg: false,
+//     time: '06:00 pm',
+//     image: require('../../assets/burger.jpg'),
+//   },
+//   {
+//     heading: 'Merlin Super Jumbo',
+//     address: 'Amrit Sweets, Phase 5, Mohali',
+//     isLiked: true,
+//     time: '06:00 pm',
+//     isVeg: true,
+//     image: require('../../assets/sweet.jpg'),
+//   },
+//   {
+//     heading: 'Lamb Stuffed Sweet Potato',
+//     address: 'Amrit Sweets, Phase 5, Mohali',
+//     isLiked: 'none',
+//     time: '06:00 pm',
+//     isVeg: true,
+//     image: require('../../assets/food.jpg'),
+//   },
+//   {
+//     heading: 'Merlin Super Jumbo',
+//     address: 'Amrit Sweets, Phase 5, Mohali',
+//     isLiked: true,
+//     isVeg: false,
+//     time: '06:00 pm',
+//     image: require('../../assets/burger.jpg'),
+//   },
+//   {
+//     heading: 'Bolognese Baked Potato',
+//     address: 'Amrit Sweets, Phase 5, Mohali',
+//     isLiked: false,
+//     time: '06:00 pm',
+//     isVeg: true,
+//     image: require('../../assets/sweet.jpg'),
+//   },
+//   {
+//     heading: 'Lamb Stuffed Sweet Potato',
+//     address: 'Amrit Sweets, Phase 5, Mohali',
+//     isLiked: 'none',
+//     isVeg: false,
+//     time: '06:00 pm',
+//     image: require('../../assets/burger.jpg'),
+//   },
+//   {
+//     heading: 'Bolognese Baked Potato',
+//     address: 'Amrit Sweets, Phase 5, Mohali',
+//     isLiked: true,
+//     isVeg: true,
+//     time: '06:00 pm',
+//     image: require('../../assets/sweet.jpg'),
+//   },
+//   {
+//     heading: 'Bolognese Baked Potato',
+//     address: 'Amrit Sweets, Phase 5, Mohali',
+//     isLiked: false,
+//     time: '06:00 pm',
+//     isVeg: true,
+//     image: require('../../assets/sweet.jpg'),
+//   },
+//   {
+//     heading: 'Lamb Stuffed Sweet Potato',
+//     address: 'Amrit Sweets, Phase 5, Mohali',
+//     isLiked: 'none',
+//     isVeg: false,
+//     time: '06:00 pm',
+//     image: require('../../assets/burger.jpg'),
+//   },
+//   {
+//     heading: 'Bolognese Baked Potato',
+//     address: 'Amrit Sweets, Phase 5, Mohali',
+//     isLiked: true,
+//     isVeg: true,
+//     time: '06:00 pm',
+//     image: require('../../assets/sweet.jpg'),
+//   },
+// ],

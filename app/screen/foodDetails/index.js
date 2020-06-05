@@ -21,12 +21,7 @@ export default class addPhotos extends Component {
       pickupTime: '',
       deliveryPrice: '',
       totalAmount: '',
-      images: [
-        // {source: require('../../assets/food.jpg')},
-        // {source: require('../../assets/burger.jpg')},
-        // {source: require('../../assets/food.jpg')},
-        // {source: require('../../assets/burger.jpg')},
-      ],
+      images: [],
     };
   }
   componentDidMount = async () => {
@@ -40,10 +35,7 @@ export default class addPhotos extends Component {
 
   getFoodDetail = async () => {
     try {
-      let response = Service.getDataApi(
-        Url.BASE_URL + `foods/${this.state.foodId}`,
-        '',
-      );
+      let response = Service.getDataApi(`foods/${this.state.foodId}`, '');
       response
         .then(res => {
           if (res.data) {
@@ -89,7 +81,13 @@ export default class addPhotos extends Component {
     );
   }
   _renderItem = ({item, index}) => {
-    return <Image resizeMode="cover" style={styles.images} source={{uri:item.url}} />;
+    return (
+      <Image
+        resizeMode="cover"
+        style={styles.images}
+        source={{uri: item.url}}
+      />
+    );
   };
 
   render() {

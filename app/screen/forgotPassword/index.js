@@ -28,8 +28,8 @@ export default class ForgotPassword extends Component {
       otp: '',
       password: '',
       confirmPassword: '',
-      minutes: 0,
-      seconds: 10,
+      minutes: 3,
+      seconds: 0,
     };
   }
 
@@ -75,19 +75,15 @@ export default class ForgotPassword extends Component {
         email: this.state.email,
       };
       try {
-        let response = Service.postDataApi(
-          Url.BASE_URL + Url.FORGOT_PASSWORD,
-          body,
-          '',
-        );
+        let response = Service.postDataApi(Url.FORGOT_PASSWORD, body, '');
         response
           .then(res => {
             if (res.data) {
               alert(res.data);
               this.setState({
                 sendOtp: true,
-                minutes: 0,
-                seconds: 10,
+                minutes: 3,
+                seconds: 0,
               });
               this.refs.first.focus();
               this.timer();
@@ -170,11 +166,7 @@ export default class ForgotPassword extends Component {
         newPassword: this.state.password,
       };
       try {
-        let response = Service.postDataApi(
-          Url.BASE_URL + Url.RESET_PASSWORD,
-          body,
-          '',
-        );
+        let response = Service.postDataApi(Url.RESET_PASSWORD, body, '');
         response
           .then(res => {
             if (res.data) {

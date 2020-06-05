@@ -119,6 +119,7 @@ export default class home extends Component {
       lastSearch: false,
       nearYou: false,
       follow: false,
+      name: '',
       dataProvider: this.dataProvider.cloneWithRows(
         this._generateArray(this.products),
       ),
@@ -127,7 +128,7 @@ export default class home extends Component {
   getFood = async () => {
     this.products = [];
     try {
-      let response = Service.getDataApi(Url.BASE_URL + Url.GET_FOODS, '');
+      let response = Service.getDataApi(Url.GET_FOODS, '');
       response
         .then(res => {
           if (res.data) {
@@ -249,7 +250,7 @@ export default class home extends Component {
     return true;
   };
   onSearch = async () => {
-    this.props.navigation.navigate('SearchName');
+    this.props.navigation.navigate('SearchName',{name: this.state.name});
   };
   closeDialog = async () => {
     this.setState({isVisible: false});
@@ -296,7 +297,12 @@ export default class home extends Component {
                       source={require('../../assets/search.png')}
                       style={search_icon}
                     />
-                    <TextInput placeholder="Search" style={search_input} />
+                    <TextInput
+                      placeholder="Search"
+                      style={search_input}
+                      onChangeText={name => this.setState({name})}
+                      value={this.state.name}
+                    />
                   </View>
                 </TouchableOpacity>
 

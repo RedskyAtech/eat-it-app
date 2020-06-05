@@ -13,7 +13,6 @@ import Icon from 'react-native-vector-icons/Feather';
 import LikeDislikeFood from '../likeDislikeFood';
 import * as Service from '../../api/services';
 import * as utility from '../../utility/index';
-import * as Url from '../../constants/urls';
 
 export default class myFood extends Component {
   constructor(props) {
@@ -24,134 +23,10 @@ export default class myFood extends Component {
       userId: '',
       dataArray: [
         {
-          // title: 'Food you bought',
-          content: [
-            {
-              heading: 'Lamb Stuffed Sweet Potato',
-              address: 'Amrit Sweets, Phase 5, Mohali',
-              isLiked: false,
-              isVeg: true,
-              time: '06:00 pm',
-              image: require('../../assets/burger.jpg'),
-            },
-            {
-              heading: 'Bolognese Baked Potato',
-              address: 'Amrit Sweets, Phase 5, Mohali',
-              isLiked: true,
-              isVeg: false,
-              time: '06:00 pm',
-              image: require('../../assets/food.jpg'),
-            },
-            {
-              heading: 'Lamb Stuffed Sweet Potato',
-              address: 'Amrit Sweets, Phase 5, Mohali',
-              isLiked: true,
-              time: '06:00 pm',
-              isVeg: true,
-              image: require('../../assets/sweet.jpg'),
-            },
-            {
-              heading: 'Lamb Stuffed Sweet Potato',
-              address: 'Amrit Sweets, Phase 5, Mohali',
-              isLiked: 'none',
-              time: '06:00 pm',
-              isVeg: true,
-              image: require('../../assets/food.jpg'),
-            },
-            {
-              heading: 'Merlin Super Potato',
-              address: 'Amrit Sweets, Phase 5, Mohali',
-              isLiked: true,
-              isVeg: false,
-              time: '06:00 pm',
-              image: require('../../assets/burger.jpg'),
-            },
-            {
-              heading: 'Lamb Stuffed Sweet Potato',
-              address: 'Amrit Sweets, Phase 5, Mohali',
-              isLiked: false,
-              time: '06:00 pm',
-              isVeg: true,
-              image: require('../../assets/sweet.jpg'),
-            },
-            {
-              heading: 'Bolognese Baked Potato',
-              address: 'Amrit Sweets, Phase 5, Mohali',
-              isLiked: 'none',
-              isVeg: false,
-              time: '06:00 pm',
-              image: require('../../assets/food.jpg'),
-            },
-            {
-              heading: 'Lamb Stuffed Sweet Potato',
-              address: 'Amrit Sweets, Phase 5, Mohali',
-              isLiked: true,
-              isVeg: true,
-              time: '06:00 pm',
-              image: require('../../assets/burger.jpg'),
-            },
-          ],
+          content: [],
         },
         {
-          // title: 'Food you share',
-          content: [
-            // {
-            //   heading: 'Merlin Super Potato',
-            //   address: 'Amrit Sweets, Phase 5, Mohali',
-            //   isLiked: 'none',
-            //   isVeg: false,
-            //   time: '06:00 pm',
-            //   image: require('../../assets/burger.jpg'),
-            // },
-            // {
-            //   heading: 'Bolognese Baked Potato',
-            //   address: 'Amrit Sweets, Phase 5, Mohali',
-            //   isLiked: 'none',
-            //   isVeg: false,
-            //   time: '06:00 pm',
-            //   image: require('../../assets/sweet.jpg'),
-            // },
-            // {
-            //   heading: 'Merlin Super Potato',
-            //   address: 'Amrit Sweets, Phase 5, Mohali',
-            //   isLiked: 'none',
-            //   time: '06:00 pm',
-            //   isVeg: true,
-            //   image: require('../../assets/food.jpg'),
-            // },
-            // {
-            //   heading: 'Bolognese Baked Potato',
-            //   address: 'Amrit Sweets, Phase 5, Mohali',
-            //   isLiked: 'none',
-            //   isVeg: true,
-            //   time: '06:00 pm',
-            //   image: require('../../assets/sweet.jpg'),
-            // },
-            // {
-            //   heading: 'Merlin Super Potato',
-            //   address: 'Amrit Sweets, Phase 5, Mohali',
-            //   isLiked: 'none',
-            //   isVeg: false,
-            //   time: '06:00 pm',
-            //   image: require('../../assets/burger.jpg'),
-            // },
-            // {
-            //   heading: 'Bolognese Baked Potato',
-            //   address: 'Amrit Sweets, Phase 5, Mohali',
-            //   isLiked: 'none',
-            //   time: '06:00 pm',
-            //   isVeg: true,
-            //   image: require('../../assets/food.jpg'),
-            // },
-            // {
-            //   heading: 'Lamb Stuffed Sweet Potato',
-            //   address: 'Amrit Sweets, Phase 5, Mohali',
-            //   isLiked: 'none',
-            //   isVeg: true,
-            //   time: '06:00 pm',
-            //   image: require('../../assets/burger.jpg'),
-            // },
-          ],
+          content: [],
         },
       ],
     };
@@ -159,25 +34,33 @@ export default class myFood extends Component {
   componentDidMount = async () => {
     const userId = await utility.getItem('userId');
     this.setState({userId: userId});
-    // this.getSharedFood();
+    await this.getSharedFood();
   };
   getSharedFood = async () => {
     try {
       let response = Service.getDataApi(
-        Url.BASE_URL + `foods?userId=${this.state.userId}`,
+        `foods?userId=${this.state.userId}`,
         '',
       );
       response
         .then(res => {
           if (res.data) {
             if (res.data.length != 0) {
-              let shared = [];
+              let shared = [
+                {
+                  content: [],
+                },
+                {
+                  content: [],
+                },
+              ];
+              let tempContent = [];
               for (let i = 0; i < res.data.length; i++) {
                 let image;
                 if (res.data[i].images) {
                   image = res.data[i].images[0].url;
                 }
-                shared.push({
+                tempContent.push({
                   id: res.data[i]._id,
                   name: res.data[i].name,
                   price: res.data[i].price,
@@ -185,13 +68,13 @@ export default class myFood extends Component {
                   address: res.data[i].address,
                   image: image,
                   isLiked: 'none',
+                  type: res.data[i].type,
                   isVeg: true,
                 });
               }
-              console.log('sharedddddddddddd:',shared)
-              // this.setState({
-              //   dataArray: [...this.state.dataArray[1].content, shared],
-              // });
+              shared[1].content = tempContent;
+              shared[0].content = tempContent;
+              this.setState({dataArray: shared});
             }
           } else {
             console.log('if no data in response:', res.error);
@@ -217,7 +100,6 @@ export default class myFood extends Component {
     let index;
     if (this.state && this.state.dataArray) {
       index = this.state.dataArray.indexOf(item);
-      this.getSharedFood();
     }
     return (
       <View
@@ -242,13 +124,18 @@ export default class myFood extends Component {
     );
   };
   renderContent = item => {
+    let index;
+    if (this.state && this.state.dataArray) {
+      index = this.state.dataArray.indexOf(item);
+    }
     return (
       <>
         <View style={styles.list_height}>
           <ScrollView>
             {item.content.map(value => {
               return (
-                <TouchableOpacity onPress={this.showDialog}>
+                <TouchableOpacity
+                  onPress={index == 0 ? this.showDialog : () => {}}>
                   <View
                     style={[
                       styles.row,
@@ -260,11 +147,10 @@ export default class myFood extends Component {
                       <View style={styles.list_image_continer}>
                         <Image
                           resizeMode="cover"
-                          source={value.image}
+                          source={{uri: value.image}}
                           style={styles.list_image}
                         />
                       </View>
-
                       <View
                         style={[styles.column, styles.column_between_spaceing]}>
                         <View>
@@ -282,12 +168,14 @@ export default class myFood extends Component {
                           <View style={[styles.row, styles.row_center_align]}>
                             <View
                               style={
-                                value.isVeg
+                                value.type == 'veg'
                                   ? [styles.non_veg_icon, styles.green_color]
                                   : [styles.non_veg_icon, styles.red_color]
                               }
                             />
-                            <Text style={styles.text_style}>Non-veg</Text>
+                            <Text style={styles.text_style}>
+                              {value.type == 'veg' ? 'Veg' : 'Non-veg'}
+                            </Text>
                           </View>
                           <View style={[styles.row, styles.row_center_align]}>
                             <Image
@@ -295,7 +183,7 @@ export default class myFood extends Component {
                               source={require('../../assets/clock.png')}
                               style={styles.clock}
                             />
-                            <Text style={styles.text_style}>06:00 pm</Text>
+                            <Text style={styles.text_style}>{value.time}</Text>
                           </View>
                         </View>
                       </View>
@@ -318,7 +206,7 @@ export default class myFood extends Component {
                           ]}
                         />
                       )}
-                      <Text style={styles.price_text}>Rs 50</Text>
+                      <Text style={styles.price_text}>Rs {value.price}</Text>
                     </View>
                   </View>
                 </TouchableOpacity>
@@ -381,3 +269,136 @@ export default class myFood extends Component {
     );
   }
 }
+
+// dataArray: [
+//   {
+//     // title: 'Food you bought',
+//     content: [
+//       {
+//         heading: 'Lamb Stuffed Sweet Potato',
+//         address: 'Amrit Sweets, Phase 5, Mohali',
+//         isLiked: false,
+//         isVeg: true,
+//         time: '06:00 pm',
+//         image: require('../../assets/burger.jpg'),
+//       },
+//       {
+//         heading: 'Bolognese Baked Potato',
+//         address: 'Amrit Sweets, Phase 5, Mohali',
+//         isLiked: true,
+//         isVeg: false,
+//         time: '06:00 pm',
+//         image: require('../../assets/food.jpg'),
+//       },
+//       {
+//         heading: 'Lamb Stuffed Sweet Potato',
+//         address: 'Amrit Sweets, Phase 5, Mohali',
+//         isLiked: true,
+//         time: '06:00 pm',
+//         isVeg: true,
+//         image: require('../../assets/sweet.jpg'),
+//       },
+//       {
+//         heading: 'Lamb Stuffed Sweet Potato',
+//         address: 'Amrit Sweets, Phase 5, Mohali',
+//         isLiked: 'none',
+//         time: '06:00 pm',
+//         isVeg: true,
+//         image: require('../../assets/food.jpg'),
+//       },
+//       {
+//         heading: 'Merlin Super Potato',
+//         address: 'Amrit Sweets, Phase 5, Mohali',
+//         isLiked: true,
+//         isVeg: false,
+//         time: '06:00 pm',
+//         image: require('../../assets/burger.jpg'),
+//       },
+//       {
+//         heading: 'Lamb Stuffed Sweet Potato',
+//         address: 'Amrit Sweets, Phase 5, Mohali',
+//         isLiked: false,
+//         time: '06:00 pm',
+//         isVeg: true,
+//         image: require('../../assets/sweet.jpg'),
+//       },
+//       {
+//         heading: 'Bolognese Baked Potato',
+//         address: 'Amrit Sweets, Phase 5, Mohali',
+//         isLiked: 'none',
+//         isVeg: false,
+//         time: '06:00 pm',
+//         image: require('../../assets/food.jpg'),
+//       },
+//       {
+//         heading: 'Lamb Stuffed Sweet Potato',
+//         address: 'Amrit Sweets, Phase 5, Mohali',
+//         isLiked: true,
+//         isVeg: true,
+//         time: '06:00 pm',
+//         image: require('../../assets/burger.jpg'),
+//       },
+//     ],
+//   },
+//   {
+//     // title: 'Food you share',
+//     content: [
+//       // {
+//       //   heading: 'Merlin Super Potato',
+//       //   address: 'Amrit Sweets, Phase 5, Mohali',
+//       //   isLiked: 'none',
+//       //   isVeg: false,
+//       //   time: '06:00 pm',
+//       //   image: require('../../assets/burger.jpg'),
+//       // },
+//       // {
+//       //   heading: 'Bolognese Baked Potato',
+//       //   address: 'Amrit Sweets, Phase 5, Mohali',
+//       //   isLiked: 'none',
+//       //   isVeg: false,
+//       //   time: '06:00 pm',
+//       //   image: require('../../assets/sweet.jpg'),
+//       // },
+//       // {
+//       //   heading: 'Merlin Super Potato',
+//       //   address: 'Amrit Sweets, Phase 5, Mohali',
+//       //   isLiked: 'none',
+//       //   time: '06:00 pm',
+//       //   isVeg: true,
+//       //   image: require('../../assets/food.jpg'),
+//       // },
+//       // {
+//       //   heading: 'Bolognese Baked Potato',
+//       //   address: 'Amrit Sweets, Phase 5, Mohali',
+//       //   isLiked: 'none',
+//       //   isVeg: true,
+//       //   time: '06:00 pm',
+//       //   image: require('../../assets/sweet.jpg'),
+//       // },
+//       // {
+//       //   heading: 'Merlin Super Potato',
+//       //   address: 'Amrit Sweets, Phase 5, Mohali',
+//       //   isLiked: 'none',
+//       //   isVeg: false,
+//       //   time: '06:00 pm',
+//       //   image: require('../../assets/burger.jpg'),
+//       // },
+//       // {
+//       //   heading: 'Bolognese Baked Potato',
+//       //   address: 'Amrit Sweets, Phase 5, Mohali',
+//       //   isLiked: 'none',
+//       //   time: '06:00 pm',
+//       //   isVeg: true,
+//       //   image: require('../../assets/food.jpg'),
+//       // },
+//       // {
+//       //   heading: 'Lamb Stuffed Sweet Potato',
+//       //   address: 'Amrit Sweets, Phase 5, Mohali',
+//       //   isLiked: 'none',
+//       //   isVeg: true,
+//       //   time: '06:00 pm',
+//       //   image: require('../../assets/burger.jpg'),
+//       // },
+//     ],
+//   },
+// ],

@@ -46,9 +46,10 @@ export default class profile extends Component {
 
     try {
       let response = Service.getDataApi(
-        Url.BASE_URL + `users/${this.state.userId}`,
+        `users/${this.state.userId}`,
         this.state.userToken,
       );
+
       response
         .then(res => {
           if (res.data) {
@@ -98,7 +99,7 @@ export default class profile extends Component {
       };
       try {
         let response = Service.postDataApi(
-          Url.BASE_URL + 'users/changePassword',
+          Url.CHANGE_PASSWORD,
           body,
           this.state.userToken,
         );
@@ -145,7 +146,7 @@ export default class profile extends Component {
     let body = {};
     try {
       let response = Service.postDataApi(
-        Url.BASE_URL + 'users/logOut',
+        Url.LOGOUT_URL,
         body,
         this.state.userToken,
       );
@@ -204,7 +205,7 @@ export default class profile extends Component {
       settings,
       profile_image,
       profile_container,
-      capitalize_text
+      capitalize_text,
     } = styles;
     return (
       <Provider>
@@ -288,7 +289,9 @@ export default class profile extends Component {
               </LinearGradient>
 
               <View style={user_details}>
-                <Text style={[spacing, heading_color,capitalize_text]}>{this.state.name}</Text>
+                <Text style={[spacing, heading_color, capitalize_text]}>
+                  {this.state.name}
+                </Text>
                 <Text style={[spacing, colored_text]}>{this.state.email}</Text>
                 <Text style={[spacing, heading_color]}>{this.state.phone}</Text>
               </View>
