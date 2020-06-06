@@ -280,6 +280,7 @@ export default class profile extends Component {
                       />
                     </View>
                   </Menu>
+                  
                 </View>
                 <Image
                   resizeMode="cover"

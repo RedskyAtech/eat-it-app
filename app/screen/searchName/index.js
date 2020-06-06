@@ -18,10 +18,12 @@ export default class searchName extends Component {
     this.state = {
       name: '',
       products: [],
+      query:''
     };
   }
   componentDidMount = async () => {
     let name;
+    let filters = {};
     if (this.props.navigation.state.params.name) {
       name = this.props.navigation.state.params.name;
     }
@@ -29,6 +31,10 @@ export default class searchName extends Component {
       await this.setState({name: name});
       await this.getFood();
     }
+    // if (this.props.navigation.state.params.filters) {
+    //   filters = this.props.navigation.state.params.filters;
+    //   this.setState({query:})
+    // }
   };
 
   onNameChange(name) {

@@ -11,54 +11,76 @@ export default class filter extends Component {
       paid: false,
       veg: true,
       nonVeg: false,
-      homeMade: false,
+      homeMade: true,
       restaurant: false,
       value: 10,
+      cost: 'free',
+      type: 'veg',
+      from: 'homeMade',
+      min: 0,
+      max: 0,
     };
   }
   onFree = async () => {
-    await this.setState({free: true, paid: false});
+    await this.setState({free: true, paid: false, cost: 'free'});
   };
   onPaid = async () => {
-    await this.setState({free: false, paid: true});
+    await this.setState({free: false, paid: true, cost: 'paid'});
   };
   onVeg = async () => {
     await this.setState({
       veg: true,
       nonVeg: false,
-      homeMade: false,
-      restaurant: false,
+      type: 'veg',
     });
   };
   onNonVeg = async () => {
     await this.setState({
       veg: false,
       nonVeg: true,
-      homeMade: false,
-      restaurant: false,
+      type: 'nonVeg',
     });
   };
   onHomeMade = async () => {
     await this.setState({
-      veg: false,
-      nonVeg: false,
       homeMade: true,
       restaurant: false,
+      from: 'homeMade',
     });
   };
   onRestaurant = async () => {
     await this.setState({
-      veg: false,
-      nonVeg: false,
       homeMade: false,
       restaurant: true,
+      from: 'restaurant',
     });
   };
   onBack = async () => {
     this.props.navigation.navigate('tab2');
   };
   onNext = async () => {
-    this.props.navigation.navigate('tab1');
+    let filters;
+    if (this.state.cost == 'paid') {
+      if (utility.isFieldEmpty(this.state.min || this.state.max)) {
+        alert('Please seletect minimum or maximum price');
+        return;
+      } else {
+        filters = {
+          cost: this.state.cost,
+          type: this.state.type,
+          from: this.state.from,
+          minPrice: this.state.min,
+          maxPrice: this.state.max,
+        };
+      }
+    } else {
+      filters = {
+        cost: this.state.cost,
+        type: this.state.type,
+        from: this.state.from,
+      };
+    }
+    this.props.navigation.navigate('tab2', {filters: filters});
   };
   render() {
     const {
@@ -107,6 +129,7 @@ export default class filter extends Component {
 
           <View style={[column, filter_box]}>
             <Text style={inner_heading}>Cost</Text>
+
             <View style={[row, filter_container]}>
               <TouchableOpacity onPress={this.onFree}>
                 <View
@@ -133,7 +156,7 @@ export default class filter extends Component {
 
           <View style={[column, filter_box]}>
             <Text style={inner_heading}>Food type</Text>
-            <View style={[row, filter_container, wrap_container]}>
+            <View style={[row, filter_container]}>
               <TouchableOpacity onPress={this.onVeg}>
                 <View
                   style={
@@ -154,6 +177,12 @@ export default class filter extends Component {
                   <Text style={filter_text}>Non-veg</Text>
                 </View>
               </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={[column, filter_box]}>
+            <Text style={inner_heading}>Food From</Text>
+            <View style={[row, filter_container]}>
               <TouchableOpacity onPress={this.onHomeMade}>
                 <View
                   style={
@@ -209,6 +238,8 @@ export default class filter extends Component {
                     placeholder="Min. cost"
                     placeholderTextColor={'#6A6A6A'}
                     style={input_box}
+                    onChangeText={min => this.setState({min})}
+                    value={this.state.min}
                   />
                 </View>
                 <View style={price_container}>
@@ -217,6 +248,8 @@ export default class filter extends Component {
                     placeholder="Max. cost"
                     placeholderTextColor={'#6A6A6A'}
                     style={input_box}
+                    onChangeText={max => this.setState({max})}
+                    value={this.state.max}
                   />
                 </View>
               </View>

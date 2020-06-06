@@ -23,6 +23,7 @@ import MyFood from '../screen/myFood';
 import SearchName from '../screen/searchName';
 import LikeDislikeFood from '../screen/likeDislikeFood';
 import ShareFood from '../screen/shareFood';
+import AddFood from '../screen/addFood';
 import Header from '../components/header';
 
 const TabNavigator = createBottomTabNavigator(
@@ -287,6 +288,12 @@ const AppStack = createStackNavigator(
         headerShown: false,
       },
     },
+    AddFood: {
+      screen: AddFood,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
     Header: {
       screen: Header,
       navigationOptions: {
@@ -301,7 +308,7 @@ const AppStack = createStackNavigator(
     },
   },
   {
-    initialRouteName: 'Splash',
+    initialRouteName: 'AddFood',
     headerMode: 'none',
     mode: 'modal',
   },
