@@ -153,9 +153,9 @@ export default class profile extends Component {
       response
         .then(res => {
           if (res.message) {
-            alert(res.message);
             utility.setToken('token', '');
             this.props.navigation.navigate('Login');
+            this.closeMenu();
           } else {
             alert(res.error);
           }
@@ -280,7 +280,6 @@ export default class profile extends Component {
                       />
                     </View>
                   </Menu>
-                  
                 </View>
                 <Image
                   resizeMode="cover"

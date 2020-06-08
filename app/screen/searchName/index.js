@@ -6,11 +6,16 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import styles from './style';
 import * as Service from '../../api/services';
 import * as utility from '../../utility/index';
 import * as Url from '../../constants/urls';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from '../../utility/index';
 
 export default class searchName extends Component {
   constructor(props) {
@@ -18,7 +23,8 @@ export default class searchName extends Component {
     this.state = {
       name: '',
       products: [],
-      query:''
+      query: '',
+      isVisibleLoading: false,
     };
   }
   componentDidMount = async () => {
@@ -29,12 +35,126 @@ export default class searchName extends Component {
     }
     if (name != '') {
       await this.setState({name: name});
+      this.setState({query: `name=${this.state.name}&searchType=food`});
       await this.getFood();
     }
-    // if (this.props.navigation.state.params.filters) {
-    //   filters = this.props.navigation.state.params.filters;
-    //   this.setState({query:})
-    // }
+    if (this.props.navigation.state.params.filters) {
+      filters = this.props.navigation.state.params.filters;
+      console.log('filtersssssss:', this.props.navigation.state.params.filters);
+      if (filters) {
+        if (filters.cost != '' && filters.type == '' && filters.from == '') {
+          if (filters.cost == 'paid') {
+            this.setState({
+              query: `name=${
+                this.state.name
+              }&searchType=food&cost=paid&minPrice=${
+                filters.minPrice
+              }&maxPrice=${filters.maxPrice}`,
+            });
+          } else {
+            this.setState({
+              query: `name=${this.state.name}&searchType=food&cost=free`,
+            });
+          }
+        } else if (
+          filters.cost != '' &&
+          filters.type != '' &&
+          filters.from == ''
+        ) {
+          this.setState({
+            query: `name=${this.state.name}&searchType=food&type=${
+              filters.type
+            }`,
+          });
+        } else if (
+          filters.cost != '' &&
+          filters.type == '' &&
+          filters.from != ''
+        ) {
+          this.setState({
+            query: `name=${this.state.name}&searchType=food&foodCooked=${
+              filters.from
+            }`,
+          });
+        } else if (
+          filters.cost != '' &&
+          filters.type != '' &&
+          filters.from == ''
+        ) {
+          if (filters.cost == 'paid') {
+            this.setState({
+              query: `name=${
+                this.state.name
+              }&searchType=food&cost=paid&minPrice=${
+                filters.minPrice
+              }&maxPrice=${filters.maxPrice}&foodCooked=${filters.from}`,
+            });
+          } else {
+            this.setState({
+              query: `name=${
+                this.state.name
+              }&searchType=food&cost=free&foodCooked=${filters.from}`,
+            });
+          }
+        } else if (
+          filters.cost == '' &&
+          filters.type != '' &&
+          filters.from != ''
+        ) {
+          this.setState({
+            query: `name=${this.state.name}&searchType=food&type=${
+              filters.type
+            }&foodCooked=${filters.from}`,
+          });
+        } else if (
+          filters.cost != '' &&
+          filters.type == '' &&
+          filters.from != ''
+        ) {
+          if (filters.cost == 'paid') {
+            this.setState({
+              query: `name=${
+                this.state.name
+              }&searchType=food&cost=paid&minPrice=${
+                filters.minPrice
+              }&maxPrice=${filters.maxPrice}$&foodCooked=${filters.from}`,
+            });
+          } else {
+            this.setState({
+              query: `name=${
+                this.state.name
+              }&searchType=food&cost=free&foodCooked=${filters.from}`,
+            });
+          }
+        } else if (
+          filters.cost != '' &&
+          filters.type != '' &&
+          filters.from != ''
+        ) {
+          if (filters.cost == 'paid') {
+            this.setState({
+              query: `name=${
+                this.state.name
+              }&searchType=food&cost=paid&minPrice=${
+                filters.minPrice
+              }&maxPrice=${filters.maxPrice}$&foodCooked=${filters.from}&type=${
+                filters.type
+              }`,
+            });
+          } else {
+            this.setState({
+              query: `name=${
+                this.state.name
+              }&searchType=food&cost=free&foodCooked=${filters.from}&type=${
+                filters.type
+              }`,
+            });
+          }
+        } else {
+          this.setState({query: `name=${this.state.name}&searchType=food`});
+        }
+      }
+    }
   };
 
   onNameChange(name) {
@@ -42,16 +162,18 @@ export default class searchName extends Component {
       this.setState({products: [], name});
     } else {
       this.setState({name});
+      this.setState({query: `name=${this.state.name}&searchType=food`});
       this.getFood();
     }
   }
 
   getFood = async () => {
-    await this.setState({products: []});
-
-    let query = `name=${this.state.name}&searchType=food`;
+    await this.setState({products: [], isVisibleLoading: true});
     try {
-      let response = Service.getDataApi(Url.SEARCH_FOOD + `?${query}`, '');
+      let response = Service.getDataApi(
+        Url.SEARCH_FOOD + `?${this.state.query}`,
+        '',
+      );
       response
         .then(res => {
           if (res.data) {
@@ -72,18 +194,21 @@ export default class searchName extends Component {
                   type: res.data[i].type,
                 });
               }
-              this.setState({products: tempProducts});
+              this.setState({products: tempProducts, isVisibleLoading: false});
             }
           } else {
+            this.setState({isVisibleLoading: false});
             console.log('if no data in response:', res.error);
             alert(res.error);
           }
         })
         .catch(error => {
+          this.setState({isVisibleLoading: false});
           console.log('api problem:', error.error);
           alert(error.error);
         });
     } catch (err) {
+      this.setState({isVisibleLoading: false});
       console.log('another problem:', err);
       alert(err);
     }
@@ -168,7 +293,7 @@ export default class searchName extends Component {
                       </View>
 
                       <View style={[column, column_between_spacing]}>
-                        <View>
+                        <View style={{width: wp(45)}}>
                           <View style={[row]}>
                             <Text style={product_heading}>{value.name}</Text>
                           </View>
@@ -206,6 +331,14 @@ export default class searchName extends Component {
                   </View>
                 );
               })}
+              <View
+                style={{position: 'absolute', top: '50%', right: 0, left: 0}}>
+                <ActivityIndicator
+                  animating={this.state.isVisibleLoading}
+                  size="large"
+                  color="#0000ff"
+                />
+              </View>
             </ScrollView>
           </View>
         </View>

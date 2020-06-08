@@ -11,6 +11,9 @@ import {
 import styles from './style';
 import {Menu, Provider} from 'react-native-paper';
 import {Slider} from 'react-native-elements';
+import * as Service from '../../api/services';
+import * as utility from '../../utility/index';
+import * as Url from '../../constants/urls';
 
 export default class addFood extends Component {
   constructor(props) {
@@ -20,12 +23,65 @@ export default class addFood extends Component {
       dishName: '',
       visibleCategory: false,
       category: 'Veg',
+      categories: [
+        {
+          name: 'Veg',
+        },
+        {
+          name: 'Non-veg',
+        },
+      ],
       visiblePurpose: false,
-      purpose:'Sale',
-      visibleFrom:false,
-      from:'Restaurant'
+      purpose: 'Sale',
+      purposes: [
+        {
+          name: 'Sale',
+        },
+        {
+          name: 'Share',
+        },
+      ],
+      visibleFrom: false,
+      from: 'Restaurant',
+      cookedFrom: [
+        {
+          name: 'Restaurant',
+        },
+        {
+          name: 'Home made',
+        },
+      ],
+      visiblePortions: false,
+      portion: 'One',
+      portions: [
+        {
+          name: 'One',
+        },
+        {
+          name: 'Half',
+        },
+        {
+          name: 'Quatar',
+        },
+      ],
+      homedelivery: 'Yes',
+      visibleHomeDelivery: false,
+      homeDelValues: [
+        {
+          name: 'Yes',
+        },
+        {
+          name: 'No',
+        },
+      ],
+      cuisions: [],
+      cuision: '',
+      visibleCuisions: false,
     };
   }
+  componentDidMount = async () => {
+    await this.getCuisions();
+  };
   onBack = async () => {
     this.props.navigation.navigate('AttatchFoodPhotos');
   };
@@ -38,17 +94,69 @@ export default class addFood extends Component {
   openMenu = async () => {
     await this.setState({visibleCategory: true});
   };
-  closePurposeMenu=async()=>{
+  closePurposeMenu = async () => {
     await this.setState({visiblePurpose: false});
   };
   openPurposeMenu = async () => {
     await this.setState({visiblePurpose: true});
   };
-  closeFromMenu=async()=>{
+  closeFromMenu = async () => {
     await this.setState({visibleFrom: false});
   };
   openFromMenu = async () => {
     await this.setState({visibleFrom: true});
+  };
+  closePortionMenu = async () => {
+    await this.setState({visiblePortions: false});
+  };
+  openPortionMenu = async () => {
+    await this.setState({visiblePortions: true});
+  };
+  closeDeliveryMenu = async () => {
+    await this.setState({visibleHomeDelivery: false});
+  };
+  openDeliveryMenu = async () => {
+    await this.setState({visibleHomeDelivery: true});
+  };
+  closeCuisionMenu = async () => {
+    await this.setState({visibleCuisions: false});
+  };
+  openCuisionMenu = async () => {
+    await this.setState({visibleCuisions: true});
+  };
+  getCuisions = async () => {
+    this.setState({cuisions: []});
+    try {
+      let response = Service.getDataApi(Url.GET_CUISIONS, '');
+      response
+        .then(res => {
+          if (res.data) {
+            if (res.data.length != 0) {
+              let tempCuisions = [];
+              for (let i = 0; i < res.data.length; i++) {
+                tempCuisions.push({
+                  id: res.data[i]._id,
+                  name: res.data[i].name,
+                });
+              }
+              this.setState({
+                cuisions: tempCuisions,
+                cuision: tempCuisions[0].name,
+              });
+            }
+          } else {
+            console.log('if no data in response:', res.error);
+            alert(res.error);
+          }
+        })
+        .catch(error => {
+          console.log('api problem:', error.error);
+          alert(error.error);
+        });
+    } catch (err) {
+      console.log('another problem:', err);
+      alert(err);
+    }
   };
   render() {
     const {
@@ -97,13 +205,38 @@ export default class addFood extends Component {
               <View style={fields_container}>
                 <View style={[row, between_spacing, fields_between_spacing]}>
                   <Text style={field_label}>Cusinies</Text>
-                  <View style={[row, picker_style, between_spacing]}>
-                    <Text style={picker_label}>Veg</Text>
-                    <Image
-                      source={require('../../assets/down_arrow.png')}
-                      style={picker_icons}
-                    />
-                  </View>
+                  <Menu
+                    style={menu_position}
+                    contentStyle={menu_background}
+                    visible={this.state.visibleCuisions}
+                    onDismiss={this.closeCuisionMenu}
+                    anchor={
+                      <TouchableOpacity onPress={this.openCuisionMenu}>
+                        <View style={[row, picker_style, between_spacing]}>
+                          <Text style={picker_label}>{this.state.cuision}</Text>
+                          <Image
+                            source={require('../../assets/down_arrow.png')}
+                            style={picker_icons}
+                          />
+                        </View>
+                      </TouchableOpacity>
+                    }>
+                    {this.state.cuisions.map(value => {
+                      return (
+                        <Menu.Item
+                          titleStyle={[menu_list_title]}
+                          style={list_item_height}
+                          onPress={() => {
+                            this.setState({
+                              cuision: value.name,
+                              visibleCuisions: false,
+                            });
+                          }}
+                          title={value.name}
+                        />
+                      );
+                    })}
+                  </Menu>
                 </View>
 
                 <View style={[row, between_spacing, fields_between_spacing]}>
@@ -126,28 +259,21 @@ export default class addFood extends Component {
                         </View>
                       </TouchableOpacity>
                     }>
-                    <Menu.Item
-                      titleStyle={[menu_list_title]}
-                      style={list_item_height}
-                      onPress={() => {
-                        this.setState({
-                          category: 'Veg',
-                          visibleCategory: false,
-                        });
-                      }}
-                      title="Veg"
-                    />
-                    <Menu.Item
-                      titleStyle={[menu_list_title]}
-                      style={list_item_height}
-                      onPress={() => {
-                        this.setState({
-                          category: 'Non-veg',
-                          visibleCategory: false,
-                        });
-                      }}
-                      title="Non-veg"
-                    />
+                    {this.state.categories.map(value => {
+                      return (
+                        <Menu.Item
+                          titleStyle={[menu_list_title]}
+                          style={list_item_height}
+                          onPress={() => {
+                            this.setState({
+                              category: value.name,
+                              visibleCategory: false,
+                            });
+                          }}
+                          title={value.name}
+                        />
+                      );
+                    })}
                   </Menu>
                 </View>
 
@@ -169,30 +295,22 @@ export default class addFood extends Component {
                         </View>
                       </TouchableOpacity>
                     }>
-                    <Menu.Item
-                      titleStyle={[menu_list_title]}
-                      style={list_item_height}
-                      onPress={() => {
-                        this.setState({
-                          purpose: 'Sale',
-                          visiblePurpose: false,
-                        });
-                      }}
-                      title="Sale"
-                    />
-                    <Menu.Item
-                      titleStyle={[menu_list_title]}
-                      style={list_item_height}
-                      onPress={() => {
-                        this.setState({
-                          purpose: 'Share',
-                          visiblePurpose: false,
-                        });
-                      }}
-                      title="Share"
-                    />
+                    {this.state.purposes.map(value => {
+                      return (
+                        <Menu.Item
+                          titleStyle={[menu_list_title]}
+                          style={list_item_height}
+                          onPress={() => {
+                            this.setState({
+                              purpose: 'Sale',
+                              visiblePurpose: false,
+                            });
+                          }}
+                          title={value.name}
+                        />
+                      );
+                    })}
                   </Menu>
-
                 </View>
 
                 <View style={[row, between_spacing, fields_between_spacing]}>
@@ -213,36 +331,28 @@ export default class addFood extends Component {
                         </View>
                       </TouchableOpacity>
                     }>
-                    <Menu.Item
-                      titleStyle={[menu_list_title]}
-                      style={list_item_height}
-                      onPress={() => {
-                        this.setState({
-                          from: 'Restaurant',
-                          visibleFrom: false,
-                        });
-                      }}
-                      title="Restaurant"
-                    />
-                    <Menu.Item
-                      titleStyle={[menu_list_title]}
-                      style={list_item_height}
-                      onPress={() => {
-                        this.setState({
-                          from: 'Home made',
-                          visibleFrom: false,
-                        });
-                      }}
-                      title="Home made"
-                    />
+                    {this.state.cookedFrom.map(value => {
+                      return (
+                        <Menu.Item
+                          titleStyle={[menu_list_title]}
+                          style={list_item_height}
+                          onPress={() => {
+                            this.setState({
+                              from: 'Sale',
+                              visibleFrom: false,
+                            });
+                          }}
+                          title={value.name}
+                        />
+                      );
+                    })}
                   </Menu>
-
                 </View>
 
                 <View style={[row, between_spacing, fields_between_spacing]}>
                   <Text style={field_label}>Cooking date</Text>
                   <View style={[row, picker_style, between_spacing]}>
-                    <Text style={picker_label}>Veg</Text>
+                    <Text style={picker_label}>12/12/2012</Text>
                     <Image
                       source={require('../../assets/calender.png')}
                       style={picker_icons}
@@ -253,7 +363,7 @@ export default class addFood extends Component {
                 <View style={[row, between_spacing, fields_between_spacing]}>
                   <Text style={field_label}>Cooking time</Text>
                   <View style={[row, picker_style, between_spacing]}>
-                    <Text style={picker_label}>Veg</Text>
+                    <Text style={picker_label}>10:00 am</Text>
                     <Image
                       source={require('../../assets/clock_black.png')}
                       style={picker_icons}
@@ -263,19 +373,45 @@ export default class addFood extends Component {
 
                 <View style={[row, between_spacing, fields_between_spacing]}>
                   <Text style={field_label}>Portions</Text>
-                  <View style={[row, picker_style, between_spacing]}>
-                    <Text style={picker_label}>Veg</Text>
-                    <Image
-                      source={require('../../assets/down_arrow.png')}
-                      style={picker_icons}
-                    />
-                  </View>
+
+                  <Menu
+                    style={menu_position}
+                    contentStyle={menu_background}
+                    visible={this.state.visiblePortions}
+                    onDismiss={this.closePortionMenu}
+                    anchor={
+                      <TouchableOpacity onPress={this.openPortionMenu}>
+                        <View style={[row, picker_style, between_spacing]}>
+                          <Text style={picker_label}>{this.state.portion}</Text>
+                          <Image
+                            source={require('../../assets/down_arrow.png')}
+                            style={picker_icons}
+                          />
+                        </View>
+                      </TouchableOpacity>
+                    }>
+                    {this.state.portions.map(value => {
+                      return (
+                        <Menu.Item
+                          titleStyle={[menu_list_title]}
+                          style={list_item_height}
+                          onPress={() => {
+                            this.setState({
+                              portion: value.name,
+                              visiblePortions: false,
+                            });
+                          }}
+                          title={value.name}
+                        />
+                      );
+                    })}
+                  </Menu>
                 </View>
 
                 <View style={[row, between_spacing, fields_between_spacing]}>
                   <Text style={field_label}>Pickup time</Text>
                   <View style={[row, picker_style, between_spacing]}>
-                    <Text style={picker_label}>Veg</Text>
+                    <Text style={picker_label}>12:00 pm</Text>
                     <Image
                       source={require('../../assets/clock_black.png')}
                       style={picker_icons}
@@ -285,19 +421,45 @@ export default class addFood extends Component {
 
                 <View style={[row, between_spacing, fields_between_spacing]}>
                   <Text style={field_label}>Home delivery</Text>
-                  <View style={[row, picker_style, between_spacing]}>
-                    <Text style={picker_label}>Veg</Text>
-                    <Image
-                      source={require('../../assets/down_arrow.png')}
-                      style={picker_icons}
-                    />
-                  </View>
+                  <Menu
+                    style={menu_position}
+                    contentStyle={menu_background}
+                    visible={this.state.visibleHomeDelivery}
+                    onDismiss={this.closeDeliveryMenu}
+                    anchor={
+                      <TouchableOpacity onPress={this.openDeliveryMenu}>
+                        <View style={[row, picker_style, between_spacing]}>
+                          <Text style={picker_label}>
+                            {this.state.homedelivery}
+                          </Text>
+                          <Image
+                            source={require('../../assets/down_arrow.png')}
+                            style={picker_icons}
+                          />
+                        </View>
+                      </TouchableOpacity>
+                    }>
+                    {this.state.homeDelValues.map(value => {
+                      return (
+                        <Menu.Item
+                          titleStyle={[menu_list_title]}
+                          style={list_item_height}
+                          onPress={() => {
+                            this.setState({
+                              homedelivery: value.name,
+                              visibleHomeDelivery: false,
+                            });
+                          }}
+                          title={value.name}
+                        />
+                      );
+                    })}
+                  </Menu>
                 </View>
-
                 <View style={[row, between_spacing, fields_between_spacing]}>
                   <Text style={field_label}>Home delivery price</Text>
                   <View style={[row, picker_style, between_spacing]}>
-                    <Text style={picker_label}>Veg</Text>
+                    <Text style={picker_label}>Rs 10</Text>
                     <Image
                       source={require('../../assets/price_tag.png')}
                       style={picker_icons}
@@ -308,7 +470,7 @@ export default class addFood extends Component {
                 <View style={[row, between_spacing, fields_between_spacing]}>
                   <Text style={field_label}>Price</Text>
                   <View style={[row, picker_style, between_spacing]}>
-                    <Text style={picker_label}>Veg</Text>
+                    <Text style={picker_label}>Rs 50</Text>
                     <Image
                       source={require('../../assets/price_tag.png')}
                       style={picker_icons}

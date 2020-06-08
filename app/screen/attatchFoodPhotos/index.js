@@ -56,7 +56,9 @@ export default class attatchFoodPhotos extends Component {
   onBack = async () => {
     this.props.navigation.navigate('tab1');
   };
-
+  onNext = async () => {
+    this.props.navigation.navigate('AddFood');
+  };
   render() {
     const {
       container,
@@ -112,7 +114,9 @@ export default class attatchFoodPhotos extends Component {
                     />
                   </View>
                   <View style={[cross_container, centered_text]}>
-                    <TouchableOpacity activeOpacity={1} onPress={() => this.onRemove(item)}>
+                    <TouchableOpacity
+                      activeOpacity={1}
+                      onPress={() => this.onRemove(item)}>
                       <Image
                         resizeMode="cover"
                         source={require('../../assets/cross.png')}
@@ -137,7 +141,7 @@ export default class attatchFoodPhotos extends Component {
 
         <View style={bottom_container}>
           <Text />
-          <TouchableOpacity activeOpacity={1}>
+          <TouchableOpacity activeOpacity={1} onPress={this.onNext}>
             <View style={forward_container}>
               <Image
                 resizeMode="contain"

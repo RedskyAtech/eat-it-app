@@ -197,11 +197,7 @@ export default class login extends Component {
         image: this.state.image,
       };
       try {
-        let response = Service.postDataApi(
-          Url.REGISTRATION_URL,
-          body,
-          '',
-        );
+        let response = Service.postDataApi(Url.REGISTRATION_URL, body, '');
         response
           .then(res => {
             if (res.data) {
@@ -242,7 +238,6 @@ export default class login extends Component {
         response
           .then(res => {
             if (res.data) {
-              alert('Successfully logged in');
               if (this.state.checked) {
                 utility.setItem('rembemberMe', true);
               } else {

@@ -2,61 +2,88 @@ import React, {Component} from 'react';
 import {View, Image, Text, TouchableOpacity, TextInput} from 'react-native';
 import styles from './style';
 import {Slider} from 'react-native-elements';
+import * as utility from '../../utility/index';
 
 export default class filter extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      free: true,
+      free: false,
       paid: false,
-      veg: true,
+      veg: false,
       nonVeg: false,
-      homeMade: true,
+      homeMade: false,
       restaurant: false,
       value: 10,
-      cost: 'free',
-      type: 'veg',
-      from: 'homeMade',
+      cost: '',
+      type: '',
+      from: '',
       min: 0,
       max: 0,
     };
   }
   onFree = async () => {
-    await this.setState({free: true, paid: false, cost: 'free'});
+    await this.setState({free: !this.state.free, paid: false});
+    if (this.state.free) {
+      await this.setState({cost: 'free'});
+    } else {
+      await this.setState({cost: ''});
+    }
   };
   onPaid = async () => {
-    await this.setState({free: false, paid: true, cost: 'paid'});
+    await this.setState({free: false, paid: !this.state.paid});
+    if (this.state.paid) {
+      await this.setState({cost: 'paid'});
+    } else {
+      await this.setState({cost: ''});
+    }
   };
   onVeg = async () => {
     await this.setState({
-      veg: true,
+      veg: !this.state.veg,
       nonVeg: false,
-      type: 'veg',
     });
+    if (this.state.veg) {
+      await this.setState({type: 'veg'});
+    } else {
+      await this.setState({type: ''});
+    }
   };
   onNonVeg = async () => {
     await this.setState({
       veg: false,
-      nonVeg: true,
-      type: 'nonVeg',
+      nonVeg: !this.state.nonVeg,
     });
+    if (this.state.nonVeg) {
+      await this.setState({type: 'nonVeg'});
+    } else {
+      await this.setState({type: ''});
+    }
   };
   onHomeMade = async () => {
     await this.setState({
-      homeMade: true,
+      homeMade: !this.state.homeMade,
       restaurant: false,
-      from: 'homeMade',
     });
+    if (this.state.nonVeg) {
+      await this.setState({from: 'homeMade'});
+    } else {
+      await this.setState({from: ''});
+    }
   };
   onRestaurant = async () => {
     await this.setState({
       homeMade: false,
-      restaurant: true,
-      from: 'restaurant',
+      restaurant: !this.state.restaurant,
     });
+    if (this.state.nonVeg) {
+      await this.setState({from: 'restaurant'});
+    } else {
+      await this.setState({from: ''});
+    }
   };
   onBack = async () => {
-    this.props.navigation.navigate('tab2');
+    this.props.navigation.navigate('SearchName');
   };
   onNext = async () => {
     let filters;
@@ -80,7 +107,7 @@ export default class filter extends Component {
         from: this.state.from,
       };
     }
-    this.props.navigation.navigate('tab2', {filters: filters});
+    this.props.navigation.navigate('SearchName', {filters: filters});
   };
   render() {
     const {

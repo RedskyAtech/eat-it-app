@@ -308,7 +308,7 @@ const AppStack = createStackNavigator(
     },
   },
   {
-    initialRouteName: 'AddFood',
+    initialRouteName: 'Splash',
     headerMode: 'none',
     mode: 'modal',
   },

@@ -68,7 +68,7 @@ export const getDataApi = (url, token) => {
     })
       .then(response => response.json())
       .then(response => {
-        // console.log('Get Api data response', response);
+        console.log('Get Api data response', response);
         if (response !== null) {
           let data = response;
           if (data !== null && Object.keys(data).length !== 0) {

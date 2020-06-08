@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
   BackHandler,
+  ActivityIndicator,
 } from 'react-native';
 import styles from './style';
 import {RecyclerListView, DataProvider, LayoutProvider} from 'recyclerlistview';
@@ -120,6 +121,7 @@ export default class home extends Component {
       nearYou: false,
       follow: false,
       name: '',
+      isVisibleLoading: false,
       dataProvider: this.dataProvider.cloneWithRows(
         this._generateArray(this.products),
       ),
@@ -127,6 +129,7 @@ export default class home extends Component {
   }
   getFood = async () => {
     this.products = [];
+    await this.setState({isVisibleLoading: true});
     try {
       let response = Service.getDataApi(Url.GET_FOODS, '');
       response
@@ -151,18 +154,22 @@ export default class home extends Component {
                 dataProvider: this.dataProvider.cloneWithRows(
                   this._generateArray(this.products),
                 ),
+                isVisibleLoading:false
               });
             }
           } else {
+            this.setState({isVisibleLoading:false})
             console.log('if no data in response:', res.error);
             alert(res.error);
           }
         })
         .catch(error => {
+          this.setState({isVisibleLoading:false})
           console.log('api problem:', error.error);
           alert(error.error);
         });
     } catch (err) {
+      this.setState({isVisibleLoading:false});
       console.log('another problem:', err);
       alert(err);
     }
@@ -250,7 +257,7 @@ export default class home extends Component {
     return true;
   };
   onSearch = async () => {
-    this.props.navigation.navigate('SearchName',{name: this.state.name});
+    this.props.navigation.navigate('SearchName', {name: this.state.name});
   };
   closeDialog = async () => {
     this.setState({isVisible: false});
@@ -371,6 +378,13 @@ export default class home extends Component {
               layoutProvider={this._layoutProvider}
               dataProvider={this.state.dataProvider}
               rowRenderer={this._rowRenderer}
+            />
+          </View>
+          <View style={{position: 'absolute', top: '50%', right: 0, left: 0}}>
+            <ActivityIndicator
+              animating={this.state.isVisibleLoading}
+              size="large"
+              color="#0000ff"
             />
           </View>
         </View>

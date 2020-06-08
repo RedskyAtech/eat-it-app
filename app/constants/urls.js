@@ -10,4 +10,6 @@ export const RESET_PASSWORD = 'users/resetPassword';
 export const CHANGE_PASSWORD = 'users/changePassword';
 
 export const GET_FOODS = 'foods';
-export const SEARCH_FOOD='foods/search'
+export const SEARCH_FOOD = 'foods/search';
+export const GET_CUISIONS = 'cuisines';
+export const ADD_FAVOURITES = 'favorites';

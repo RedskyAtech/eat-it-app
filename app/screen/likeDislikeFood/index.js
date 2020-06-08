@@ -5,6 +5,9 @@ import {RadioButton} from 'react-native-paper';
 import * as colors from '../../constants/colors';
 import LinearGradient from 'react-native-linear-gradient';
 import Modal from 'react-native-modal';
+import * as Service from '../../api/services';
+import * as utility from '../../utility/index';
+import * as Url from '../../constants/urls';
 
 export default class likeDislikeFood extends Component {
   constructor(props) {
@@ -19,37 +22,102 @@ export default class likeDislikeFood extends Component {
       starThree: false,
       starFour: false,
       starFive: false,
+      foodId: '',
+      userToken: '',
+      rating: false,
+      sellerId: '',
+      paymentId: '',
+      ratings: [1, 2, 3, 4, 5],
+      status: [
+        {
+          name: 'Yummy',
+        },
+        {
+          name: 'Delicious',
+        },
+        {
+          name: 'Tasty',
+        },
+      ],
+      selectedRating: 0,
     };
   }
   componentDidMount = async () => {
-    await this.setState({isVisible: this.props.visible});
+    let userToken = await utility.getToken('token');
+    await this.setState({
+      isVisible: this.props.visible,
+      foodId: this.props.foodId,
+      userToken: userToken,
+      sellerId: this.props.sellerId,
+    });
   };
   onLike = async () => {
     await this.setState({like: !this.state.like, dislike: false});
   };
+  onSubmit = async () => {
+    let status = this.state.checked.toLowerCase();
+    let body;
+    if (this.state.like) {
+      if (this.state.selectedRating == 0) {
+        body = {
+          foodId: this.state.foodId,
+          type: 'like',
+          status: status,
+        };
+      } else {
+        body = {
+          foodId: this.state.foodId,
+          type: 'like',
+          status: status,
+          ratingNo: this.state.selectedRating,
+          sellerId: this.state.sellerId,
+        };
+      }
+    }
+    if (this.state.dislike) {
+      body = {
+        foodId: this.state.foodId,
+        type: 'dislike',
+      };
+    }
+    try {
+      let response = Service.postDataApi(
+        Url.ADD_FAVOURITES,
+        body,
+        this.state.userToken,
+      );
+      response
+        .then(res => {
+          if (res.data) {
+            this.setState({selectedRating: 0});
+            this.props.closeDialog();
+            if (this.state.dislike) {
+              alert('Dislike successfully');
+            }
+            if (this.state.like) {
+              alert('Liked successfully');
+            }
+          } else {
+            alert(res.error);
+          }
+        })
+        .catch(error => {
+          alert(error.error);
+          console.log('errorrr:', error.error);
+        });
+    } catch (err) {
+      alert('try:', err);
+    }
+  };
   onDisLike = async () => {
     await this.setState({dislike: !this.state.dislike, like: false});
-    setTimeout(() => {
-      this.props.closeDialog();
-    }, 1000);
+    await this.onSubmit();
   };
   close = async () => {
     this.props.closeDialog();
   };
-  onFirst = async () => {
-    await this.setState({starOne: !this.state.starOne});
-  };
-  onSecond = async () => {
-    await this.setState({starTwo: !this.state.starTwo});
-  };
-  onThird = async () => {
-    await this.setState({starThree: !this.state.starThree});
-  };
-  onFourth = async () => {
-    await this.setState({starFour: !this.state.starFour});
-  };
-  onFifth = async () => {
-    await this.setState({starFive: !this.state.starFive});
+  onRating = async value => {
+    await this.setState({selectedRating: value});
   };
   render() {
     const {
@@ -113,129 +181,52 @@ export default class likeDislikeFood extends Component {
             {this.state.like == true ? (
               <>
                 <View style={[row, bottom_margin, radio_button_list]}>
-                  <View style={[row, row_centered]}>
-                    <RadioButton
-                      value="Yummy"
-                      color={colors.primaryColor}
-                      uncheckedColor={colors.greyText}
-                      status={
-                        this.state.checked === 'Yummy' ? 'checked' : 'unchecked'
-                      }
-                      onPress={() => {
-                        this.setState({checked: 'Yummy'});
-                      }}
-                    />
-                    <Text
-                      style={
-                        this.state.checked == 'Yummy'
-                          ? radio_text_selected
-                          : radio_text_unselected
-                      }>
-                      Yummy
-                    </Text>
-                  </View>
-                  <View style={[row, row_centered]}>
-                    <RadioButton
-                      value="Delicious"
-                      color={colors.primaryColor}
-                      uncheckedColor={colors.greyText}
-                      status={
-                        this.state.checked === 'Delicious'
-                          ? 'checked'
-                          : 'unchecked'
-                      }
-                      onPress={() => {
-                        this.setState({checked: 'Delicious'});
-                      }}
-                    />
-                    <Text
-                      style={
-                        this.state.checked == 'Delicious'
-                          ? radio_text_selected
-                          : radio_text_unselected
-                      }>
-                      Delicious
-                    </Text>
-                  </View>
-                  <View style={[row, row_centered]}>
-                    <RadioButton
-                      value="Tasty"
-                      color={colors.primaryColor}
-                      uncheckedColor={colors.greyText}
-                      status={
-                        this.state.checked === 'Tasty' ? 'checked' : 'unchecked'
-                      }
-                      onPress={() => {
-                        this.setState({checked: 'Tasty'});
-                      }}
-                    />
-                    <Text
-                      style={
-                        this.state.checked == 'Tasty'
-                          ? radio_text_selected
-                          : radio_text_unselected
-                      }>
-                      Tasty
-                    </Text>
-                  </View>
+                  {this.state.status.map(value => {
+                    return (
+                      <View style={[row, row_centered]}>
+                        <RadioButton
+                          value={value.name}
+                          color={colors.primaryColor}
+                          uncheckedColor={colors.greyText}
+                          status={
+                            this.state.checked === value.name
+                              ? 'checked'
+                              : 'unchecked'
+                          }
+                          onPress={() => {
+                            this.setState({checked: value.name});
+                          }}
+                        />
+                        <Text
+                          style={
+                            this.state.checked == value.name
+                              ? radio_text_selected
+                              : radio_text_unselected
+                          }>
+                          {value.name}
+                        </Text>
+                      </View>
+                    );
+                  })}
                 </View>
 
                 <View style={[row, bottom_margin, star_container]}>
-                  <TouchableOpacity onPress={this.onFirst}>
-                    <Image
-                      resizeMode="stretch"
-                      source={
-                        this.state.starOne
-                          ? require('../../assets/star.png')
-                          : require('../../assets/star_unselected.png')
-                      }
-                      style={like_icon}
-                    />
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={this.onSecond}>
-                    <Image
-                      resizeMode="stretch"
-                      source={
-                        this.state.starTwo
-                          ? require('../../assets/star.png')
-                          : require('../../assets/star_unselected.png')
-                      }
-                      style={like_icon}
-                    />
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={this.onThird}>
-                    <Image
-                      resizeMode="stretch"
-                      source={
-                        this.state.starThree
-                          ? require('../../assets/star.png')
-                          : require('../../assets/star_unselected.png')
-                      }
-                      style={like_icon}
-                    />
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={this.onFourth}>
-                    <Image
-                      resizeMode="stretch"
-                      source={
-                        this.state.starFour
-                          ? require('../../assets/star.png')
-                          : require('../../assets/star_unselected.png')
-                      }
-                      style={like_icon}
-                    />
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={this.onFifth}>
-                    <Image
-                      resizeMode="stretch"
-                      source={
-                        this.state.starFive
-                          ? require('../../assets/star.png')
-                          : require('../../assets/star_unselected.png')
-                      }
-                      style={like_icon}
-                    />
-                  </TouchableOpacity>
+                  {this.state.ratings.map(value => {
+                    let index = this.state.ratings.indexOf(value);
+                    return (
+                      <TouchableOpacity onPress={() => this.onRating(value)}>
+                        <Image
+                          resizeMode="stretch"
+                          source={
+                            this.state.selectedRating < index + 1
+                              ? require('../../assets/star_unselected.png')
+                              : require('../../assets/star.png')
+                          }
+                          style={like_icon}
+                        />
+                      </TouchableOpacity>
+                    );
+                  })}
                 </View>
 
                 <View
@@ -249,7 +240,9 @@ export default class likeDislikeFood extends Component {
                     <Text style={cancel_style}>Cancel</Text>
                   </TouchableOpacity>
 
-                  <TouchableOpacity activeOpacity={0.7} onPress={() => this.close()}>
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={() => this.onSubmit()}>
                     <LinearGradient
                       start={{x: 0, y: 0}}
                       end={{x: 1, y: 0}}
