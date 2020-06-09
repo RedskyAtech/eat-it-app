@@ -65,11 +65,28 @@ const styles = {
     height: hp(3.8),
     borderRadius: 20,
     fontSize: 10,
-    paddingHorizontal:wp(3.6),
+    paddingHorizontal: wp(3.6),
     backgroundColor: colors.unselectedFilter,
   },
-  picker_label:{
-   fontSize:13
+  picker_label: {
+    fontSize: 13,
+  },
+  date_picker_text: {color: 'black', fontSize: 13, padding: 0, margin: 0},
+  placeholder_text: {color: 'grey', fontSize: 13, padding: 0, margin: 0},
+  input_box_style:{
+    width:wp(26),
+    height:hp(6),
+    fontSize: 13,
+  },
+  ckeckbox: {
+    marginRight: wp(5),
+    borderRadius: 4,
+    height: hp(2.6),
+    width: hp(2.6),
+  },
+  checkbox_container:{
+    alignItems:'center',
+    width:wp(38)
   },
   fields: {
     borderBottomWidth: 1.4,
@@ -83,7 +100,7 @@ const styles = {
     marginRight: wp(2.8),
     padding: 0,
   },
-  picker_icons:{
+  picker_icons: {
     height: hp(1.8),
     width: hp(1.8),
   },
@@ -99,14 +116,18 @@ const styles = {
     backgroundColor: '#ECECEC',
   },
   menu_list_title: {
-    fontSize:13,
-    fontWeight:fonts.FONT_BOLD,
-    color:colors.greyText
+    fontSize: 13,
+    fontWeight: fonts.FONT_BOLD,
+    color: colors.greyText,
   },
   list_item_height: {
     height: hp(4),
-    paddingHorizontal:wp(0),
-    width: wp(38)
+    paddingHorizontal: wp(0),
+    width: wp(38),
+  },
+  checkbox_list:{
+    height: hp(4),
+    paddingHorizontal: wp(0),
   },
   bottom_container: {
     flexDirection: 'row',

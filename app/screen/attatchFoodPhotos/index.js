@@ -25,27 +25,31 @@ export default class attatchFoodPhotos extends Component {
     clearTimeout(this.timeoutHandle);
   }
   onLaunchCamera = () => {
-    let options = {
-      cameraType: 'front',
-      storageOptions: {
-        skipBackup: true,
-        path: 'images',
-      },
-    };
-    ImagePicker.showImagePicker(options, response => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-        alert(response.customButton);
-      } else {
-        const source = {uri: response.uri};
-        var joined = this.state.photos.concat({uri: response.uri});
-        this.setState({photos: joined});
-      }
-    });
+    if (this.state.photos && this.state.photos.length < 5) {
+      let options = {
+        cameraType: 'front',
+        storageOptions: {
+          skipBackup: true,
+          path: 'images',
+        },
+      };
+      ImagePicker.showImagePicker(options, response => {
+        if (response.didCancel) {
+          console.log('User cancelled image picker');
+        } else if (response.error) {
+          console.log('ImagePicker Error: ', response.error);
+        } else if (response.customButton) {
+          console.log('User tapped custom button: ', response.customButton);
+          alert(response.customButton);
+        } else {
+          const source = {uri: response.uri};
+          var joined = this.state.photos.concat({uri: response.uri});
+          this.setState({photos: joined});
+        }
+      });
+    } else {
+      alert('Unable to add more images');
+    }
   };
   onRemove = async item => {
     let index = this.state.photos.indexOf(item);
@@ -57,7 +61,12 @@ export default class attatchFoodPhotos extends Component {
     this.props.navigation.navigate('tab1');
   };
   onNext = async () => {
-    this.props.navigation.navigate('AddFood');
+    if (this.state.photos && this.state.photos.length != 0) {
+      this.props.navigation.navigate('AddFood');
+      await this.setState({photos: []});
+    }else{
+      alert('Select images first')
+    }
   };
   render() {
     const {
@@ -127,6 +136,7 @@ export default class attatchFoodPhotos extends Component {
                 </View>
               );
             })}
+            
             <TouchableOpacity onPress={this.onLaunchCamera}>
               <View style={[photo_continer, centered_text]}>
                 <Image

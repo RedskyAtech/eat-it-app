@@ -9,6 +9,7 @@ export const FORGOT_PASSWORD = 'users/forgotPassword';
 export const RESET_PASSWORD = 'users/resetPassword';
 export const CHANGE_PASSWORD = 'users/changePassword';
 
+export const ADD_FOOD = 'foods';
 export const GET_FOODS = 'foods';
 export const SEARCH_FOOD = 'foods/search';
 export const GET_CUISIONS = 'cuisines';

@@ -24,6 +24,7 @@ import SearchName from '../screen/searchName';
 import LikeDislikeFood from '../screen/likeDislikeFood';
 import ShareFood from '../screen/shareFood';
 import AddFood from '../screen/addFood';
+import PriceSelection from '../screen/priceSelection';
 import Header from '../components/header';
 
 const TabNavigator = createBottomTabNavigator(
@@ -296,6 +297,12 @@ const AppStack = createStackNavigator(
     },
     Header: {
       screen: Header,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
+    PriceSelection: {
+      screen: PriceSelection,
       navigationOptions: {
         headerShown: false,
       },

@@ -30,8 +30,19 @@ const styles = {
     width: wp(96),
     marginBottom: hp(1.6),
   },
+  // inner_container: {
+  //   width: wp(96),
+  // },
   inner_container: {
     width: wp(96),
+    alignSelf: 'center',
+  },
+  list_height:{
+    marginTop:hp(2),
+    height:hp(82),
+  },
+  row_list: {
+    flexWrap: 'wrap',
   },
   search_container: {
     width: wp(83.2),
@@ -40,6 +51,30 @@ const styles = {
     borderColor: colors.primaryColor,
     borderRadius: 25,
     backgroundColor: '#ECECEC',
+  },
+  photo_continer: {
+    height: hp(14.6),
+    width: wp(27.4),
+    borderWidth: 1.4,
+    borderRadius: 4,
+    borderColor: colors.primaryColor,
+    backgroundColor: 'white',
+    marginBottom: hp(1),
+    marginHorizontal: wp(2),
+  },
+  cuision_text:{
+    marginBottom: hp(2.6),
+    color:colors.gradientFirstColor,
+    alignSelf:'center'
+  },
+  centered_text: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  photo_style: {
+    height: '100%',
+    width: '100%',
+    borderRadius: 2,
   },
   right_icon: {
     fontSize: 28,

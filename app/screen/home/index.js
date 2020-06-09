@@ -113,7 +113,7 @@ export default class home extends Component {
     this._rowRenderer = this._rowRenderer.bind(this);
 
     this.products = [];
-    this.getFood();
+    // this.getFood();
 
     this.state = {
       forYou: true,
@@ -127,6 +127,10 @@ export default class home extends Component {
       ),
     };
   }
+  componentDidMount = async () => {
+    this.products = [];
+    this.getFood();
+  };
   getFood = async () => {
     this.products = [];
     await this.setState({isVisibleLoading: true});
@@ -154,22 +158,22 @@ export default class home extends Component {
                 dataProvider: this.dataProvider.cloneWithRows(
                   this._generateArray(this.products),
                 ),
-                isVisibleLoading:false
+                isVisibleLoading: false,
               });
             }
           } else {
-            this.setState({isVisibleLoading:false})
+            this.setState({isVisibleLoading: false});
             console.log('if no data in response:', res.error);
             alert(res.error);
           }
         })
         .catch(error => {
-          this.setState({isVisibleLoading:false})
+          this.setState({isVisibleLoading: false});
           console.log('api problem:', error.error);
           alert(error.error);
         });
     } catch (err) {
-      this.setState({isVisibleLoading:false});
+      this.setState({isVisibleLoading: false});
       console.log('another problem:', err);
       alert(err);
     }
