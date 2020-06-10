@@ -39,6 +39,7 @@ export default class addPhotos extends Component {
       response
         .then(res => {
           if (res.data) {
+            console.log('fffffffffffff:', res.data.homeDeliveryPrice);
             this.setState({
               name: res.data.name,
               address: res.data.address,
@@ -116,6 +117,7 @@ export default class addPhotos extends Component {
       between_spacing,
       type_icon,
       veg_icon,
+      top_spacing,
     } = styles;
     return (
       <View>
@@ -150,7 +152,12 @@ export default class addPhotos extends Component {
         {this.pagination}
 
         <View style={[detail_container]}>
-          <View style={[row, between_spacing, bottom_spacing]}>
+          <View
+            style={
+              this.state.images.length == 1
+                ? [row, between_spacing, bottom_spacing, top_spacing]
+                : [row, between_spacing, bottom_spacing]
+            }>
             <Text style={product_name}>{this.state.name}</Text>
             <Image
               resizeMode="cover"
@@ -187,7 +194,13 @@ export default class addPhotos extends Component {
           </View>
           <View style={[row, bottom_spacing]}>
             <Text style={timing_heading_style}>Home delivery price : </Text>
-            <Text style={address_style}>Rs {this.state.deliveryPrice}</Text>
+            <Text style={address_style}>
+              Rs{' '}
+              {this.state.deliveryPrice == '' ||
+              this.state.deliveryPrice == undefined
+                ? '0'
+                : this.state.deliveryPrice}
+            </Text>
           </View>
           <View style={[row, bottom_spacing]}>
             <Text style={timing_heading_style}>Total payable amount : </Text>

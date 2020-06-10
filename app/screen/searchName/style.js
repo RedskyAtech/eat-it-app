@@ -26,6 +26,7 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'space-evenly',
   },
+  centered_text: {justifyContent: 'center', alignItems: 'center'},
   top_container: {
     width: wp(96),
     marginBottom: hp(1.6),
@@ -80,7 +81,7 @@ const styles = {
   product_heading: {
     fontSize: fonts.FONT_TEXT,
     fontWeight: fonts.FONT_BOLD,
-    textTransform: 'capitalize'
+    textTransform: 'capitalize',
   },
   like_dislike_icon: {
     height: hp(3),

@@ -39,6 +39,7 @@ export default class addFood extends Component {
       price: 0,
       isLangar: false,
       isVisibleLoading: false,
+      images: [],
 
       dishName: '',
       visibleCategory: false,
@@ -110,12 +111,24 @@ export default class addFood extends Component {
     await this.getCuisions();
     let initialCheck = this.state.cuisions.map(() => false);
     this.setState({isChecked: initialCheck});
+    if (
+      this.props.navigation.state.params.images &&
+      this.props.navigation.state.params.images.length != 0
+    ) {
+      let images = this.props.navigation.state.params.images;
+      console.log('imagessssss:');
+      console.log('imagessssss:', images);
+      await this.setState({images: images});
+    }
   };
   onChecked = async (index, item) => {
     let {isChecked, selectedLists} = this.state;
     isChecked[index] = !isChecked[index];
     this.setState({isChecked: isChecked});
     if (isChecked[index] == true) {
+      if (item.name == 'Langar') {
+        await this.setState({isLangar: true, price: 0});
+      }
       if (selectedLists.length < 3) {
         selectedLists.push({
           id: item.id,
@@ -124,9 +137,12 @@ export default class addFood extends Component {
       } else {
         isChecked[index] = !isChecked[index];
         this.setState({isChecked: isChecked});
-        alert('Tou can add only three cuisions');
+        alert('You can add only three cuisions');
       }
     } else {
+      if (item.name == 'Langar') {
+        await this.setState({isLangar: false});
+      }
       selectedLists.pop({
         id: item.id,
       });
@@ -162,6 +178,12 @@ export default class addFood extends Component {
     } else {
       let type;
       let foodCooked;
+      let price;
+      if (this.state.isLangar) {
+        price = 0;
+      } else {
+        price = this.state.price;
+      }
       if (this.state.category == 'Non-veg') {
         type = 'nonVeg';
       } else {
@@ -184,32 +206,11 @@ export default class addFood extends Component {
         cookingDate: this.state.cookingDate,
         pickupTime: this.state.pickupTime,
         foodCooked: foodCooked,
-        price: this.state.price,
+        price: price,
         address: this.state.dishAddress,
         description: this.state.description,
         cuisine: this.state.selectedLists,
-        images: [
-          {
-            url: 'http://18.139.111.3:6800/files/burger-1591250258623.jpg',
-            thumbnail: 'string',
-            resize_url:
-              'http://18.139.111.3:6800/files/burger-1591250258940.jpg',
-            resize_thumbnail: 'string',
-          },
-          {
-            url: 'http://18.139.111.3:6800/files/food-1591250300502.jpg',
-            thumbnail: 'string',
-            resize_url: 'http://18.139.111.3:6800/files/food-1591250300901.jpg',
-            resize_thumbnail: 'string',
-          },
-          {
-            url: 'http://18.139.111.3:6800/files/sweet-1591250330763.jpg',
-            thumbnail: 'string',
-            resize_url:
-              'http://18.139.111.3:6800/files/sweet-1591250330989.jpg',
-            resize_thumbnail: 'string',
-          },
-        ],
+        images: this.state.images,
       };
       console.log('bodyyyyyyyyyy::::', body);
       try {
@@ -351,8 +352,8 @@ export default class addFood extends Component {
   showDialog = async () => {
     if (this.state.homedelivery == 'Yes') {
       await this.setState({isDeliveryPriceDialogVisible: true});
-    }else{
-      alert('Home delivery should be enabled')
+    } else {
+      alert('Home delivery should be enabled');
     }
   };
   closeDialog = async () => {
@@ -749,7 +750,10 @@ export default class addFood extends Component {
 
                 <View style={[row, between_spacing, fields_between_spacing]}>
                   <Text style={field_label}>Price</Text>
-                  <TouchableOpacity onPress={this.showPriceDialog}>
+                  <TouchableOpacity
+                    onPress={
+                      !this.state.isLangar ? this.showPriceDialog : () => {}
+                    }>
                     <View style={[row, picker_style, between_spacing]}>
                       <Text style={picker_label}>Rs {this.state.price}</Text>
                       <Image

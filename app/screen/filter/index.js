@@ -20,8 +20,16 @@ export default class filter extends Component {
       from: '',
       min: 0,
       max: 0,
+      screenFrom: '',
     };
   }
+  componentDidMount = async () => {
+    let from;
+    if (this.props.navigation.state.params.from == 'name') {
+      from = this.props.navigation.state.params.from;
+    }
+    await this.setState({screenFrom:from})
+  };
   onFree = async () => {
     await this.setState({free: !this.state.free, paid: false});
     if (this.state.free) {
@@ -65,8 +73,8 @@ export default class filter extends Component {
       homeMade: !this.state.homeMade,
       restaurant: false,
     });
-    if (this.state.nonVeg) {
-      await this.setState({from: 'homeMade'});
+    if (this.state.homeMade) {
+      await this.setState({from: 'homemade'});
     } else {
       await this.setState({from: ''});
     }
@@ -76,7 +84,7 @@ export default class filter extends Component {
       homeMade: false,
       restaurant: !this.state.restaurant,
     });
-    if (this.state.nonVeg) {
+    if (this.state.restaurant) {
       await this.setState({from: 'restaurant'});
     } else {
       await this.setState({from: ''});
@@ -86,7 +94,7 @@ export default class filter extends Component {
     this.props.navigation.navigate('SearchName');
   };
   onNext = async () => {
-    let filters;
+    let filters = {};
     if (this.state.cost == 'paid') {
       if (utility.isFieldEmpty(this.state.min || this.state.max)) {
         alert('Please seletect minimum or maximum price');
@@ -107,7 +115,13 @@ export default class filter extends Component {
         from: this.state.from,
       };
     }
-    this.props.navigation.navigate('SearchName', {filters: filters});
+    console.log('from::::', filters);
+    if(this.state.screenFrom=='name'){
+      await this.props.navigation.state.params.refresh(filters);
+    }else{
+      await this.props.navigation.state.params.onCuisines(filters);
+    }
+    this.props.navigation.goBack();
   };
   render() {
     const {

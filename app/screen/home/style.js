@@ -117,6 +117,7 @@ const styles = {
     textWrap: 'wrap',
     textTransform: 'capitalize'
   },
+  centered_text: {justifyContent: 'center', alignItems: 'center'},
   colored_text: {
     fontSize: 12,
     fontWeight: fonts.FONT_BOLD,

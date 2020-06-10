@@ -25,138 +25,250 @@ export default class searchName extends Component {
       products: [],
       query: '',
       isVisibleLoading: false,
+      cuisineId: '',
+      noDataExist: false,
+      filters: '',
+      count: 1,
     };
+    this.refersh = this.refersh.bind(this);
+    this.onCuisines=this.onCuisines.bind(this);
   }
   componentDidMount = async () => {
     let name;
-    let filters = {};
-    if (this.props.navigation.state.params.name) {
-      name = this.props.navigation.state.params.name;
-    }
-    if (name != '') {
-      await this.setState({name: name});
-      this.setState({query: `name=${this.state.name}&searchType=food`});
-      await this.getFood();
-    }
-    if (this.props.navigation.state.params.filters) {
-      filters = this.props.navigation.state.params.filters;
-      console.log('filtersssssss:', this.props.navigation.state.params.filters);
-      if (filters) {
-        if (filters.cost != '' && filters.type == '' && filters.from == '') {
-          if (filters.cost == 'paid') {
-            this.setState({
-              query: `name=${
-                this.state.name
-              }&searchType=food&cost=paid&minPrice=${
-                filters.minPrice
-              }&maxPrice=${filters.maxPrice}`,
-            });
-          } else {
-            this.setState({
-              query: `name=${this.state.name}&searchType=food&cost=free`,
-            });
-          }
-        } else if (
-          filters.cost != '' &&
-          filters.type != '' &&
-          filters.from == ''
-        ) {
-          this.setState({
-            query: `name=${this.state.name}&searchType=food&type=${
-              filters.type
-            }`,
-          });
-        } else if (
-          filters.cost != '' &&
-          filters.type == '' &&
-          filters.from != ''
-        ) {
-          this.setState({
-            query: `name=${this.state.name}&searchType=food&foodCooked=${
-              filters.from
-            }`,
-          });
-        } else if (
-          filters.cost != '' &&
-          filters.type != '' &&
-          filters.from == ''
-        ) {
-          if (filters.cost == 'paid') {
-            this.setState({
-              query: `name=${
-                this.state.name
-              }&searchType=food&cost=paid&minPrice=${
-                filters.minPrice
-              }&maxPrice=${filters.maxPrice}&foodCooked=${filters.from}`,
-            });
-          } else {
-            this.setState({
-              query: `name=${
-                this.state.name
-              }&searchType=food&cost=free&foodCooked=${filters.from}`,
-            });
-          }
-        } else if (
-          filters.cost == '' &&
-          filters.type != '' &&
-          filters.from != ''
-        ) {
-          this.setState({
-            query: `name=${this.state.name}&searchType=food&type=${
-              filters.type
-            }&foodCooked=${filters.from}`,
-          });
-        } else if (
-          filters.cost != '' &&
-          filters.type == '' &&
-          filters.from != ''
-        ) {
-          if (filters.cost == 'paid') {
-            this.setState({
-              query: `name=${
-                this.state.name
-              }&searchType=food&cost=paid&minPrice=${
-                filters.minPrice
-              }&maxPrice=${filters.maxPrice}$&foodCooked=${filters.from}`,
-            });
-          } else {
-            this.setState({
-              query: `name=${
-                this.state.name
-              }&searchType=food&cost=free&foodCooked=${filters.from}`,
-            });
-          }
-        } else if (
-          filters.cost != '' &&
-          filters.type != '' &&
-          filters.from != ''
-        ) {
-          if (filters.cost == 'paid') {
-            this.setState({
-              query: `name=${
-                this.state.name
-              }&searchType=food&cost=paid&minPrice=${
-                filters.minPrice
-              }&maxPrice=${filters.maxPrice}$&foodCooked=${filters.from}&type=${
-                filters.type
-              }`,
-            });
-          } else {
-            this.setState({
-              query: `name=${
-                this.state.name
-              }&searchType=food&cost=free&foodCooked=${filters.from}&type=${
-                filters.type
-              }`,
-            });
-          }
-        } else {
-          this.setState({query: `name=${this.state.name}&searchType=food`});
+    let cuisineId;
+    if (this.props.navigation.state.params) {
+      if (this.props.navigation.state.params.from == 'home') {
+        if (this.props.navigation.state.params.name) {
+          name = this.props.navigation.state.params.name;
         }
+        if (name != '') {
+          await this.setState({name: name});
+          this.setState({query: `name=${this.state.name}&searchType=food`});
+          await this.getFood();
+        }
+      } else if (this.props.navigation.state.params.from == 'search') {
+        if (this.props.navigation.state.params.cuisineId) {
+          cuisineId = this.props.navigation.state.params.cuisineId;
+        }
+        if (this.props.navigation.state.params.cuisineName) {
+          name = this.props.navigation.state.params.cuisineName;
+        }
+        await this.setState({cuisineId: cuisineId, name: name});
+        await this.setState({
+          query: `cuisineId=${this.state.cuisineId}&searchType=food`,
+        });
+        await this.getFood();
       }
     }
   };
 
+  refersh = async (filters) => {
+    console.log('filters:::::::::::::', filters, this.state.name);
+    if (filters) {
+      if (filters.type != '' && filters.from == '' && filters.cost == '') {
+        await this.setState({
+          query: `name=${this.state.name}&type=${filters.type}&searchType=food`,
+        });
+      }else if(filters.type == '' && filters.from != '' && filters.cost == ''){
+        await this.setState({
+          query: `name=${this.state.name}&foodCooked=${filters.from}&searchType=food`,
+        });
+      }else if(filters.type == '' && filters.from == '' && filters.cost != ''){
+        if(filters.cost=='paid'){
+          if(filters.minPrice !=''&&filters.maxPrice==''){
+            await this.setState({
+              query: `name=${this.state.name}&cost=${filters.cost}&&minPrice=${filters.minPrice}&searchType=food`,
+            });
+          }else if(filters.minPrice ==''&&filters.maxPrice !=''){
+            await this.setState({
+              query: `name=${this.state.name}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&searchType=food`,
+            });
+          }else{
+            await this.setState({
+              query: `name=${this.state.name}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&minPrice=${filters.minPrice}&searchType=food`,
+            });
+          }
+        }else{
+          await this.setState({
+            query: `name=${this.state.name}&cost=${filters.cost}&searchType=food`,
+          });
+        }
+      }else if(filters.type != '' && filters.from != '' && filters.cost == ''){
+        await this.setState({
+          query: `name=${this.state.name}&type=${filters.type}&foodCooked=${filters.from}&searchType=food`,
+        });
+      }else if(filters.type == '' && filters.from != '' && filters.cost != ''){
+        if(filters.cost=='paid'){
+          if(filters.minPrice !=''&&filters.maxPrice==''){
+            await this.setState({
+              query: `name=${this.state.name}&foodCooked=${filters.from}&cost=${filters.cost}&&minPrice=${filters.minPrice}&searchType=food`,
+            });
+          }else if(filters.minPrice ==''&&filters.maxPrice !=''){
+            await this.setState({
+              query: `name=${this.state.name}&foodCooked=${filters.from}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&searchType=food`,
+            });
+          }else{
+            await this.setState({
+              query: `name=${this.state.name}&foodCooked=${filters.from}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&minPrice=${filters.minPrice}&searchType=food`,
+            });
+          }
+        }else{
+          await this.setState({
+            query: `name=${this.state.name}&foodCooked=${filters.from}&cost=${filters.cost}&searchType=food`,
+          });
+        }
+      }else if(filters.type != '' && filters.from == '' && filters.cost != ''){
+        if(filters.cost=='paid'){
+          if(filters.minPrice !=''&&filters.maxPrice==''){
+            await this.setState({
+              query: `name=${this.state.name}&type=${filters.type}&cost=${filters.cost}&&minPrice=${filters.minPrice}&searchType=food`,
+            });
+          }else if(filters.minPrice ==''&& filters.maxPrice !=''){
+            await this.setState({
+              query: `name=${this.state.name}&type=${filters.type}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&searchType=food`,
+            });
+          }else{
+            await this.setState({
+              query: `name=${this.state.name}&type=${filters.type}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&minPrice=${filters.minPrice}&searchType=food`,
+            });
+          }
+        }else{
+          await this.setState({
+            query: `name=${this.state.name}&type=${filters.type}&cost=${filters.cost}&searchType=food`,
+          });
+        }
+      }else if(filters.type != '' && filters.from != '' && filters.cost != ''){
+        if(filters.cost=='paid'){
+          if(filters.minPrice !=''&&filters.maxPrice==''){
+            await this.setState({
+              query: `name=${this.state.name}&foodCooked=${filters.from}&type=${filters.type}&cost=${filters.cost}&&minPrice=${filters.minPrice}&searchType=food`,
+            });
+          }else if(filters.minPrice ==''&& filters.maxPrice !=''){
+            await this.setState({
+              query: `name=${this.state.name}&foodCooked=${filters.from}&type=${filters.type}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&searchType=food`,
+            });
+          }else{
+            await this.setState({
+              query: `name=${this.state.name}&foodCooked=${filters.from}&type=${filters.type}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&minPrice=${filters.minPrice}&searchType=food`,
+            });
+          }
+        }else{
+          await this.setState({
+            query: `name=${this.state.name}&foodCooked=${filters.from}&type=${filters.type}&cost=${filters.cost}&searchType=food`,
+          });
+        }
+      }else{
+        await this.setState({
+          query: `name=${this.state.name}&searchType=food`,
+        });  
+      }
+      await this.getFood();
+    }
+  };
+
+  onCuisines = async (filters) => {
+    console.log('filters:::::::::::::', filters, this.state.name);
+    if (filters) {
+      if (filters.type != '' && filters.from == '' && filters.cost == '') {
+        await this.setState({
+          query: `cuisineId=${this.state.cuisineId}&type=${filters.type}&searchType=food`,
+        });
+      }else if(filters.type == '' && filters.from != '' && filters.cost == ''){
+        await this.setState({
+          query: `cuisineId=${this.state.cuisineId}&foodCooked=${filters.from}&searchType=food`,
+        });
+      }else if(filters.type == '' && filters.from == '' && filters.cost != ''){
+        if(filters.cost=='paid'){
+          if(filters.minPrice !=''&&filters.maxPrice==''){
+            await this.setState({
+              query: `cuisineId=${this.state.cuisineId}&cost=${filters.cost}&&minPrice=${filters.minPrice}&searchType=food`,
+            });
+          }else if(filters.minPrice ==''&&filters.maxPrice !=''){
+            await this.setState({
+              query: `cuisineId=${this.state.cuisineId}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&searchType=food`,
+            });
+          }else{
+            await this.setState({
+              query: `cuisineId=${this.state.cuisineId}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&minPrice=${filters.minPrice}&searchType=food`,
+            });
+          }
+        }else{
+          await this.setState({
+            query: `cuisineId=${this.state.cuisineId}&cost=${filters.cost}&searchType=food`,
+          });
+        }
+      }else if(filters.type != '' && filters.from != '' && filters.cost == ''){
+        await this.setState({
+          query: `cuisineId=${this.state.cuisineId}&type=${filters.type}&foodCooked=${filters.from}&searchType=food`,
+        });
+      }else if(filters.type == '' && filters.from != '' && filters.cost != ''){
+        if(filters.cost=='paid'){
+          if(filters.minPrice !=''&&filters.maxPrice==''){
+            await this.setState({
+              query: `cuisineId=${this.state.cuisineId}&foodCooked=${filters.from}&cost=${filters.cost}&&minPrice=${filters.minPrice}&searchType=food`,
+            });
+          }else if(filters.minPrice ==''&&filters.maxPrice !=''){
+            await this.setState({
+              query: `cuisineId=${this.state.cuisineId}&foodCooked=${filters.from}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&searchType=food`,
+            });
+          }else{
+            await this.setState({
+              query: `cuisineId=${this.state.cuisineId}&foodCooked=${filters.from}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&minPrice=${filters.minPrice}&searchType=food`,
+            });
+          }
+        }else{
+          await this.setState({
+            query: `cuisineId=${this.state.cuisineId}&foodCooked=${filters.from}&cost=${filters.cost}&searchType=food`,
+          });
+        }
+      }else if(filters.type != '' && filters.from == '' && filters.cost != ''){
+        if(filters.cost=='paid'){
+          if(filters.minPrice !=''&&filters.maxPrice==''){
+            await this.setState({
+              query: `cuisineId=${this.state.cuisineId}&type=${filters.type}&cost=${filters.cost}&&minPrice=${filters.minPrice}&searchType=food`,
+            });
+          }else if(filters.minPrice ==''&& filters.maxPrice !=''){
+            await this.setState({
+              query: `cuisineId=${this.state.cuisineId}&type=${filters.type}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&searchType=food`,
+            });
+          }else{
+            await this.setState({
+              query: `cuisineId=${this.state.cuisineId}&type=${filters.type}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&minPrice=${filters.minPrice}&searchType=food`,
+            });
+          }
+        }else{
+          await this.setState({
+            query: `cuisineId=${this.state.cuisineId}&type=${filters.type}&cost=${filters.cost}&searchType=food`,
+          });
+        }
+      }else if(filters.type != '' && filters.from != '' && filters.cost != ''){
+        if(filters.cost=='paid'){
+          if(filters.minPrice !=''&&filters.maxPrice==''){
+            await this.setState({
+              query: `cuisineId=${this.state.cuisineId}&foodCooked=${filters.from}&type=${filters.type}&cost=${filters.cost}&&minPrice=${filters.minPrice}&searchType=food`,
+            });
+          }else if(filters.minPrice ==''&& filters.maxPrice !=''){
+            await this.setState({
+              query: `cuisineId=${this.state.cuisineId}&foodCooked=${filters.from}&type=${filters.type}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&searchType=food`,
+            });
+          }else{
+            await this.setState({
+              query: `cuisineId=${this.state.cuisineId}&foodCooked=${filters.from}&type=${filters.type}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&minPrice=${filters.minPrice}&searchType=food`,
+            });
+          }
+        }else{
+          await this.setState({
+            query: `cuisineId=${this.state.cuisineId}&foodCooked=${filters.from}&type=${filters.type}&cost=${filters.cost}&searchType=food`,
+          });
+        }
+      }else{
+        await this.setState({
+          query: `cuisineId=${this.state.cuisineId}&searchType=food`,
+        });  
+      }
+      await this.getFood();
+    }
+  };
   onNameChange(name) {
     if (name == '') {
       this.setState({products: [], name});
@@ -178,6 +290,7 @@ export default class searchName extends Component {
         .then(res => {
           if (res.data) {
             if (res.data.length != 0) {
+              this.setState({noDataExist: false});
               let tempProducts = [];
               for (let i = 0; i < res.data.length; i++) {
                 let image;
@@ -195,6 +308,8 @@ export default class searchName extends Component {
                 });
               }
               this.setState({products: tempProducts, isVisibleLoading: false});
+            } else {
+              this.setState({noDataExist: true, isVisibleLoading: false});
             }
           } else {
             this.setState({isVisibleLoading: false});
@@ -215,7 +330,17 @@ export default class searchName extends Component {
   };
 
   onFilter = async () => {
-    this.props.navigation.navigate('Filter');
+    if(this.state.cuisineId==''){
+      this.props.navigation.navigate('Filter', {
+        from:'name',
+        refresh: this.refersh,
+      });
+    }else{
+      this.props.navigation.navigate('Filter', {
+        from:'cuisines',
+        onCuisines: this.onCuisines,
+      });
+    }
   };
   render() {
     const {
@@ -242,6 +367,7 @@ export default class searchName extends Component {
       around_spacing,
       search_input,
       icons,
+      centered_text,
       search_icon,
     } = styles;
     return (
@@ -257,7 +383,7 @@ export default class searchName extends Component {
                 />
               </TouchableOpacity>
               <TextInput
-                placeholder="Search"
+                placeholder="Search food"
                 style={search_input}
                 onChangeText={name => this.onNameChange(name)}
                 value={this.state.name}
@@ -271,169 +397,82 @@ export default class searchName extends Component {
               />
             </TouchableOpacity>
           </View>
+          {!this.state.noDataExist ? (
+            <View style={list_height}>
+              <ScrollView>
+                {this.state.products.map(value => {
+                  return (
+                    <View
+                      style={[
+                        row,
+                        column_between_spacing,
+                        top_container,
+                        inner_list_spacing,
+                      ]}>
+                      <View style={row}>
+                        <View style={list_image_continer}>
+                          <Image
+                            resizeMode="cover"
+                            source={{uri: value.image}}
+                            style={list_image}
+                          />
+                        </View>
 
-          <View style={list_height}>
-            <ScrollView>
-              {this.state.products.map(value => {
-                return (
-                  <View
-                    style={[
-                      row,
-                      column_between_spacing,
-                      top_container,
-                      inner_list_spacing,
-                    ]}>
-                    <View style={row}>
-                      <View style={list_image_continer}>
-                        <Image
-                          resizeMode="cover"
-                          source={{uri: value.image}}
-                          style={list_image}
-                        />
+                        <View style={[column, column_between_spacing]}>
+                          <View style={{width: wp(45)}}>
+                            <View style={[row]}>
+                              <Text style={product_heading}>{value.name}</Text>
+                            </View>
+                            <Text style={address_text}>{value.address}</Text>
+                          </View>
+
+                          <View style={[row, between_spacing]}>
+                            <View style={[row, row_center_align]}>
+                              <View
+                                style={
+                                  value.type == 'veg'
+                                    ? [non_veg_icon, green_color]
+                                    : [non_veg_icon, red_color]
+                                }
+                              />
+                              <Text style={text_style}>
+                                {value.type == 'veg' ? 'Veg' : 'Non-veg'}
+                              </Text>
+                            </View>
+                            <View style={[row, row_center_align]}>
+                              <Image
+                                resizeMode="stretch"
+                                source={require('../../assets/clock.png')}
+                                style={clock}
+                              />
+                              <Text style={text_style}>{value.time}</Text>
+                            </View>
+                          </View>
+                        </View>
                       </View>
-
                       <View style={[column, column_between_spacing]}>
-                        <View style={{width: wp(45)}}>
-                          <View style={[row]}>
-                            <Text style={product_heading}>{value.name}</Text>
-                          </View>
-                          <Text style={address_text}>{value.address}</Text>
-                        </View>
-
-                        <View style={[row, between_spacing]}>
-                          <View style={[row, row_center_align]}>
-                            <View
-                              style={
-                                value.type == 'veg'
-                                  ? [non_veg_icon, green_color]
-                                  : [non_veg_icon, red_color]
-                              }
-                            />
-                            <Text style={text_style}>
-                              {value.type == 'veg' ? 'Veg' : 'Non-veg'}
-                            </Text>
-                          </View>
-                          <View style={[row, row_center_align]}>
-                            <Image
-                              resizeMode="stretch"
-                              source={require('../../assets/clock.png')}
-                              style={clock}
-                            />
-                            <Text style={text_style}>{value.time}</Text>
-                          </View>
-                        </View>
+                        <View />
+                        <Text style={price_text}>Rs {value.price}</Text>
                       </View>
                     </View>
-                    <View style={[column, column_between_spacing]}>
-                      <View />
-                      <Text style={price_text}>Rs {value.price}</Text>
-                    </View>
-                  </View>
-                );
-              })}
-              <View
-                style={{position: 'absolute', top: '50%', right: 0, left: 0}}>
-                <ActivityIndicator
-                  animating={this.state.isVisibleLoading}
-                  size="large"
-                  color="#0000ff"
-                />
-              </View>
-            </ScrollView>
+                  );
+                })}
+              </ScrollView>
+            </View>
+          ) : (
+            <View style={[list_height, column, centered_text]}>
+              <Text style={{textAlign: 'center'}}>No food found</Text>
+            </View>
+          )}
+          <View style={{position: 'absolute', top: '50%', right: 0, left: 0}}>
+            <ActivityIndicator
+              animating={this.state.isVisibleLoading}
+              size="large"
+              color="#0000ff"
+            />
           </View>
         </View>
       </View>
     );
   }
 }
-
-// products: [
-//   {
-//     heading: 'Bolognese Baked Potato',
-//     address: 'Amrit Sweets, Phase 5, Mohali',
-//     isLiked: false,
-//     isVeg: true,
-//     time: '06:00 pm',
-//     image: require('../../assets/food.jpg'),
-//   },
-//   {
-//     heading: 'Lamb Stuffed Sweet Potato',
-//     address: 'Amrit Sweets, Phase 5, Mohali',
-//     isLiked: true,
-//     isVeg: false,
-//     time: '06:00 pm',
-//     image: require('../../assets/burger.jpg'),
-//   },
-//   {
-//     heading: 'Merlin Super Jumbo',
-//     address: 'Amrit Sweets, Phase 5, Mohali',
-//     isLiked: true,
-//     time: '06:00 pm',
-//     isVeg: true,
-//     image: require('../../assets/sweet.jpg'),
-//   },
-//   {
-//     heading: 'Lamb Stuffed Sweet Potato',
-//     address: 'Amrit Sweets, Phase 5, Mohali',
-//     isLiked: 'none',
-//     time: '06:00 pm',
-//     isVeg: true,
-//     image: require('../../assets/food.jpg'),
-//   },
-//   {
-//     heading: 'Merlin Super Jumbo',
-//     address: 'Amrit Sweets, Phase 5, Mohali',
-//     isLiked: true,
-//     isVeg: false,
-//     time: '06:00 pm',
-//     image: require('../../assets/burger.jpg'),
-//   },
-//   {
-//     heading: 'Bolognese Baked Potato',
-//     address: 'Amrit Sweets, Phase 5, Mohali',
-//     isLiked: false,
-//     time: '06:00 pm',
-//     isVeg: true,
-//     image: require('../../assets/sweet.jpg'),
-//   },
-//   {
-//     heading: 'Lamb Stuffed Sweet Potato',
-//     address: 'Amrit Sweets, Phase 5, Mohali',
-//     isLiked: 'none',
-//     isVeg: false,
-//     time: '06:00 pm',
-//     image: require('../../assets/burger.jpg'),
-//   },
-//   {
-//     heading: 'Bolognese Baked Potato',
-//     address: 'Amrit Sweets, Phase 5, Mohali',
-//     isLiked: true,
-//     isVeg: true,
-//     time: '06:00 pm',
-//     image: require('../../assets/sweet.jpg'),
-//   },
-//   {
-//     heading: 'Bolognese Baked Potato',
-//     address: 'Amrit Sweets, Phase 5, Mohali',
-//     isLiked: false,
-//     time: '06:00 pm',
-//     isVeg: true,
-//     image: require('../../assets/sweet.jpg'),
-//   },
-//   {
-//     heading: 'Lamb Stuffed Sweet Potato',
-//     address: 'Amrit Sweets, Phase 5, Mohali',
-//     isLiked: 'none',
-//     isVeg: false,
-//     time: '06:00 pm',
-//     image: require('../../assets/burger.jpg'),
-//   },
-//   {
-//     heading: 'Bolognese Baked Potato',
-//     address: 'Amrit Sweets, Phase 5, Mohali',
-//     isLiked: true,
-//     isVeg: true,
-//     time: '06:00 pm',
-//     image: require('../../assets/sweet.jpg'),
-//   },
-// ],

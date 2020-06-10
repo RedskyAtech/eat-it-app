@@ -29,10 +29,8 @@ const styles = {
   top_container: {
     width: wp(96),
     marginBottom: hp(1.6),
+    // marginVertical:hp(1.6)
   },
-  // inner_container: {
-  //   width: wp(96),
-  // },
   inner_container: {
     width: wp(96),
     alignSelf: 'center',

@@ -123,6 +123,9 @@ const styles = {
   timing_heading_style: {
     fontSize: fonts.FONT_TEXT,
   },
+  top_spacing: {
+    marginTop: hp(1),
+  },
 
   bottom_container: {
     flexDirection: 'row',

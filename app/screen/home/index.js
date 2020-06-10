@@ -113,7 +113,7 @@ export default class home extends Component {
     this._rowRenderer = this._rowRenderer.bind(this);
 
     this.products = [];
-    // this.getFood();
+    this.getFood();
 
     this.state = {
       forYou: true,
@@ -122,14 +122,15 @@ export default class home extends Component {
       follow: false,
       name: '',
       isVisibleLoading: false,
+      noDataExist: false,
       dataProvider: this.dataProvider.cloneWithRows(
         this._generateArray(this.products),
       ),
     };
   }
   componentDidMount = async () => {
-    this.products = [];
-    this.getFood();
+    // this.products = [];
+    // this.getFood();
   };
   getFood = async () => {
     this.products = [];
@@ -140,6 +141,7 @@ export default class home extends Component {
         .then(res => {
           if (res.data) {
             if (res.data.length != 0) {
+              this.setState({noDataExist: false});
               for (let i = 0; i < res.data.length; i++) {
                 let image;
                 if (res.data[i].images) {
@@ -160,6 +162,8 @@ export default class home extends Component {
                 ),
                 isVisibleLoading: false,
               });
+            } else {
+              this.setState({noDataExist: true, isVisibleLoading: false});
             }
           } else {
             this.setState({isVisibleLoading: false});
@@ -261,7 +265,11 @@ export default class home extends Component {
     return true;
   };
   onSearch = async () => {
-    this.props.navigation.navigate('SearchName', {name: this.state.name});
+    this.props.navigation.navigate('SearchName', {
+      name: this.state.name,
+      from: 'home',
+    });
+    await this.setState({name: ''});
   };
   closeDialog = async () => {
     this.setState({isVisible: false});
@@ -289,6 +297,7 @@ export default class home extends Component {
       search_icon,
       search_input,
       search_container,
+      centered_text
     } = styles;
     return (
       <HandleBack onBack={this.onBack}>
@@ -309,7 +318,7 @@ export default class home extends Component {
                       style={search_icon}
                     />
                     <TextInput
-                      placeholder="Search"
+                      placeholder="Search food"
                       style={search_input}
                       onChangeText={name => this.setState({name})}
                       value={this.state.name}
@@ -376,14 +385,19 @@ export default class home extends Component {
               </View>
             </View>
           </View>
-
-          <View style={list_container}>
-            <RecyclerListView
-              layoutProvider={this._layoutProvider}
-              dataProvider={this.state.dataProvider}
-              rowRenderer={this._rowRenderer}
-            />
-          </View>
+          {!this.state.noDataExist ? (
+            <View style={list_container}>
+              <RecyclerListView
+                layoutProvider={this._layoutProvider}
+                dataProvider={this.state.dataProvider}
+                rowRenderer={this._rowRenderer}
+              />
+            </View>
+          ) : (
+            <View style={[list_container, column, centered_text]}>
+              <Text style={{textAlign: 'center'}}>No food found for today, add food for share</Text>
+            </View>
+          )}
           <View style={{position: 'absolute', top: '50%', right: 0, left: 0}}>
             <ActivityIndicator
               animating={this.state.isVisibleLoading}

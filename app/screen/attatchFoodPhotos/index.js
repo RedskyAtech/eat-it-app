@@ -1,8 +1,18 @@
 import React, {Component} from 'react';
-import {View, ScrollView, Image, Text, TouchableOpacity} from 'react-native';
+import {
+  View,
+  ScrollView,
+  Image,
+  Text,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import styles from './style';
 import ImagePicker from 'react-native-image-picker';
 import ShareFood from '../shareFood';
+import * as utility from '../../utility/index';
+import * as Url from '../../constants/urls';
+import * as Service from '../../api/services';
 
 export default class attatchFoodPhotos extends Component {
   constructor(props) {
@@ -10,6 +20,9 @@ export default class attatchFoodPhotos extends Component {
     this.state = {
       photos: [],
       isDialogVisible: true,
+      files: [],
+      isVisibleLoading: false,
+      images: [],
     };
   }
   componentDidMount = async () => {
@@ -43,14 +56,20 @@ export default class attatchFoodPhotos extends Component {
           alert(response.customButton);
         } else {
           const source = {uri: response.uri};
-          var joined = this.state.photos.concat({uri: response.uri});
+          var joined = this.state.photos.concat({
+            uri: response.uri,
+            fileName: response.fileName,
+            type: response.type,
+          });
           this.setState({photos: joined});
+          // this.onUploadImage(response);
         }
       });
     } else {
       alert('Unable to add more images');
     }
   };
+
   onRemove = async item => {
     let index = this.state.photos.indexOf(item);
     this.state.photos.splice(index, 1);
@@ -61,11 +80,76 @@ export default class attatchFoodPhotos extends Component {
     this.props.navigation.navigate('tab1');
   };
   onNext = async () => {
-    if (this.state.photos && this.state.photos.length != 0) {
-      this.props.navigation.navigate('AddFood');
-      await this.setState({photos: []});
-    }else{
-      alert('Select images first')
+    if (this.state.photos && this.state.photos != 0) {
+      for (let file of this.state.photos) {
+        if (file) {
+          await this.onUploadImage(file);
+        }
+      }
+    } else {
+      alert('Select images first');
+    }
+  };
+  onUploadImage = async file => {
+    await this.setState({isVisibleLoading: true});
+
+    var formData = new FormData();
+    let fileData = {
+      uri: file.uri,
+      name: file.fileName,
+      type: file.type,
+    };
+    formData.append('file', fileData);
+    const headers = {
+      'Content-Type': 'multipart/form-data',
+      Accept: 'application/json',
+    };
+    try {
+      console.log('fileeeeeeeeeeee:', file);
+      let response = Service.uploadImageApi(
+        Url.UPLOAD_IMAGE,
+        formData,
+        headers,
+      );
+      response
+        .then(res => {
+          if (res.data) {
+            if (res.data != null) {
+              if (res.data.image != null) {
+                var joined = this.state.images.concat({
+                  url: res.data.image.url,
+                  resize_url: res.data.image.resize_url,
+                });
+                this.setState({images: joined});
+              }
+              if (this.state.images.length == this.state.photos.length) {
+                this.props.navigation.navigate('AddFood', {
+                  images: this.state.images,
+                });
+                this.setState({
+                  photos: [],
+                  images: [],
+                  isVisibleLoading: false,
+                });
+              }
+            }
+          } else {
+            this.setState({isVisibleLoading: false});
+            // alert('errrr', res.error);
+            alert('Network problem');
+            console.log('errorrrrr',res.error)
+          }
+        })
+        .catch(error => {
+          this.setState({isVisibleLoading: false});
+          // alert(error.error);
+          alert('Network problem');
+          console.log('catch',error.error)
+        });
+    } catch (err) {
+      this.setState({isVisibleLoading: false});
+      console.log('another problem:', err);
+      alert(err);
     }
   };
   render() {
@@ -136,7 +220,7 @@ export default class attatchFoodPhotos extends Component {
                 </View>
               );
             })}
-            
+
             <TouchableOpacity onPress={this.onLaunchCamera}>
               <View style={[photo_continer, centered_text]}>
                 <Image
@@ -160,6 +244,13 @@ export default class attatchFoodPhotos extends Component {
               />
             </View>
           </TouchableOpacity>
+        </View>
+        <View style={{position: 'absolute', top: '50%', right: 0, left: 0}}>
+          <ActivityIndicator
+            animating={this.state.isVisibleLoading}
+            size="large"
+            color="#0000ff"
+          />
         </View>
       </View>
     );

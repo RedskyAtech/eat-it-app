@@ -1,4 +1,5 @@
 export const BASE_URL = 'http://18.139.111.3:6800/api/';
+// export const BASE_URL = 'http://192.168.43.151:6600/api/';
 
 export const REGISTRATION_URL = 'users';
 export const LOGIN_URL = 'users/login';
