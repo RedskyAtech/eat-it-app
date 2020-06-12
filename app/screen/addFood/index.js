@@ -46,6 +46,7 @@ export default class addFood extends Component {
       isLangar: false,
       isVisibleLoading: false,
       images: [],
+      photos: [],
       noHomeDelivery: false,
 
       dishName: '',
@@ -111,13 +112,13 @@ export default class addFood extends Component {
     this.setState({isChecked: initialCheck});
     if (this.props.navigation.state.params) {
       if (
-        this.props.navigation.state.params.images &&
-        this.props.navigation.state.params.images.length != 0
+        this.props.navigation.state.params.photos &&
+        this.props.navigation.state.params.photos.length != 0
       ) {
-        let images = this.props.navigation.state.params.images;
+        let photos = this.props.navigation.state.params.photos;
         console.log('imagessssss:');
-        console.log('imagessssss:', images);
-        await this.setState({images: images});
+        console.log('imagessssss:', photos);
+        await this.setState({photos: photos});
       }
     }
   };
@@ -146,46 +147,7 @@ export default class addFood extends Component {
     }
     console.log('selectedList:::', selectedLists);
   };
-  onAddFood = async () => {
-    if (!this.state.isLangar) {
-      if (
-        utility.isFieldEmpty(
-          this.state.category &&
-            this.state.from &&
-            this.state.cookingTime &&
-            this.state.portion &&
-            this.state.fromPickupTime &&
-            this.state.toPickupTime &&
-            this.state.homedelivery &&
-            this.state.dishName &&
-            this.state.dishAddress &&
-            this.state.description &&
-            this.state.price,
-        )
-      ) {
-        alert('All fields are required');
-        return;
-      } else if (
-        this.state.selectedLists &&
-        this.state.selectedLists.length == 0
-      ) {
-        alert('Cuisions are required');
-      }
-    } else {
-      if (
-        utility.isFieldEmpty(
-          this.state.cookingTime &&
-            this.state.fromPickupTime &&
-            this.state.toPickupTime &&
-            this.state.dishName &&
-            this.state.dishAddress &&
-            this.state.description,
-        )
-      ) {
-        alert('All fields are required');
-      }
-    }
-
+  onAddFoodValidations = async () => {
     let type;
     let foodCooked;
     let price;
@@ -274,9 +236,112 @@ export default class addFood extends Component {
                   ],
                 }),
               );
-              this.props.navigation.navigate('DashBoard');
               this.props.navigation.navigate('tab1');
             }
+          } else {
+            this.setState({isVisibleLoading: false});
+            console.log('no data found', res.error);
+          }
+        })
+        .catch(error => {
+          this.setState({isVisibleLoading: false});
+          console.log('error in try-catch', error.error);
+          alert('Something went wrong');
+        });
+    } catch (err) {
+      this.setState({isVisibleLoading: false});
+      console.log('another problem:', err);
+      alert('Something went wrong');
+    }
+  };
+  onAddFood = async () => {
+    if (!this.state.isLangar) {
+      if (
+        utility.isFieldEmpty(
+          this.state.category &&
+            this.state.from &&
+            this.state.cookingTime &&
+            this.state.portion &&
+            this.state.fromPickupTime &&
+            this.state.toPickupTime &&
+            this.state.homedelivery &&
+            this.state.dishName &&
+            this.state.dishAddress &&
+            this.state.description &&
+            this.state.price,
+        )
+      ) {
+        alert('All fields are required');
+        return;
+      } else if (
+        this.state.selectedLists &&
+        this.state.selectedLists.length == 0
+      ) {
+        alert('Cuisions are required');
+        return;
+      }
+    } else {
+      if (
+        utility.isFieldEmpty(
+          this.state.cookingTime &&
+            this.state.fromPickupTime &&
+            this.state.toPickupTime &&
+            this.state.dishName &&
+            this.state.dishAddress &&
+            this.state.description,
+        )
+      ) {
+        alert('All fields are required');
+        return;
+      }
+    }
+    if (this.state.photos && this.state.photos != 0) {
+      for (let file of this.state.photos) {
+        if (file) {
+          await this.onUploadImage(file);
+        }
+      }
+    }
+
+    
+  };
+
+  onUploadImage = async file => {
+    await this.setState({isVisibleLoading: true});
+
+    var formData = new FormData();
+    let fileData = {
+      uri: file.uri,
+      name: file.fileName,
+      type: file.type,
+    };
+    formData.append('file', fileData);
+    const headers = {
+      'Content-Type': 'multipart/form-data',
+      Accept: 'application/json',
+    };
+    try {
+      let response = Service.uploadImageApi(
+        Url.UPLOAD_IMAGE,
+        formData,
+        headers,
+      );
+      response
+        .then(res => {
+          if (res.data) {
+            if (res.data != null) {
+              if (res.data.image != null) {
+                var joined = this.state.images.concat({
+                  url: res.data.image.url,
+                  resize_url: res.data.image.resize_url,
+                });
+                this.setState({images: joined});
+              }
+              if (this.state.images.length == this.state.photos.length) {
+                this.onAddFoodValidations();
+              }
+            }
+            this.setState({isVisibleLoading: false});
           } else {
             this.setState({isVisibleLoading: false});
             console.log('no data found', res.error);
@@ -995,6 +1060,137 @@ export default class addFood extends Component {
     );
   }
 }
+
+
+
+
+
+
+
+
+// let type;
+    // let foodCooked;
+    // let price;
+    // let body;
+
+    // if (this.state.category == 'Non-veg') {
+    //   type = 'nonVeg';
+    // } else if (this.state.category == 'Langar') {
+    //   type = 'langar';
+    // } else {
+    //   type = 'veg';
+    // }
+    // if (this.state.from == 'Restaurant') {
+    //   foodCooked = 'restaurant';
+    // } else {
+    //   foodCooked = 'homemade';
+    // }
+    // if (this.state.isLangar) {
+    //   price = 0;
+    //   body = {
+    //     type: type,
+    //     cookingTime: this.state.cookingTime,
+    //     pickupTime: {
+    //       from: this.state.fromPickupTime,
+    //       to: this.state.toPickupTime,
+    //     },
+    //     name: this.state.dishName,
+    //     address: this.state.dishAddress,
+    //     description: this.state.description,
+    //     images: this.state.images,
+    //     price: price,
+    //   };
+    // } else {
+    //   price = this.state.price;
+    //   body = {
+    //     name: this.state.dishName,
+    //     type: type,
+    //     homeDelivery: this.state.homedelivery.toLowerCase(),
+    //     homeDeliveryPrice: this.state.deliveryPrice,
+    //     portion: this.state.portion.toLowerCase(),
+    //     cookingTime: this.state.cookingTime,
+    //     pickupTime: {
+    //       from: this.state.fromPickupTime,
+    //       to: this.state.toPickupTime,
+    //     },
+    //     foodCooked: foodCooked,
+    //     price: price,
+    //     address: this.state.dishAddress,
+    //     description: this.state.description,
+    //     cuisine: this.state.selectedLists,
+    //     images: this.state.images,
+    //   };
+    // }
+    // this.setState({isVisibleLoading: true});
+
+    // try {
+    //   let response = Service.postDataApi(
+    //     Url.ADD_FOOD,
+    //     body,
+    //     this.state.userToken,
+    //   );
+    //   response
+    //     .then(res => {
+    //       if (res.data) {
+    //         if (res.isSuccess == true) {
+    //           alert('Added successfully');
+
+    //           this.setState({
+    //             cuision: '',
+    //             category: 'Veg',
+    //             from: 'Restaurant',
+    //             cookingTime: '',
+    //             portion: 'One',
+    //             toPickupDateTime: Date(),
+    //             fromPickupDateTime: Date(),
+    //             homedelivery: 'Yes',
+    //             deliveryPrice: 0,
+    //             price: 0,
+    //             isVisibleLoading: false,
+    //           });
+    //           this.props.navigation.dispatch(
+    //             StackActions.reset({
+    //               index: 0,
+    //               actions: [
+    //                 NavigationActions.navigate({routeName: 'BottomTab'}),
+    //               ],
+    //             }),
+    //           );
+    //           this.props.navigation.navigate('DashBoard');
+    //           this.props.navigation.navigate('tab1');
+    //         }
+    //       } else {
+    //         this.setState({isVisibleLoading: false});
+    //         console.log('no data found', res.error);
+    //       }
+    //     })
+    //     .catch(error => {
+    //       this.setState({isVisibleLoading: false});
+    //       console.log('error in try-catch', error.error);
+    //       alert('Something went wrong');
+    //     });
+    // } catch (err) {
+    //   this.setState({isVisibleLoading: false});
+    //   console.log('another problem:', err);
+    //   alert('Something went wrong');
+    // }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // visiblePurpose: false,
 // purpose: 'Sale',

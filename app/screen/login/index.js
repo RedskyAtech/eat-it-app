@@ -18,7 +18,7 @@ import * as utility from '../../utility/index';
 import * as Url from '../../constants/urls';
 import * as Service from '../../api/services';
 import ImagePicker from 'react-native-image-picker';
-import AsyncStorage from '@react-native-community/async-storage';
+import {TextInputMask} from 'react-native-masked-text';
 
 export default class login extends Component {
   constructor(props) {
@@ -36,6 +36,11 @@ export default class login extends Component {
       confirmPassword: '',
       isImagePicked: false,
       fileUri: '',
+      file: {
+        uri: '',
+        fileName: '',
+        type: '',
+      },
       image: {
         url: '',
         thumbnail: '',
@@ -70,6 +75,11 @@ export default class login extends Component {
       regChecked: false,
       isImagePicked: false,
       fileUri: '',
+      file: {
+        uri: '',
+        fileName: '',
+        type: '',
+      },
       image: {
         url: '',
         thumbnail: '',
@@ -96,8 +106,72 @@ export default class login extends Component {
       await this.setState({isLogin: true});
     }
   };
-  onUploadImage = file => {
-    this.setState({isVisibleLoading: true});
+  onRegistrationValidations = async () => {
+    await this.setState({isVisibleLoading: true});
+
+    let body = {
+      loginType: 'app',
+      firstName: this.state.firstName,
+      lastName: this.state.lastName,
+      email: this.state.email,
+      phone: this.state.phone,
+      password: this.state.password,
+      image: this.state.image,
+    };
+    try {
+      let response = Service.postDataApi(Url.REGISTRATION_URL, body, '');
+      response
+        .then(res => {
+          if (res.data) {
+            alert('Registered successfully');
+            this.setState({
+              isVisibleLoading: false,
+              isLogin: true,
+              regChecked: false,
+              firstName: '',
+              lastName: '',
+              email: '',
+              phone: '',
+              password: '',
+              confirmPassword: '',
+              isImagePicked: false,
+              fileUri: '',
+              file: {
+                uri: '',
+                fileName: '',
+                type: '',
+              },
+              image: {
+                url: '',
+                thumbnail: '',
+                resize_url: '',
+                resize_thumbnail: '',
+              },
+            });
+          } else {
+            this.setState({isVisibleLoading: false});
+            console.log('no data found:', res.error);
+            // alert(res.error);
+          }
+        })
+        .catch(error => {
+          this.setState({isVisibleLoading: false});
+          console.log('try-catch error:', error.error);
+          if (error.error == 'Error: USER_ALREADY_EXISTS') {
+            alert('User already exists');
+          } else {
+            alert('Something went wrong');
+          }
+        });
+    } catch (err) {
+      this.setState({isVisibleLoading: false});
+      console.log('another problem:', err);
+      alert('Something went wrong');
+    }
+  };
+  onUploadImage = async (file) => {
+    console.log('fileeeeeeeeeee:', file);
+    await this.setState({isVisibleLoading: true});
 
     var formData = new FormData();
     let fileData = {
@@ -131,6 +205,7 @@ export default class login extends Component {
                     resize_thumbnail: res.data.image.resize_thumbnail,
                   },
                 });
+                this.onRegistrationValidations();
                 this.setState({isVisibleLoading: false});
               }
             }
@@ -159,7 +234,6 @@ export default class login extends Component {
       },
     };
     ImagePicker.showImagePicker(options, response => {
-      // console.log('response,', response);
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.error) {
@@ -171,11 +245,12 @@ export default class login extends Component {
         const source = {uri: response.uri};
         let file = {
           uri: response.uri,
-          name: response.fileName,
+          fileName: response.fileName,
           type: response.type,
         };
         console.log('fileee::::::', file);
-        this.onUploadImage(response);
+        this.setState({isImagePicked: true, file: file});
+        // this.onUploadImage(response);
       }
     });
   };
@@ -204,69 +279,15 @@ export default class login extends Component {
       alert('Password and confirm password should be same');
       return;
     } else if (!this.state.regChecked) {
-      alert('Please agree terms and conditions');
+      alert('Please agree with terms and conditions');
       return;
     } else if (!this.state.isImagePicked) {
       alert('Profile picture is required');
       return;
     } else {
-      this.setState({isVisibleLoading: true});
-
-      let body = {
-        loginType: 'app',
-        firstName: this.state.firstName,
-        lastName: this.state.lastName,
-        email: this.state.email,
-        phone: this.state.phone,
-        password: this.state.password,
-        image: this.state.image,
-      };
-      try {
-        let response = Service.postDataApi(Url.REGISTRATION_URL, body, '');
-        response
-          .then(res => {
-            if (res.data) {
-              alert('Registered successfully');
-              this.setState({
-                isVisibleLoading: false,
-                isLogin: true,
-                regChecked: false,
-                firstName: '',
-                lastName: '',
-                email: '',
-                phone: '',
-                password: '',
-                confirmPassword: '',
-                isImagePicked: false,
-                fileUri: '',
-                image: {
-                  url: '',
-                  thumbnail: '',
-                  resize_url: '',
-                  resize_thumbnail: '',
-                },
-              });
-            } else {
-              this.setState({isVisibleLoading: false});
-              console.log('no data found:', res.error);
-              // alert(res.error);
-            }
-          })
-          .catch(error => {
-            this.setState({isVisibleLoading: false});
-            console.log('try-catch error:', error.error);
-            if (error.error == 'Error: USER_ALREADY_EXISTS') {
-              alert('User already exists');
-            } else {
-              alert('Something went wrong');
-            }
-          });
-      } catch (err) {
-        this.setState({isVisibleLoading: false});
-        console.log('another problem:', err);
-        alert('Something went wrong');
-      }
+      await this.onUploadImage(this.state.file);
     }
+    
   };
   onLoginSubmit = async () => {
     if (utility.isFieldEmpty(this.state.email && this.state.password)) {
@@ -293,7 +314,6 @@ export default class login extends Component {
         }
         await utility.setToken('token', res.data.token);
         await utility.setItem('userId', res.data._id);
-
         await this.setState({
           isVisibleLoading: false,
           email: '',
@@ -357,13 +377,17 @@ export default class login extends Component {
               source={require('../../assets/login_background.png')}
               style={container}
               resizeMode="cover">
-              <TouchableOpacity onPress={this.onTopBackButton}>
-                <Image
-                  resizeMode="contain"
-                  source={require('../../assets/back_arrow.png')}
-                  style={[back_container, arrow]}
-                />
-              </TouchableOpacity>
+              {!this.state.isLogin ? (
+                <TouchableOpacity onPress={this.onTopBackButton}>
+                  <Image
+                    resizeMode="contain"
+                    source={require('../../assets/back_arrow.png')}
+                    style={[back_container, arrow]}
+                  />
+                </TouchableOpacity>
+              ) : (
+                <View style={[back_container, arrow]} />
+              )}
               <View style={logo_container}>
                 <Image
                   resizeMode="stretch"
@@ -499,11 +523,25 @@ export default class login extends Component {
                         source={require('../../assets/phone.png')}
                         style={field_icons}
                       />
-                      <TextInput
+                      {/* <TextInput
                         placeholder="Phone"
                         style={input_box}
                         onChangeText={phone => this.setState({phone})}
                         value={this.state.phone}
+                      /> */}
+                      <TextInputMask
+                        require
+                        allowFontScaling={false}
+                        require
+                        placeholder="Phone"
+                        type={'custom'}
+                        options={{
+                          mask: '9999999999',
+                        }}
+                        keyboardType="numeric"
+                        onChangeText={phone => this.setState({phone})}
+                        value={this.state.phone}
+                        style={input_box}
                       />
                     </View>
                     <View style={[row, fields]}>
@@ -566,7 +604,7 @@ export default class login extends Component {
                           resizeMode="stretch"
                           source={
                             this.state.isImagePicked
-                              ? {uri: this.state.fileUri}
+                              ? {uri: this.state.file.uri}
                               : require('../../assets/profile.png')
                           }
                           style={profile_image}
@@ -618,57 +656,103 @@ export default class login extends Component {
   }
 }
 
+// try {
+//   let response = Service.postDataApi(Url.LOGIN_URL, body, '');
+//   response
+//     .then(res => {
+//       if (res.data) {
+//         if (this.state.checked) {
+//           utility.setItem('rembemberMe', true);
+//         } else {
+//           utility.setItem('rembemberMe', false);
+//         }
+//         utility.setToken('token', res.data.token);
+//         utility.setItem('userId', res.data._id);
 
+//         this.setState({
+//           isVisibleLoading: false,
+//           email: '',
+//           password: '',
+//           checked: false,
+//         });
+//         this.props.navigation.navigate('tab1');
+//       } else {
+//         this.setState({isVisibleLoading: false});
+//         console.log('no data found:', res.error);
+//       }
+//     })
+//     .catch(error => {
+//       this.setState({isVisibleLoading: false});
+//       console.log('try-catch error:', error.error);
+//       if (error.error == 'Error: USER_NOT_FOUND') {
+//         alert('User not found');
+//       } else if (error.error == 'Error: PASSWORD_MISMATCH') {
+//         alert('Password mismatch');
+//       } else {
+//         alert('Something went wrong');
+//       }
+//     });
+// } catch (err) {
+//   this.setState({isVisibleLoading: false});
+//   console.log('another problem:', err);
+//   alert('Something went wrong');
+// }
+// else {
+    //   await this.setState({isVisibleLoading: true});
+    //   // await this.onUploadImage(this.state.file);
 
-
-
-
-
-
-
-
-
-
-
-
-      // try {
-      //   let response = Service.postDataApi(Url.LOGIN_URL, body, '');
-      //   response
-      //     .then(res => {
-      //       if (res.data) {
-      //         if (this.state.checked) {
-      //           utility.setItem('rembemberMe', true);
-      //         } else {
-      //           utility.setItem('rembemberMe', false);
-      //         }
-      //         utility.setToken('token', res.data.token);
-      //         utility.setItem('userId', res.data._id);
-
-      //         this.setState({
-      //           isVisibleLoading: false,
-      //           email: '',
-      //           password: '',
-      //           checked: false,
-      //         });
-      //         this.props.navigation.navigate('tab1');
-      //       } else {
-      //         this.setState({isVisibleLoading: false});
-      //         console.log('no data found:', res.error);
-      //       }
-      //     })
-      //     .catch(error => {
-      //       this.setState({isVisibleLoading: false});
-      //       console.log('try-catch error:', error.error);
-      //       if (error.error == 'Error: USER_NOT_FOUND') {
-      //         alert('User not found');
-      //       } else if (error.error == 'Error: PASSWORD_MISMATCH') {
-      //         alert('Password mismatch');
-      //       } else {
-      //         alert('Something went wrong');
-      //       }
-      //     });
-      // } catch (err) {
-      //   this.setState({isVisibleLoading: false});
-      //   console.log('another problem:', err);
-      //   alert('Something went wrong');
-      // }
+    //   let body = {
+    //     loginType: 'app',
+    //     firstName: this.state.firstName,
+    //     lastName: this.state.lastName,
+    //     email: this.state.email,
+    //     phone: this.state.phone,
+    //     password: this.state.password,
+    //     image: this.state.image,
+    //   };
+    //   try {
+    //     let response = Service.postDataApi(Url.REGISTRATION_URL, body, '');
+    //     response
+    //       .then(res => {
+    //         if (res.data) {
+    //           alert('Registered successfully');
+    //           this.setState({
+    //             isVisibleLoading: false,
+    //             isLogin: true,
+    //             regChecked: false,
+    //             firstName: '',
+    //             lastName: '',
+    //             email: '',
+    //             phone: '',
+    //             password: '',
+    //             confirmPassword: '',
+    //             isImagePicked: false,
+    //             fileUri: '',
+    //             image: {
+    //               url: '',
+    //               thumbnail: '',
+    //               resize_url: '',
+    //               resize_thumbnail: '',
+    //             },
+    //           });
+    //         } else {
+    //           this.setState({isVisibleLoading: false});
+    //           console.log('no data found:', res.error);
+    //           // alert(res.error);
+    //         }
+    //       })
+    //       .catch(error => {
+    //         this.setState({isVisibleLoading: false});
+    //         console.log('try-catch error:', error.error);
+    //         if (error.error == 'Error: USER_ALREADY_EXISTS') {
+    //           alert('User already exists');
+    //         } else {
+    //           alert('Something went wrong');
+    //         }
+    //       });
+    //   } catch (err) {
+    //     this.setState({isVisibleLoading: false});
+    //     console.log('another problem:', err);
+    //     alert('Something went wrong');
+    //   }
+    // }

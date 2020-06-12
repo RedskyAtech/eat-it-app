@@ -46,7 +46,7 @@ export default class attatchFoodPhotos extends Component {
           path: 'images',
         },
       };
-      ImagePicker.showImagePicker(options, (response) => {
+      ImagePicker.showImagePicker(options, response => {
         if (response.didCancel) {
           console.log('User cancelled image picker');
         } else if (response.error) {
@@ -81,11 +81,12 @@ export default class attatchFoodPhotos extends Component {
   };
   onNext = async () => {
     if (this.state.photos && this.state.photos != 0) {
-      for (let file of this.state.photos) {
-        if (file) {
-          await this.onUploadImage(file);
-        }
-      }
+      await this.props.navigation.navigate('AddFood', {photos: this.state.photos});
+      // for (let file of this.state.photos) {
+      //   if (file) {
+      //     await this.onUploadImage(file);
+      //   }
+      // }
     } else {
       alert('Select images first');
     }
