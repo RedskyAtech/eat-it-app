@@ -57,6 +57,9 @@ const styles = {
     borderWidth: 2,
     marginTop: hp(0.6),
     elevation: 4,
+    backgroundColor:'#EDEDED'
+    
+    
   },
   user_details: {
     marginTop: hp(6.4),

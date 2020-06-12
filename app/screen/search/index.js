@@ -19,6 +19,8 @@ export default class search extends Component {
       cuisions: [],
       name: '',
       isVisibleLoading: false,
+      dataExist: true,
+      isLangar: false,
     };
   }
   componentDidMount = async () => {
@@ -30,13 +32,15 @@ export default class search extends Component {
   };
 
   getCuisions = async () => {
-    this.setState({cuisions: [],isVisibleLoading:true});
+    this.setState({cuisions: [], isVisibleLoading: true});
     try {
       let response = Service.getDataApi(Url.GET_CUISIONS, '');
       response
         .then(res => {
           if (res.data) {
             if (res.data.length != 0) {
+              this.setState({dataExist: true});
+
               let tempCuisions = [];
               for (let i = 0; i < res.data.length; i++) {
                 let image;
@@ -53,33 +57,39 @@ export default class search extends Component {
               }
               this.setState({
                 cuisions: tempCuisions,
-                isVisibleLoading:false
+                isLangar: true,
+                isVisibleLoading: false,
               });
+            } else {
+              this.setState({isVisibleLoading: false, dataExist: false});
             }
           } else {
-            this.setState({isVisibleLoading:false})
-            console.log('if no data in response:', res.error);
-            alert(res.error);
+            this.setState({isVisibleLoading: false});
+            console.log('no data found:', res.error);
+            // alert(res.error);
           }
         })
         .catch(error => {
-          this.setState({isVisibleLoading:false})
-          console.log('api problem:', error.error);
-          alert(error.error);
+          this.setState({isVisibleLoading: false});
+          console.log('try-catch error:', error.error);
+          alert('Something went wrong');
         });
     } catch (err) {
-      this.setState({isVisibleLoading:false})
+      this.setState({isVisibleLoading: false});
       console.log('another problem:', err);
-      alert(err);
+      alert('Something went wrong');
     }
   };
   onNameChange(name) {
     if (name == '') {
-      this.setState({cuisions: [], name:''});
+      this.setState({cuisions: [], name: ''});
       this.getCuisions();
     } else {
       this.setState({name});
-      this.setState({query: `name=${this.state.name}&searchType=cuisine`});
+      this.setState({
+        isLangar: false,
+        query: `name=${this.state.name}&searchType=cuisine`,
+      });
       this.getFood();
     }
   }
@@ -90,6 +100,9 @@ export default class search extends Component {
       cuisineName: name,
       from: 'search',
     });
+  };
+  getLangarFood = async type => {
+    await this.props.navigation.navigate('SearchName', {from: 'langar'});
   };
   getFood = async () => {
     await this.setState({cuisions: [], isVisibleLoading: true});
@@ -102,6 +115,7 @@ export default class search extends Component {
         .then(res => {
           if (res.data) {
             if (res.data.length != 0) {
+              this.setState({dataExist: true});
               let tempProducts = [];
               for (let i = 0; i < res.data.length; i++) {
                 let image;
@@ -117,21 +131,24 @@ export default class search extends Component {
                 });
               }
               this.setState({cuisions: tempProducts, isVisibleLoading: false});
+            } else {
+              this.setState({isVisibleLoading: false, dataExist: false});
+              console.log('dexist', this.state.dataExist, res.data);
             }
           } else {
             this.setState({isVisibleLoading: false});
-            console.log('if no data in response:', res.error);
+            console.log('no data found:', res);
           }
         })
         .catch(error => {
           this.setState({isVisibleLoading: false});
-          console.log('api problem:', error.error);
-          alert(error.error);
+          console.log('try-catch error:', error.error);
+          alert('Something went wrong');
         });
     } catch (err) {
       this.setState({isVisibleLoading: false});
       console.log('another problem:', err);
-      alert(err);
+      alert('Something went wrong');
     }
   };
   render() {
@@ -172,42 +189,67 @@ export default class search extends Component {
                 value={this.state.name}
               />
             </View>
-            <TouchableOpacity>
+            {/* <TouchableOpacity>
               <Image
                 resizeMode="contain"
                 source={require('../../assets/filter_yellow.png')}
                 style={icons}
               />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
-
-          <View style={list_height}>
-            <ScrollView>
-              <View style={[inner_container, row, row_list]}>
-                {this.state.cuisions.map(item => {
-                  return (
+          {this.state.dataExist ? (
+            <View style={list_height}>
+              <ScrollView>
+                <View style={[inner_container, row, row_list]}>
+                  {this.state.isLangar ? (
                     <View>
                       <View style={row}>
                         <TouchableOpacity
-                          onPress={() =>
-                            this.getCuisionFood(item.id, item.name)
-                          }>
+                          onPress={() => this.getLangarFood('langar')}>
                           <View style={[photo_continer]}>
                             <Image
                               resizeMode="cover"
-                              source={{uri: item.image}}
+                              source={require('../../assets/burger.jpg')}
                               style={photo_style}
                             />
                           </View>
                         </TouchableOpacity>
                       </View>
-                      <Text style={cuision_text}>{item.name}</Text>
+                      <Text style={cuision_text}>Langar</Text>
                     </View>
-                  );
-                })}
-              </View>
-            </ScrollView>
-          </View>
+                  ) : (
+                    <View />
+                  )}
+                  {this.state.cuisions.map(item => {
+                    return (
+                      <View>
+                        <View style={row}>
+                          <TouchableOpacity
+                            onPress={() =>
+                              this.getCuisionFood(item.id, item.name)
+                            }>
+                            <View style={[photo_continer]}>
+                              <Image
+                                resizeMode="cover"
+                                source={{uri: item.image}}
+                                style={photo_style}
+                              />
+                            </View>
+                          </TouchableOpacity>
+                        </View>
+                        <Text style={cuision_text}>{item.name}</Text>
+                      </View>
+                    );
+                  })}
+                </View>
+              </ScrollView>
+            </View>
+          ) : (
+            <View style={[list_height, column, centered_text]}>
+              <Text style={{textAlign: 'center'}}>No food found</Text>
+            </View>
+          )}
+
           <View style={{position: 'absolute', top: '50%', right: 0, left: 0}}>
             <ActivityIndicator
               animating={this.state.isVisibleLoading}

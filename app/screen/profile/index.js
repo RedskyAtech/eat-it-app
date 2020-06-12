@@ -32,13 +32,16 @@ export default class profile extends Component {
       newPassword: '',
       confirmPassword: '',
       isVisibleLoading: false,
+      profileImage: '',
     };
   }
   componentDidMount = async () => {
     const token = await utility.getToken('token');
     const userId = await utility.getItem('userId');
-    this.setState({userToken: token, userId: userId});
-    this.getUser();
+    await this.setState({userToken: token, userId: userId});
+    await this.getUser();
+    console.log('token', token);
+    console.log('id', userId);
   };
 
   getUser = async () => {
@@ -53,27 +56,31 @@ export default class profile extends Component {
       response
         .then(res => {
           if (res.data) {
+            let image;
+            if (res.data.image) {
+              image = res.data.image.resize_url;
+            }
             this.setState({
               name: res.data.firstName + ' ' + res.data.lastName,
               email: res.data.email,
               phone: res.data.phone,
+              profileImage: image,
             });
             this.setState({isVisibleLoading: false});
           } else {
             this.setState({isVisibleLoading: false});
-            alert(res.error);
+            console.log('no data found', res.error);
           }
         })
         .catch(error => {
           this.setState({isVisibleLoading: false});
-          this.props.navigation.navigate('Login');
-          console.log('api problem:', error.error);
-          alert(error.error);
+          console.log('error in try-catch', error.error);
+          alert('Something went wrong');
         });
     } catch (err) {
       this.setState({isVisibleLoading: false});
       console.log('another problem:', err);
-      alert(err);
+      alert('Something went wrong');
     }
   };
   changePassword = async () => {
@@ -93,6 +100,8 @@ export default class profile extends Component {
       alert('New password and confirm password should be same');
       return;
     } else {
+      this.setState({isVisibleLoading: true});
+
       let body = {
         password: this.state.password,
         newPassword: this.state.newPassword,
@@ -106,20 +115,27 @@ export default class profile extends Component {
         response
           .then(res => {
             if (res.data) {
-              alert(res.data);
+              this.setState({isVisibleLoading: false});
+              alert('Password changed successfully');
               this.hideCard();
             } else {
-              alert(res.error);
+              this.setState({isVisibleLoading: false});
+              console.log('no data found', res.error);
             }
           })
           .catch(error => {
-            this.props.navigation.navigate('Login');
-            console.log('api problem:', error.error);
-            alert(error.error);
+            this.setState({isVisibleLoading: false});
+            console.log('error in try-catch', error);
+            if (error.error == 'Error: OLD_PASSWORD_DID_NOT_MATCH') {
+              alert('Old password did not match');
+            } else {
+              alert('Something went wrong');
+            }
           });
       } catch (err) {
+        this.setState({isVisibleLoading: false});
         console.log('another problem:', err);
-        alert(err);
+        alert('Something went wrong');
       }
     }
   };
@@ -143,33 +159,22 @@ export default class profile extends Component {
   };
 
   onLogOutSubmit = async () => {
-    let body = {};
-    try {
-      let response = Service.postDataApi(
-        Url.LOGOUT_URL,
-        body,
-        this.state.userToken,
-      );
-      response
-        .then(res => {
-          if (res.message) {
-            utility.setToken('token', '');
-            this.props.navigation.navigate('Login');
-            this.closeMenu();
-          } else {
-            alert(res.error);
-          }
-        })
-        .catch(error => {
-          this.props.navigation.navigate('Login');
-          console.log('api problem:', error.error);
-          alert(error.error);
-        });
-    } catch (err) {
-      console.log('another problem:', err);
-      alert(err);
-    }
+    await this.setState({isVisibleLoading: true});
+    await utility.removeAuthKey('token');
+    await utility.removeAuthKey('userId');
+    await utility.removeAuthKey('rembemberMe');
+    await this.setState({
+      isVisibleLoading: false,
+      name: '',
+      email: '',
+      phone: '',
+      profileImage: '',
+    });
+    await this.props.navigation.navigate('Login');
+    await this.closeMenu();
   };
+
+  
   render() {
     const {
       container,
@@ -283,7 +288,11 @@ export default class profile extends Component {
                 </View>
                 <Image
                   resizeMode="cover"
-                  source={require('../../assets/pic.jpg')}
+                  source={
+                    this.state.profileImage == ''
+                      ? ''
+                      : {uri: this.state.profileImage}
+                  }
                   style={profile_image}
                 />
               </LinearGradient>
@@ -351,7 +360,7 @@ export default class profile extends Component {
                     style={field_icons}
                   />
                   <Text style={[list_title, heading_color]}>
-                    Seller you follows
+                    Seller you follow
                   </Text>
                 </View>
                 <Image
@@ -383,13 +392,13 @@ export default class profile extends Component {
               <View style={[row, between_spacing, rows_spacing]}>
                 <View style={[row, row_centered_text]}>
                   <Image
-                    source={require('../../assets/customer_care.png')}
+                    source={require('../../assets/customer_care_gray.png')}
                     style={field_icons}
                   />
-                  <Text style={[list_title, colored_text]}>Customer care</Text>
+                  <Text style={[list_title, heading_color]}>Customer care</Text>
                 </View>
                 <Image
-                  source={require('../../assets/next_arrow.png')}
+                  source={require('../../assets/next_arrow_grey.png')}
                   style={field_icons}
                 />
               </View>
@@ -397,13 +406,13 @@ export default class profile extends Component {
               <View style={[row, between_spacing, rows_spacing]}>
                 <View style={[row, row_centered_text]}>
                   <Image
-                    source={require('../../assets/about_eat_it.png')}
+                    source={require('../../assets/about-eat_it_orange.png')}
                     style={field_icons}
                   />
-                  <Text style={[list_title, heading_color]}>About Eat it</Text>
+                  <Text style={[list_title, colored_text]}>About Eat it</Text>
                 </View>
                 <Image
-                  source={require('../../assets/next_arrow_grey.png')}
+                  source={require('../../assets/next_arrow.png')}
                   style={field_icons}
                 />
               </View>
@@ -493,3 +502,50 @@ export default class profile extends Component {
     );
   }
 }
+
+
+
+
+
+// onLogOutSubmit = async () => {
+  //   await this.setState({isVisibleLoading: true});
+  //   let body = {};
+  //   try {
+  //     let response = Service.postDataApi(
+  //       Url.LOGOUT_URL,
+  //       body,
+  //       this.state.userToken,
+  //     );
+  //     response
+  //       .then(res => {
+  //         if (res.message) {
+  //           utility.removeAuthKey('token');
+  //           utility.removeAuthKey('userId');
+  //           utility.removeAuthKey('rembemberMe');
+
+  //           this.setState({
+  //             isVisibleLoading: false,
+  //             name: '',
+  //             email: '',
+  //             phone: '',
+  //             profileImage: '',
+  //           });
+  //           this.props.navigation.navigate('Login');
+  //           this.closeMenu();
+  //         } else {
+  //           this.setState({isVisibleLoading: false});
+  //           console.log('no data found', res.error);
+  //         }
+  //       })
+  //       .catch(error => {
+  //         this.setState({isVisibleLoading: false});
+  //         this.props.navigation.navigate('Login');
+  //         console.log('error in try-catch', error);
+  //         alert(error.error);
+  //       });
+  //   } catch (err) {
+  //     this.setState({isVisibleLoading: false});
+  //     console.log('another problem:', err);
+  //     alert('Something went wrong');
+  //   }
+  // };

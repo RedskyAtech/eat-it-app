@@ -29,9 +29,10 @@ export default class searchName extends Component {
       noDataExist: false,
       filters: '',
       count: 1,
+      isLangar: false,
     };
     this.refersh = this.refersh.bind(this);
-    this.onCuisines=this.onCuisines.bind(this);
+    this.onCuisines = this.onCuisines.bind(this);
   }
   componentDidMount = async () => {
     let name;
@@ -58,213 +59,372 @@ export default class searchName extends Component {
           query: `cuisineId=${this.state.cuisineId}&searchType=food`,
         });
         await this.getFood();
+      } else if (this.props.navigation.state.params.from == 'langar') {
+        await this.setState({
+          isLangar: true,
+          name: 'Langar',
+          query: `type=langar&searchType=food`,
+        });
+        await this.getFood();
       }
     }
   };
 
-  refersh = async (filters) => {
+  refersh = async filters => {
     console.log('filters:::::::::::::', filters, this.state.name);
     if (filters) {
       if (filters.type != '' && filters.from == '' && filters.cost == '') {
         await this.setState({
           query: `name=${this.state.name}&type=${filters.type}&searchType=food`,
         });
-      }else if(filters.type == '' && filters.from != '' && filters.cost == ''){
+      } else if (
+        filters.type == '' &&
+        filters.from != '' &&
+        filters.cost == ''
+      ) {
         await this.setState({
-          query: `name=${this.state.name}&foodCooked=${filters.from}&searchType=food`,
+          query: `name=${this.state.name}&foodCooked=${
+            filters.from
+          }&searchType=food`,
         });
-      }else if(filters.type == '' && filters.from == '' && filters.cost != ''){
-        if(filters.cost=='paid'){
-          if(filters.minPrice !=''&&filters.maxPrice==''){
+      } else if (
+        filters.type == '' &&
+        filters.from == '' &&
+        filters.cost != ''
+      ) {
+        if (filters.cost == 'paid') {
+          if (filters.minPrice != '' && filters.maxPrice == '') {
             await this.setState({
-              query: `name=${this.state.name}&cost=${filters.cost}&&minPrice=${filters.minPrice}&searchType=food`,
+              query: `name=${this.state.name}&cost=${filters.cost}&&minPrice=${
+                filters.minPrice
+              }&searchType=food`,
             });
-          }else if(filters.minPrice ==''&&filters.maxPrice !=''){
+          } else if (filters.minPrice == '' && filters.maxPrice != '') {
             await this.setState({
-              query: `name=${this.state.name}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&searchType=food`,
+              query: `name=${this.state.name}&cost=${filters.cost}&maxPrice=${
+                filters.maxPrice
+              }&searchType=food`,
             });
-          }else{
+          } else {
             await this.setState({
-              query: `name=${this.state.name}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&minPrice=${filters.minPrice}&searchType=food`,
+              query: `name=${this.state.name}&cost=${filters.cost}&maxPrice=${
+                filters.maxPrice
+              }&minPrice=${filters.minPrice}&searchType=food`,
             });
           }
-        }else{
+        } else {
           await this.setState({
-            query: `name=${this.state.name}&cost=${filters.cost}&searchType=food`,
+            query: `name=${this.state.name}&cost=${
+              filters.cost
+            }&searchType=food`,
           });
         }
-      }else if(filters.type != '' && filters.from != '' && filters.cost == ''){
+      } else if (
+        filters.type != '' &&
+        filters.from != '' &&
+        filters.cost == ''
+      ) {
         await this.setState({
-          query: `name=${this.state.name}&type=${filters.type}&foodCooked=${filters.from}&searchType=food`,
+          query: `name=${this.state.name}&type=${filters.type}&foodCooked=${
+            filters.from
+          }&searchType=food`,
         });
-      }else if(filters.type == '' && filters.from != '' && filters.cost != ''){
-        if(filters.cost=='paid'){
-          if(filters.minPrice !=''&&filters.maxPrice==''){
+      } else if (
+        filters.type == '' &&
+        filters.from != '' &&
+        filters.cost != ''
+      ) {
+        if (filters.cost == 'paid') {
+          if (filters.minPrice != '' && filters.maxPrice == '') {
             await this.setState({
-              query: `name=${this.state.name}&foodCooked=${filters.from}&cost=${filters.cost}&&minPrice=${filters.minPrice}&searchType=food`,
+              query: `name=${this.state.name}&foodCooked=${filters.from}&cost=${
+                filters.cost
+              }&&minPrice=${filters.minPrice}&searchType=food`,
             });
-          }else if(filters.minPrice ==''&&filters.maxPrice !=''){
+          } else if (filters.minPrice == '' && filters.maxPrice != '') {
             await this.setState({
-              query: `name=${this.state.name}&foodCooked=${filters.from}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&searchType=food`,
+              query: `name=${this.state.name}&foodCooked=${filters.from}&cost=${
+                filters.cost
+              }&maxPrice=${filters.maxPrice}&searchType=food`,
             });
-          }else{
+          } else {
             await this.setState({
-              query: `name=${this.state.name}&foodCooked=${filters.from}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&minPrice=${filters.minPrice}&searchType=food`,
-            });
-          }
-        }else{
-          await this.setState({
-            query: `name=${this.state.name}&foodCooked=${filters.from}&cost=${filters.cost}&searchType=food`,
-          });
-        }
-      }else if(filters.type != '' && filters.from == '' && filters.cost != ''){
-        if(filters.cost=='paid'){
-          if(filters.minPrice !=''&&filters.maxPrice==''){
-            await this.setState({
-              query: `name=${this.state.name}&type=${filters.type}&cost=${filters.cost}&&minPrice=${filters.minPrice}&searchType=food`,
-            });
-          }else if(filters.minPrice ==''&& filters.maxPrice !=''){
-            await this.setState({
-              query: `name=${this.state.name}&type=${filters.type}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&searchType=food`,
-            });
-          }else{
-            await this.setState({
-              query: `name=${this.state.name}&type=${filters.type}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&minPrice=${filters.minPrice}&searchType=food`,
+              query: `name=${this.state.name}&foodCooked=${filters.from}&cost=${
+                filters.cost
+              }&maxPrice=${filters.maxPrice}&minPrice=${
+                filters.minPrice
+              }&searchType=food`,
             });
           }
-        }else{
+        } else {
           await this.setState({
-            query: `name=${this.state.name}&type=${filters.type}&cost=${filters.cost}&searchType=food`,
+            query: `name=${this.state.name}&foodCooked=${filters.from}&cost=${
+              filters.cost
+            }&searchType=food`,
           });
         }
-      }else if(filters.type != '' && filters.from != '' && filters.cost != ''){
-        if(filters.cost=='paid'){
-          if(filters.minPrice !=''&&filters.maxPrice==''){
+      } else if (
+        filters.type != '' &&
+        filters.from == '' &&
+        filters.cost != ''
+      ) {
+        if (filters.cost == 'paid') {
+          if (filters.minPrice != '' && filters.maxPrice == '') {
             await this.setState({
-              query: `name=${this.state.name}&foodCooked=${filters.from}&type=${filters.type}&cost=${filters.cost}&&minPrice=${filters.minPrice}&searchType=food`,
+              query: `name=${this.state.name}&type=${filters.type}&cost=${
+                filters.cost
+              }&&minPrice=${filters.minPrice}&searchType=food`,
             });
-          }else if(filters.minPrice ==''&& filters.maxPrice !=''){
+          } else if (filters.minPrice == '' && filters.maxPrice != '') {
             await this.setState({
-              query: `name=${this.state.name}&foodCooked=${filters.from}&type=${filters.type}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&searchType=food`,
+              query: `name=${this.state.name}&type=${filters.type}&cost=${
+                filters.cost
+              }&maxPrice=${filters.maxPrice}&searchType=food`,
             });
-          }else{
+          } else {
             await this.setState({
-              query: `name=${this.state.name}&foodCooked=${filters.from}&type=${filters.type}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&minPrice=${filters.minPrice}&searchType=food`,
+              query: `name=${this.state.name}&type=${filters.type}&cost=${
+                filters.cost
+              }&maxPrice=${filters.maxPrice}&minPrice=${
+                filters.minPrice
+              }&searchType=food`,
             });
           }
-        }else{
+        } else {
           await this.setState({
-            query: `name=${this.state.name}&foodCooked=${filters.from}&type=${filters.type}&cost=${filters.cost}&searchType=food`,
+            query: `name=${this.state.name}&type=${filters.type}&cost=${
+              filters.cost
+            }&searchType=food`,
           });
         }
-      }else{
+      } else if (
+        filters.type != '' &&
+        filters.from != '' &&
+        filters.cost != ''
+      ) {
+        if (filters.cost == 'paid') {
+          if (filters.minPrice != '' && filters.maxPrice == '') {
+            await this.setState({
+              query: `name=${this.state.name}&foodCooked=${filters.from}&type=${
+                filters.type
+              }&cost=${filters.cost}&&minPrice=${
+                filters.minPrice
+              }&searchType=food`,
+            });
+          } else if (filters.minPrice == '' && filters.maxPrice != '') {
+            await this.setState({
+              query: `name=${this.state.name}&foodCooked=${filters.from}&type=${
+                filters.type
+              }&cost=${filters.cost}&maxPrice=${
+                filters.maxPrice
+              }&searchType=food`,
+            });
+          } else {
+            await this.setState({
+              query: `name=${this.state.name}&foodCooked=${filters.from}&type=${
+                filters.type
+              }&cost=${filters.cost}&maxPrice=${filters.maxPrice}&minPrice=${
+                filters.minPrice
+              }&searchType=food`,
+            });
+          }
+        } else {
+          await this.setState({
+            query: `name=${this.state.name}&foodCooked=${filters.from}&type=${
+              filters.type
+            }&cost=${filters.cost}&searchType=food`,
+          });
+        }
+      } else {
         await this.setState({
           query: `name=${this.state.name}&searchType=food`,
-        });  
+        });
       }
       await this.getFood();
     }
   };
 
-  onCuisines = async (filters) => {
+  onCuisines = async filters => {
     console.log('filters:::::::::::::', filters, this.state.name);
     if (filters) {
       if (filters.type != '' && filters.from == '' && filters.cost == '') {
         await this.setState({
-          query: `cuisineId=${this.state.cuisineId}&type=${filters.type}&searchType=food`,
+          query: `cuisineId=${this.state.cuisineId}&type=${
+            filters.type
+          }&searchType=food`,
         });
-      }else if(filters.type == '' && filters.from != '' && filters.cost == ''){
+      } else if (
+        filters.type == '' &&
+        filters.from != '' &&
+        filters.cost == ''
+      ) {
         await this.setState({
-          query: `cuisineId=${this.state.cuisineId}&foodCooked=${filters.from}&searchType=food`,
+          query: `cuisineId=${this.state.cuisineId}&foodCooked=${
+            filters.from
+          }&searchType=food`,
         });
-      }else if(filters.type == '' && filters.from == '' && filters.cost != ''){
-        if(filters.cost=='paid'){
-          if(filters.minPrice !=''&&filters.maxPrice==''){
+      } else if (
+        filters.type == '' &&
+        filters.from == '' &&
+        filters.cost != ''
+      ) {
+        if (filters.cost == 'paid') {
+          if (filters.minPrice != '' && filters.maxPrice == '') {
             await this.setState({
-              query: `cuisineId=${this.state.cuisineId}&cost=${filters.cost}&&minPrice=${filters.minPrice}&searchType=food`,
+              query: `cuisineId=${this.state.cuisineId}&cost=${
+                filters.cost
+              }&&minPrice=${filters.minPrice}&searchType=food`,
             });
-          }else if(filters.minPrice ==''&&filters.maxPrice !=''){
+          } else if (filters.minPrice == '' && filters.maxPrice != '') {
             await this.setState({
-              query: `cuisineId=${this.state.cuisineId}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&searchType=food`,
+              query: `cuisineId=${this.state.cuisineId}&cost=${
+                filters.cost
+              }&maxPrice=${filters.maxPrice}&searchType=food`,
             });
-          }else{
+          } else {
             await this.setState({
-              query: `cuisineId=${this.state.cuisineId}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&minPrice=${filters.minPrice}&searchType=food`,
+              query: `cuisineId=${this.state.cuisineId}&cost=${
+                filters.cost
+              }&maxPrice=${filters.maxPrice}&minPrice=${
+                filters.minPrice
+              }&searchType=food`,
             });
           }
-        }else{
+        } else {
           await this.setState({
-            query: `cuisineId=${this.state.cuisineId}&cost=${filters.cost}&searchType=food`,
+            query: `cuisineId=${this.state.cuisineId}&cost=${
+              filters.cost
+            }&searchType=food`,
           });
         }
-      }else if(filters.type != '' && filters.from != '' && filters.cost == ''){
+      } else if (
+        filters.type != '' &&
+        filters.from != '' &&
+        filters.cost == ''
+      ) {
         await this.setState({
-          query: `cuisineId=${this.state.cuisineId}&type=${filters.type}&foodCooked=${filters.from}&searchType=food`,
+          query: `cuisineId=${this.state.cuisineId}&type=${
+            filters.type
+          }&foodCooked=${filters.from}&searchType=food`,
         });
-      }else if(filters.type == '' && filters.from != '' && filters.cost != ''){
-        if(filters.cost=='paid'){
-          if(filters.minPrice !=''&&filters.maxPrice==''){
+      } else if (
+        filters.type == '' &&
+        filters.from != '' &&
+        filters.cost != ''
+      ) {
+        if (filters.cost == 'paid') {
+          if (filters.minPrice != '' && filters.maxPrice == '') {
             await this.setState({
-              query: `cuisineId=${this.state.cuisineId}&foodCooked=${filters.from}&cost=${filters.cost}&&minPrice=${filters.minPrice}&searchType=food`,
+              query: `cuisineId=${this.state.cuisineId}&foodCooked=${
+                filters.from
+              }&cost=${filters.cost}&&minPrice=${
+                filters.minPrice
+              }&searchType=food`,
             });
-          }else if(filters.minPrice ==''&&filters.maxPrice !=''){
+          } else if (filters.minPrice == '' && filters.maxPrice != '') {
             await this.setState({
-              query: `cuisineId=${this.state.cuisineId}&foodCooked=${filters.from}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&searchType=food`,
+              query: `cuisineId=${this.state.cuisineId}&foodCooked=${
+                filters.from
+              }&cost=${filters.cost}&maxPrice=${
+                filters.maxPrice
+              }&searchType=food`,
             });
-          }else{
+          } else {
             await this.setState({
-              query: `cuisineId=${this.state.cuisineId}&foodCooked=${filters.from}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&minPrice=${filters.minPrice}&searchType=food`,
-            });
-          }
-        }else{
-          await this.setState({
-            query: `cuisineId=${this.state.cuisineId}&foodCooked=${filters.from}&cost=${filters.cost}&searchType=food`,
-          });
-        }
-      }else if(filters.type != '' && filters.from == '' && filters.cost != ''){
-        if(filters.cost=='paid'){
-          if(filters.minPrice !=''&&filters.maxPrice==''){
-            await this.setState({
-              query: `cuisineId=${this.state.cuisineId}&type=${filters.type}&cost=${filters.cost}&&minPrice=${filters.minPrice}&searchType=food`,
-            });
-          }else if(filters.minPrice ==''&& filters.maxPrice !=''){
-            await this.setState({
-              query: `cuisineId=${this.state.cuisineId}&type=${filters.type}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&searchType=food`,
-            });
-          }else{
-            await this.setState({
-              query: `cuisineId=${this.state.cuisineId}&type=${filters.type}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&minPrice=${filters.minPrice}&searchType=food`,
+              query: `cuisineId=${this.state.cuisineId}&foodCooked=${
+                filters.from
+              }&cost=${filters.cost}&maxPrice=${filters.maxPrice}&minPrice=${
+                filters.minPrice
+              }&searchType=food`,
             });
           }
-        }else{
+        } else {
           await this.setState({
-            query: `cuisineId=${this.state.cuisineId}&type=${filters.type}&cost=${filters.cost}&searchType=food`,
+            query: `cuisineId=${this.state.cuisineId}&foodCooked=${
+              filters.from
+            }&cost=${filters.cost}&searchType=food`,
           });
         }
-      }else if(filters.type != '' && filters.from != '' && filters.cost != ''){
-        if(filters.cost=='paid'){
-          if(filters.minPrice !=''&&filters.maxPrice==''){
+      } else if (
+        filters.type != '' &&
+        filters.from == '' &&
+        filters.cost != ''
+      ) {
+        if (filters.cost == 'paid') {
+          if (filters.minPrice != '' && filters.maxPrice == '') {
             await this.setState({
-              query: `cuisineId=${this.state.cuisineId}&foodCooked=${filters.from}&type=${filters.type}&cost=${filters.cost}&&minPrice=${filters.minPrice}&searchType=food`,
+              query: `cuisineId=${this.state.cuisineId}&type=${
+                filters.type
+              }&cost=${filters.cost}&&minPrice=${
+                filters.minPrice
+              }&searchType=food`,
             });
-          }else if(filters.minPrice ==''&& filters.maxPrice !=''){
+          } else if (filters.minPrice == '' && filters.maxPrice != '') {
             await this.setState({
-              query: `cuisineId=${this.state.cuisineId}&foodCooked=${filters.from}&type=${filters.type}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&searchType=food`,
+              query: `cuisineId=${this.state.cuisineId}&type=${
+                filters.type
+              }&cost=${filters.cost}&maxPrice=${
+                filters.maxPrice
+              }&searchType=food`,
             });
-          }else{
+          } else {
             await this.setState({
-              query: `cuisineId=${this.state.cuisineId}&foodCooked=${filters.from}&type=${filters.type}&cost=${filters.cost}&maxPrice=${filters.maxPrice}&minPrice=${filters.minPrice}&searchType=food`,
+              query: `cuisineId=${this.state.cuisineId}&type=${
+                filters.type
+              }&cost=${filters.cost}&maxPrice=${filters.maxPrice}&minPrice=${
+                filters.minPrice
+              }&searchType=food`,
             });
           }
-        }else{
+        } else {
           await this.setState({
-            query: `cuisineId=${this.state.cuisineId}&foodCooked=${filters.from}&type=${filters.type}&cost=${filters.cost}&searchType=food`,
+            query: `cuisineId=${this.state.cuisineId}&type=${
+              filters.type
+            }&cost=${filters.cost}&searchType=food`,
           });
         }
-      }else{
+      } else if (
+        filters.type != '' &&
+        filters.from != '' &&
+        filters.cost != ''
+      ) {
+        if (filters.cost == 'paid') {
+          if (filters.minPrice != '' && filters.maxPrice == '') {
+            await this.setState({
+              query: `cuisineId=${this.state.cuisineId}&foodCooked=${
+                filters.from
+              }&type=${filters.type}&cost=${filters.cost}&&minPrice=${
+                filters.minPrice
+              }&searchType=food`,
+            });
+          } else if (filters.minPrice == '' && filters.maxPrice != '') {
+            await this.setState({
+              query: `cuisineId=${this.state.cuisineId}&foodCooked=${
+                filters.from
+              }&type=${filters.type}&cost=${filters.cost}&maxPrice=${
+                filters.maxPrice
+              }&searchType=food`,
+            });
+          } else {
+            await this.setState({
+              query: `cuisineId=${this.state.cuisineId}&foodCooked=${
+                filters.from
+              }&type=${filters.type}&cost=${filters.cost}&maxPrice=${
+                filters.maxPrice
+              }&minPrice=${filters.minPrice}&searchType=food`,
+            });
+          }
+        } else {
+          await this.setState({
+            query: `cuisineId=${this.state.cuisineId}&foodCooked=${
+              filters.from
+            }&type=${filters.type}&cost=${filters.cost}&searchType=food`,
+          });
+        }
+      } else {
         await this.setState({
           query: `cuisineId=${this.state.cuisineId}&searchType=food`,
-        });  
+        });
       }
       await this.getFood();
     }
@@ -291,6 +451,7 @@ export default class searchName extends Component {
           if (res.data) {
             if (res.data.length != 0) {
               this.setState({noDataExist: false});
+
               let tempProducts = [];
               for (let i = 0; i < res.data.length; i++) {
                 let image;
@@ -313,31 +474,31 @@ export default class searchName extends Component {
             }
           } else {
             this.setState({isVisibleLoading: false});
-            console.log('if no data in response:', res.error);
-            alert(res.error);
+            console.log('no data found:', res.error);
+            // alert(res.error);
           }
         })
         .catch(error => {
           this.setState({isVisibleLoading: false});
-          console.log('api problem:', error.error);
-          alert(error.error);
+          console.log('try-catch error:', error.error);
+          alert('Something went wrong');
         });
     } catch (err) {
       this.setState({isVisibleLoading: false});
       console.log('another problem:', err);
-      alert(err);
+      alert('Something went wrong');
     }
   };
 
   onFilter = async () => {
-    if(this.state.cuisineId==''){
+    if (this.state.cuisineId == '') {
       this.props.navigation.navigate('Filter', {
-        from:'name',
+        from: 'name',
         refresh: this.refersh,
       });
-    }else{
+    } else {
       this.props.navigation.navigate('Filter', {
-        from:'cuisines',
+        from: 'cuisines',
         onCuisines: this.onCuisines,
       });
     }
@@ -369,6 +530,7 @@ export default class searchName extends Component {
       icons,
       centered_text,
       search_icon,
+      yellow_color,
     } = styles;
     return (
       <View style={[container, column, between_spacing]}>
@@ -389,7 +551,7 @@ export default class searchName extends Component {
                 value={this.state.name}
               />
             </View>
-            <TouchableOpacity onPress={this.onFilter}>
+            <TouchableOpacity onPress={!this.state.isLangar?this.onFilter:()=>{}}>
               <Image
                 resizeMode="contain"
                 source={require('../../assets/filter_yellow.png')}
@@ -432,11 +594,17 @@ export default class searchName extends Component {
                                 style={
                                   value.type == 'veg'
                                     ? [non_veg_icon, green_color]
+                                    : value.type == 'langar'
+                                    ? [non_veg_icon, yellow_color]
                                     : [non_veg_icon, red_color]
                                 }
                               />
                               <Text style={text_style}>
-                                {value.type == 'veg' ? 'Veg' : 'Non-veg'}
+                                {value.type == 'veg'
+                                  ? 'Veg'
+                                  : value.type == 'langar'
+                                  ? 'Langar'
+                                  : 'Non-veg'}
                               </Text>
                             </View>
                             <View style={[row, row_center_align]}>

@@ -73,20 +73,31 @@ const styles = {
   },
   date_picker_text: {color: 'black', fontSize: 13, padding: 0, margin: 0},
   placeholder_text: {color: 'grey', fontSize: 13, padding: 0, margin: 0},
-  input_box_style:{
-    width:wp(26),
-    height:hp(6),
+  input_box_style: {
+    width: wp(28),
+    height: hp(6),
+    fontSize: 13,
+    marginLeft: wp(-1),
+  },
+  extra_bottom_spacing: {marginBottom:hp(1.3)},
+  extra_top_spacing: {marginTop:hp(1.3)},
+  price_input_box_style: {
+    width: wp(23.8),
+    height: hp(6),
     fontSize: 13,
   },
+  disabled_color: {
+    backgroundColor: '#BFBFC1',
+  },
   ckeckbox: {
-    marginRight: wp(5),
+    marginRight: wp(3),
     borderRadius: 4,
     height: hp(2.6),
     width: hp(2.6),
   },
-  checkbox_container:{
-    alignItems:'center',
-    width:wp(38)
+  checkbox_container: {
+    alignItems: 'center',
+    width: wp(39.4),
   },
   fields: {
     borderBottomWidth: 1.4,
@@ -125,7 +136,7 @@ const styles = {
     paddingHorizontal: wp(0),
     width: wp(38),
   },
-  checkbox_list:{
+  checkbox_list: {
     height: hp(4),
     paddingHorizontal: wp(0),
   },

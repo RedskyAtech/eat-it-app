@@ -141,7 +141,7 @@ const styles = {
     borderColor: colors.fieldsColor,
     borderRadius: 4,
     marginBottom: hp(2),
-    padding: 5,
+    // padding: 5,
   },
   profile_image: {
     height: '100%',

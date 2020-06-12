@@ -49,6 +49,7 @@ const styles = {
     borderColor: colors.primaryColor,
     borderRadius: 25,
     backgroundColor: '#ECECEC',
+    marginTop:hp(1.6)
   },
   photo_continer: {
     height: hp(14.6),

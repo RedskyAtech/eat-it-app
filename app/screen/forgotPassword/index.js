@@ -6,6 +6,7 @@ import {
   ImageBackground,
   TextInput,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import styles from './style';
 import LinearGradient from 'react-native-linear-gradient';
@@ -30,6 +31,7 @@ export default class ForgotPassword extends Component {
       confirmPassword: '',
       minutes: 3,
       seconds: 0,
+      isVisibleLoading: false,
     };
   }
 
@@ -71,6 +73,7 @@ export default class ForgotPassword extends Component {
       alert('Email is not valid');
       return;
     } else {
+      this.setState({isVisibleLoading: true});
       let body = {
         email: this.state.email,
       };
@@ -79,26 +82,33 @@ export default class ForgotPassword extends Component {
         response
           .then(res => {
             if (res.data) {
-              alert(res.data);
+              alert('Otp send successfully');
               this.setState({
                 sendOtp: true,
                 minutes: 3,
                 seconds: 0,
+                isVisibleLoading: false,
               });
               this.refs.first.focus();
               this.timer();
             } else {
+              this.setState({isVisibleLoading: false});
               console.log('if no data in response:', res.error);
-              alert(res.error);
             }
           })
           .catch(error => {
-            console.log('api problem:', error.error);
-            alert(error.error);
+            this.setState({isVisibleLoading: false});
+            console.log('error in try-catch', error.error);
+            if (error.error == 'Error: USER_NOT_FOUND') {
+              alert('User not found');
+            } else {
+              alert('Something went wrong');
+            }
           });
       } catch (err) {
+        this.setState({isVisibleLoading: false});
         console.log('another problem:', err);
-        alert(err);
+        alert('Something went wrong');
       }
     }
   };
@@ -160,6 +170,7 @@ export default class ForgotPassword extends Component {
       alert('Password and confirm password should be same');
       return;
     } else {
+      this.setState({isVisibleLoading: true});
       let body = {
         email: this.state.email,
         otp: this.state.otp,
@@ -170,20 +181,28 @@ export default class ForgotPassword extends Component {
         response
           .then(res => {
             if (res.data) {
-              alert(res.data);
+              this.setState({isVisibleLoading: false});
+              alert('Password changed successfully');
               this.props.navigation.navigate('Login');
             } else {
+              this.setState({isVisibleLoading: false});
               console.log('if no data in response:', res.error);
-              alert(res.error);
+              // alert(res.error);
             }
           })
           .catch(error => {
-            console.log('api problem:', error.error);
-            alert(error.error);
+            this.setState({isVisibleLoading: false});
+            console.log('error in try-catch', error.error);
+            if (error.error == 'Error: OTP_DID_NOT_MATCH') {
+              alert('Otp did not match');
+            } else {
+              alert('Something went wrong');
+            }
           });
       } catch (err) {
+        this.setState({isVisibleLoading: false});
         console.log('another problem:', err);
-        alert(err);
+        alert('Something went wrong');
       }
     }
   };
@@ -393,6 +412,13 @@ export default class ForgotPassword extends Component {
                 )}
               </View>
             )}
+            <View style={{position: 'absolute', top: '50%', right: 0, left: 0}}>
+              <ActivityIndicator
+                animating={this.state.isVisibleLoading}
+                size="large"
+                color="#0000ff"
+              />
+            </View>
           </View>
         </ImageBackground>
       </View>

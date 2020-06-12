@@ -86,17 +86,17 @@ export default class myFood extends Component {
               }
             }
           } else {
-            console.log('if no data in response:', res.error);
-            alert(res.error);
+            console.log('no data found', res.error);
+            // alert(res.error);
           }
         })
         .catch(error => {
-          console.log('api problem:', error.error);
-          alert(error.error);
+          console.log('error in try-catch', error.error);
+          alert('Something went wrong');
         });
     } catch (err) {
       console.log('another problem:', err);
-      alert(err);
+      alert('Something went wrong');
     }
   };
   getSharedFood = async () => {
@@ -140,17 +140,17 @@ export default class myFood extends Component {
               this.setState({dataArray: shared});
             }
           } else {
-            console.log('if no data in response:', res.error);
-            alert(res.error);
+            console.log('no data found', res.error);
+            // alert(res.error);
           }
         })
         .catch(error => {
-          console.log('api problem:', error.error);
-          alert(error.error);
+          console.log('error in try-catch', error.error);
+          alert('Something went wrong');
         });
     } catch (err) {
       console.log('another problem:', err);
-      alert(err);
+      alert('Something went wrong');
     }
   };
 

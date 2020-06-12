@@ -128,7 +128,10 @@ export const uploadImageApi = (url, body, headers) => {
   return new Promise((resolve, reject) => {
     fetch(completeUrl, {
       method: 'POST',
-      headers,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Accept: 'application/json',
+      },
       body: body,
     })
       .then(response => response.json())
@@ -151,4 +154,37 @@ export const uploadImageApi = (url, body, headers) => {
         console.log('imageUploadAPIError', error);
       });
   });
+};
+
+export const loginApi = async (url, body) => {
+  var headers = {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  };
+  const completeUrl = Url.BASE_URL + url;
+  let data = JSON.stringify(body);
+  try {
+    const response = await fetch(completeUrl, {
+      method: 'POST',
+      headers,
+      body: data,
+    });
+    let res = await response.json();
+    if (res !== null) {
+      if (res !== null && Object.keys(res).length !== 0) {
+        if (res.success === true) {
+          return res;
+        } else if (res.success === false) {
+          console.log('ressss',res)
+          return res;
+        } else {
+          console.log('ressss lastttt',res)
+          return res;
+        }
+      }
+    }
+  } catch (err) {
+    alert('', ' Somthing Went Wrong');
+    console.log('post::errerrerrerrerrerrerrerrerrerr', err);
+  }
 };

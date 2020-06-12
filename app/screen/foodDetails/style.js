@@ -111,6 +111,9 @@ const styles = {
   veg_icon: {
     backgroundColor: '#12FF01',
   },
+  langar_icon:{
+    backgroundColor: '#FED704'
+  },
   type_text: {
     color: colors.greyText,
     fontSize: 12,

@@ -46,7 +46,7 @@ export default class attatchFoodPhotos extends Component {
           path: 'images',
         },
       };
-      ImagePicker.showImagePicker(options, response => {
+      ImagePicker.showImagePicker(options, (response) => {
         if (response.didCancel) {
           console.log('User cancelled image picker');
         } else if (response.error) {
@@ -105,7 +105,6 @@ export default class attatchFoodPhotos extends Component {
       Accept: 'application/json',
     };
     try {
-      console.log('fileeeeeeeeeeee:', file);
       let response = Service.uploadImageApi(
         Url.UPLOAD_IMAGE,
         formData,
@@ -135,21 +134,18 @@ export default class attatchFoodPhotos extends Component {
             }
           } else {
             this.setState({isVisibleLoading: false});
-            // alert('errrr', res.error);
-            alert('Network problem');
-            console.log('errorrrrr',res.error)
+            console.log('no data found', res.error);
           }
         })
         .catch(error => {
           this.setState({isVisibleLoading: false});
-          // alert(error.error);
-          alert('Network problem');
-          console.log('catch',error.error)
+          console.log('error in try-catch', error.error);
+          alert('Something went wrong');
         });
     } catch (err) {
       this.setState({isVisibleLoading: false});
       console.log('another problem:', err);
-      alert(err);
+      alert('Something went wrong');
     }
   };
   render() {

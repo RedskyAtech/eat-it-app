@@ -18,6 +18,7 @@ import * as utility from '../../utility/index';
 import * as Url from '../../constants/urls';
 import * as Service from '../../api/services';
 import ImagePicker from 'react-native-image-picker';
+import AsyncStorage from '@react-native-community/async-storage';
 
 export default class login extends Component {
   constructor(props) {
@@ -58,10 +59,27 @@ export default class login extends Component {
     }
   };
   onLogin = async () => {
-    await this.setState({isLogin: true});
+    await this.setState({
+      isLogin: true,
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      password: '',
+      confirmPassword: '',
+      regChecked: false,
+      isImagePicked: false,
+      fileUri: '',
+      image: {
+        url: '',
+        thumbnail: '',
+        resize_url: '',
+        resize_thumbnail: '',
+      },
+    });
   };
   onRegister = async () => {
-    await this.setState({isLogin: false});
+    await this.setState({isLogin: false, email: '', password: ''});
   };
   onForgotPassword = async () => {
     this.props.navigation.navigate('ForgotPassword');
@@ -102,7 +120,6 @@ export default class login extends Component {
         .then(res => {
           if (res.data) {
             if (res.data != null) {
-              alert('success');
               if (res.data.image != null) {
                 this.setState({
                   isImagePicked: true,
@@ -119,17 +136,18 @@ export default class login extends Component {
             }
           } else {
             this.setState({isVisibleLoading: false});
-            alert('errrr', res.error);
+            console.log('no data found', res.error);
           }
         })
         .catch(error => {
           this.setState({isVisibleLoading: false});
-          alert(error.error);
+          console.log('error in try-catch', error.error);
+          alert('Something went wrong');
         });
     } catch (err) {
       this.setState({isVisibleLoading: false});
       console.log('another problem:', err);
-      alert(err);
+      alert('Something went wrong');
     }
   };
   onLaunchCamera = () => {
@@ -141,6 +159,7 @@ export default class login extends Component {
       },
     };
     ImagePicker.showImagePicker(options, response => {
+      // console.log('response,', response);
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.error) {
@@ -150,6 +169,12 @@ export default class login extends Component {
         alert(response.customButton);
       } else {
         const source = {uri: response.uri};
+        let file = {
+          uri: response.uri,
+          name: response.fileName,
+          type: response.type,
+        };
+        console.log('fileee::::::', file);
         this.onUploadImage(response);
       }
     });
@@ -182,7 +207,7 @@ export default class login extends Component {
       alert('Please agree terms and conditions');
       return;
     } else if (!this.state.isImagePicked) {
-      alert('Profile is required');
+      alert('Profile picture is required');
       return;
     } else {
       this.setState({isVisibleLoading: true});
@@ -202,19 +227,44 @@ export default class login extends Component {
           .then(res => {
             if (res.data) {
               alert('Registered successfully');
-              this.props.navigation.navigate('Login');
-              this.setState({isVisibleLoading: false, email: '', password: ''});
+              this.setState({
+                isVisibleLoading: false,
+                isLogin: true,
+                regChecked: false,
+                firstName: '',
+                lastName: '',
+                email: '',
+                phone: '',
+                password: '',
+                confirmPassword: '',
+                isImagePicked: false,
+                fileUri: '',
+                image: {
+                  url: '',
+                  thumbnail: '',
+                  resize_url: '',
+                  resize_thumbnail: '',
+                },
+              });
             } else {
-              alert(res.error);
               this.setState({isVisibleLoading: false});
+              console.log('no data found:', res.error);
+              // alert(res.error);
             }
           })
           .catch(error => {
-            alert(error.error);
             this.setState({isVisibleLoading: false});
+            console.log('try-catch error:', error.error);
+            if (error.error == 'Error: USER_ALREADY_EXISTS') {
+              alert('User already exists');
+            } else {
+              alert('Something went wrong');
+            }
           });
       } catch (err) {
-        alert('try:', err);
+        this.setState({isVisibleLoading: false});
+        console.log('another problem:', err);
+        alert('Something went wrong');
       }
     }
   };
@@ -233,34 +283,34 @@ export default class login extends Component {
         password: this.state.password,
       };
 
-      try {
-        let response = Service.postDataApi(Url.LOGIN_URL, body, '');
-        response
-          .then(res => {
-            if (res.data) {
-              if (this.state.checked) {
-                utility.setItem('rembemberMe', true);
-              } else {
-                utility.setItem('rembemberMe', false);
-              }
-              utility.setToken('token', res.data.token);
-              utility.setItem('userId', res.data._id);
+      const res = await Service.loginApi(Url.LOGIN_URL, body);
+      if (res.data) {
+        console.log('dataaaaoooo:', res.data);
+        if (this.state.checked) {
+          await utility.setItem('rembemberMe', true);
+        } else {
+          await utility.setItem('rembemberMe', false);
+        }
+        await utility.setToken('token', res.data.token);
+        await utility.setItem('userId', res.data._id);
 
-              this.props.navigation.navigate('tab1');
-              this.setState({isVisibleLoading: false, email: '', password: ''});
-            } else {
-              alert(res.error);
-              console.log('errorrr:', res.error);
-              this.setState({isVisibleLoading: false});
-            }
-          })
-          .catch(error => {
-            alert(error.error);
-            console.log('errorrr:', error.error);
-            this.setState({isVisibleLoading: false});
-          });
-      } catch (err) {
-        alert('try:', err);
+        await this.setState({
+          isVisibleLoading: false,
+          email: '',
+          password: '',
+          checked: false,
+        });
+        await this.props.navigation.navigate('tab1');
+      } else {
+        this.setState({isVisibleLoading: false});
+        console.log('no data found:', res.error);
+        if (res.error == 'Error: USER_NOT_FOUND') {
+          alert('User not found');
+        } else if (res.error == 'Error: PASSWORD_MISMATCH') {
+          alert('Password mismatch');
+        } else {
+          alert('Something went wrong');
+        }
       }
     }
   };
@@ -504,18 +554,28 @@ export default class login extends Component {
                   <Text />
                 ) : (
                   <View style={row}>
-                    <View style={profile_container}>
-                      <Image
-                        resizeMode="stretch"
-                        source={
-                          this.state.isImagePicked
-                            ? {uri: this.state.fileUri}
-                            : require('../../assets/profile.png')
-                        }
-                        style={profile_image}
-                      />
-                    </View>
-                    <TouchableOpacity onPress={this.onLaunchCamera}>
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={this.onLaunchCamera}>
+                      <View
+                        style={[
+                          profile_container,
+                          this.state.isImagePicked ? '' : {padding: 5},
+                        ]}>
+                        <Image
+                          resizeMode="stretch"
+                          source={
+                            this.state.isImagePicked
+                              ? {uri: this.state.fileUri}
+                              : require('../../assets/profile.png')
+                          }
+                          style={profile_image}
+                        />
+                      </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      activeOpacity={0.6}
+                      onPress={this.onLaunchCamera}>
                       <View style={edit_container}>
                         <Image
                           resizeMode="stretch"
@@ -557,3 +617,58 @@ export default class login extends Component {
     );
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      // try {
+      //   let response = Service.postDataApi(Url.LOGIN_URL, body, '');
+      //   response
+      //     .then(res => {
+      //       if (res.data) {
+      //         if (this.state.checked) {
+      //           utility.setItem('rembemberMe', true);
+      //         } else {
+      //           utility.setItem('rembemberMe', false);
+      //         }
+      //         utility.setToken('token', res.data.token);
+      //         utility.setItem('userId', res.data._id);
+
+      //         this.setState({
+      //           isVisibleLoading: false,
+      //           email: '',
+      //           password: '',
+      //           checked: false,
+      //         });
+      //         this.props.navigation.navigate('tab1');
+      //       } else {
+      //         this.setState({isVisibleLoading: false});
+      //         console.log('no data found:', res.error);
+      //       }
+      //     })
+      //     .catch(error => {
+      //       this.setState({isVisibleLoading: false});
+      //       console.log('try-catch error:', error.error);
+      //       if (error.error == 'Error: USER_NOT_FOUND') {
+      //         alert('User not found');
+      //       } else if (error.error == 'Error: PASSWORD_MISMATCH') {
+      //         alert('Password mismatch');
+      //       } else {
+      //         alert('Something went wrong');
+      //       }
+      //     });
+      // } catch (err) {
+      //   this.setState({isVisibleLoading: false});
+      //   console.log('another problem:', err);
+      //   alert('Something went wrong');
+      // }

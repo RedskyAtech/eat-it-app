@@ -103,6 +103,9 @@ const styles = {
   green_color: {
     backgroundColor: '#12FF01',
   },
+  yellow_color:{
+    backgroundColor: '#FED704',
+  },
   clock: {
     height: hp(1.4),
     width: hp(1.4),

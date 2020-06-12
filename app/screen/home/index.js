@@ -128,10 +128,7 @@ export default class home extends Component {
       ),
     };
   }
-  componentDidMount = async () => {
-    // this.products = [];
-    // this.getFood();
-  };
+
   getFood = async () => {
     this.products = [];
     await this.setState({isVisibleLoading: true});
@@ -168,18 +165,18 @@ export default class home extends Component {
           } else {
             this.setState({isVisibleLoading: false});
             console.log('if no data in response:', res.error);
-            alert(res.error);
+            // alert(res.error);
           }
         })
         .catch(error => {
           this.setState({isVisibleLoading: false});
-          console.log('api problem:', error.error);
-          alert(error.error);
+          console.log('try-catch error:', error.error);
+          alert('Something went wrong');
         });
     } catch (err) {
       this.setState({isVisibleLoading: false});
       console.log('another problem:', err);
-      alert(err);
+      alert('Something went wrong');
     }
   };
 
@@ -259,7 +256,8 @@ export default class home extends Component {
     const rembemberMe = await utility.getItem('rembemberMe');
     console.log('meeeeeeeeeeeeeeeee:', rembemberMe);
     if (rembemberMe == false) {
-      await utility.setToken('token', '');
+      await utility.removeAuthKey('token');
+      await utility.removeAuthKey('userId');
     }
     BackHandler.exitApp();
     return true;
@@ -297,7 +295,7 @@ export default class home extends Component {
       search_icon,
       search_input,
       search_container,
-      centered_text
+      centered_text,
     } = styles;
     return (
       <HandleBack onBack={this.onBack}>
@@ -395,7 +393,9 @@ export default class home extends Component {
             </View>
           ) : (
             <View style={[list_container, column, centered_text]}>
-              <Text style={{textAlign: 'center'}}>No food found for today, add food for share</Text>
+              <Text style={{textAlign: 'center'}}>
+                No food found for today, add food for share
+              </Text>
             </View>
           )}
           <View style={{position: 'absolute', top: '50%', right: 0, left: 0}}>

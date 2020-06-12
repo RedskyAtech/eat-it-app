@@ -1,12 +1,17 @@
 import React, {Component} from 'react';
-import {View, Image, Text, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Image,
+  Text,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import styles from './style';
 import LinearGradient from 'react-native-linear-gradient';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
 import {widthPercentageToDP as wp} from '../../utility/index';
 import * as colors from '../../constants/colors';
 import * as Service from '../../api/services';
-import * as Url from '../../constants/urls';
 
 export default class addPhotos extends Component {
   constructor(props) {
@@ -15,13 +20,17 @@ export default class addPhotos extends Component {
       foodId: '',
       name: '',
       address: '',
-      price: '',
+      price: 0,
       type: '',
       cookingTime: '',
-      pickupTime: '',
-      deliveryPrice: '',
-      totalAmount: '',
+      pickupTime: {
+        from: '',
+        to: '',
+      },
+      deliveryPrice: 0,
+      totalAmount: 0,
       images: [],
+      isVisibleLoading: false,
     };
   }
   componentDidMount = async () => {
@@ -34,35 +43,66 @@ export default class addPhotos extends Component {
   };
 
   getFoodDetail = async () => {
+    await this.setState({isVisibleLoading: true});
     try {
       let response = Service.getDataApi(`foods/${this.state.foodId}`, '');
       response
         .then(res => {
           if (res.data) {
-            console.log('fffffffffffff:', res.data.homeDeliveryPrice);
+            let deliveryPrice;
+            let price;
+            console.log('datata:', res.data);
+            if (
+              res.data.homeDeliveryPrice == '' ||
+              res.data.homeDeliveryPrice == undefined ||
+              res.data.homeDeliveryPrice == null ||
+              res.data.homeDeliveryPrice == 0
+            ) {
+              deliveryPrice = 0;
+            } else {
+              deliveryPrice = res.data.homeDeliveryPrice;
+            }
+            if (
+              res.data.price == '' ||
+              res.data.price == undefined ||
+              res.data.price == null ||
+              res.data.price == 0
+            ) {
+              price = 0;
+            } else {
+              price = res.data.price;
+            }
             this.setState({
               name: res.data.name,
               address: res.data.address,
-              price: res.data.price,
+              price: price,
               type: res.data.type,
               cookingTime: res.data.cookingTime,
-              pickupTime: res.data.pickupTime,
-              deliveryPrice: res.data.homeDeliveryPrice,
-              totalAmount: '70',
+              pickupTime: {
+                from: res.data.pickupTime.from,
+                to: res.data.pickupTime.to,
+              },
+              deliveryPrice: deliveryPrice,
+              totalAmount: deliveryPrice + price,
               images: res.data.images,
             });
+
+            this.setState({isVisibleLoading: false});
           } else {
-            console.log('if no data in response:', res.error);
-            alert(res.error);
+            this.setState({isVisibleLoading: false});
+            console.log('no data found:', res.error);
+            // alert(res.error);
           }
         })
         .catch(error => {
-          console.log('api problem:', error.error);
-          alert(error.error);
+          this.setState({isVisibleLoading: false});
+          console.log('try-catch error:', error.error);
+          alert('Something went wrong');
         });
     } catch (err) {
+      this.setState({isVisibleLoading: false});
       console.log('another problem:', err);
-      alert(err);
+      alert('Something went wrong');
     }
   };
 
@@ -118,6 +158,7 @@ export default class addPhotos extends Component {
       type_icon,
       veg_icon,
       top_spacing,
+      langar_icon
     } = styles;
     return (
       <View>
@@ -175,9 +216,7 @@ export default class addPhotos extends Component {
             <View style={[row, {alignItems: 'center'}]}>
               <View
                 style={
-                  this.state.type == 'veg'
-                    ? [type_icon, veg_icon]
-                    : [type_icon, non_veg_icon]
+                  this.state.type==''?'': this.state.type == 'veg'? [type_icon, veg_icon]:this.state.type == 'langar'?[type_icon, langar_icon]: [type_icon, non_veg_icon]
                 }
               />
               <Text style={type_text}>{this.state.type}</Text>
@@ -190,10 +229,12 @@ export default class addPhotos extends Component {
           </View>
           <View style={[row, bottom_spacing]}>
             <Text style={timing_heading_style}>Pickup time : </Text>
-            <Text style={address_style}>{this.state.pickupTime}</Text>
+            <Text style={address_style}>
+              {this.state.pickupTime.from + ' - ' + this.state.pickupTime.to}
+            </Text>
           </View>
           <View style={[row, bottom_spacing]}>
-            <Text style={timing_heading_style}>Home delivery price : </Text>
+            <Text style={timing_heading_style}>Delivery Charges : </Text>
             <Text style={address_style}>
               Rs{' '}
               {this.state.deliveryPrice == '' ||
@@ -218,6 +259,13 @@ export default class addPhotos extends Component {
               style={[button_container, centered_text]}>
               <Text style={button_text}>Buy food</Text>
             </LinearGradient>
+          </View>
+          <View style={{position: 'absolute', top: '50%', right: 0, left: 0}}>
+            <ActivityIndicator
+              animating={this.state.isVisibleLoading}
+              size="large"
+              color="#0000ff"
+            />
           </View>
         </View>
       </View>
