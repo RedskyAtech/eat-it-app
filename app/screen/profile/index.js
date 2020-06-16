@@ -33,6 +33,8 @@ export default class profile extends Component {
       confirmPassword: '',
       isVisibleLoading: false,
       profileImage: '',
+      isProfile: false,
+      isImagePicked: false,
     };
   }
   componentDidMount = async () => {
@@ -144,7 +146,12 @@ export default class profile extends Component {
 
   closeMenu = () => this.setState({visible: false});
 
-  showCard = async () => {
+  showCard = async from => {
+    if (from == 'profile') {
+      await this.setState({isProfile: true});
+    } else {
+      await this.setState({isProfile: false});
+    }
     await this.setState({visible: false});
     Animated.timing(this.state.top, {
       toValue: 0,
@@ -173,8 +180,10 @@ export default class profile extends Component {
     await this.props.navigation.navigate('Login');
     await this.closeMenu();
   };
+  onMessages = async () => {
+    this.props.navigation.navigate('Messages');
+  };
 
-  
   render() {
     const {
       container,
@@ -211,6 +220,13 @@ export default class profile extends Component {
       profile_image,
       profile_container,
       capitalize_text,
+      pic_image_container,
+      edit_container,
+      edit_icon,
+      profile_size,
+      update_button_container,
+      update_text_style,
+      top_spacing,
     } = styles;
     return (
       <Provider>
@@ -246,6 +262,7 @@ export default class profile extends Component {
                         titleStyle={[menu_list_title, colored_text]}
                         style={list_item_height}
                         title="Edit profile"
+                        onPress={() => this.showCard('profile')}
                       />
                     </View>
                     <View style={[row, {alignItems: 'center'}]}>
@@ -268,7 +285,7 @@ export default class profile extends Component {
                       <Menu.Item
                         titleStyle={[menu_list_title, colored_text]}
                         style={list_item_height}
-                        onPress={this.showCard}
+                        onPress={() => this.showCard('changePassword')}
                         title="Change password"
                       />
                     </View>
@@ -309,19 +326,21 @@ export default class profile extends Component {
             <View style={horizontal_line} />
 
             <View style={list_width}>
-              <View style={[row, between_spacing, rows_spacing]}>
-                <View style={[row, row_centered_text]}>
+              <TouchableOpacity onPress={this.onMessages}>
+                <View style={[row, between_spacing, rows_spacing]}>
+                  <View style={[row, row_centered_text]}>
+                    <Image
+                      source={require('../../assets/email_yellow.png')}
+                      style={field_icons}
+                    />
+                    <Text style={[list_title, colored_text]}>Messages</Text>
+                  </View>
                   <Image
-                    source={require('../../assets/email_yellow.png')}
+                    source={require('../../assets/next_arrow.png')}
                     style={field_icons}
                   />
-                  <Text style={[list_title, colored_text]}>Messages</Text>
                 </View>
-                <Image
-                  source={require('../../assets/next_arrow.png')}
-                  style={field_icons}
-                />
-              </View>
+              </TouchableOpacity>
 
               <View style={[row, between_spacing, rows_spacing]}>
                 <View style={[row, row_centered_text]}>
@@ -426,69 +445,169 @@ export default class profile extends Component {
                 elevation: 10,
               }}>
               <LinearGradient
-                start={{x: 0, y: 0}}
-                end={{x: 1, y: 0}}
+                start={this.state.isProfile ? {x: 0, y: 1} : {x: 0, y: 0}}
+                end={this.state.isProfile ? {x: 0, y: 0} : {x: 1, y: 0}}
                 colors={[colors.gradientFirstColor, colors.gradientSecondColor]}
-                style={slider_container}>
+                style={[
+                  slider_container,
+                  this.state.isProfile ? profile_size : '',
+                ]}>
                 <View style={[slider_inner_box, column]}>
-                  <Text style={heading_text}>Change Password</Text>
-                  <View style={[row, fields]}>
-                    <Image
-                      source={require('../../assets/password_white.png')}
-                      style={input_field_icons}
-                    />
-                    <TextInput
-                      placeholder="Old password"
-                      placeholderTextColor="white"
-                      style={input_box}
-                      onChangeText={password => this.setState({password})}
-                      value={this.state.password}
-                    />
-                  </View>
+                  <Text style={heading_text}>
+                    {this.state.isProfile ? 'Edit profile' : 'Change Password'}
+                  </Text>
+                  {this.state.isProfile ? (
+                    <View>
+                      <View style={[row, fields]}>
+                        <Image
+                          source={require('../../assets/username_white.png')}
+                          style={input_field_icons}
+                        />
+                        <TextInput
+                          placeholder="Firstname"
+                          placeholderTextColor="white"
+                          style={input_box}
+                          onChangeText={firstName => this.setState({firstName})}
+                          value={this.state.firstName}
+                        />
+                      </View>
+                      <View style={[row, fields]}>
+                        <Image
+                          source={require('../../assets/username_white.png')}
+                          style={input_field_icons}
+                        />
+                        <TextInput
+                          placeholder="Lastname"
+                          placeholderTextColor="white"
+                          style={input_box}
+                          onChangeText={lastName => this.setState({lastName})}
+                          value={this.state.lastName}
+                        />
+                      </View>
+                      <View style={[row, fields]}>
+                        <Image
+                          source={require('../../assets/email__white.png')}
+                          style={input_field_icons}
+                        />
+                        <TextInput
+                          placeholder="Email"
+                          placeholderTextColor="white"
+                          style={input_box}
+                          onChangeText={email => this.setState({email})}
+                          value={this.state.email}
+                        />
+                      </View>
+                      <View style={[row, fields]}>
+                        <Image
+                          source={require('../../assets/phone_white.png')}
+                          style={input_field_icons}
+                        />
+                        <TextInput
+                          placeholder="Phone"
+                          placeholderTextColor="white"
+                          style={input_box}
+                          onChangeText={phone => this.setState({phone})}
+                          value={this.state.phone}
+                        />
+                      </View>
 
-                  <View style={[row, fields]}>
-                    <Image
-                      source={require('../../assets/password_white.png')}
-                      style={input_field_icons}
-                    />
-                    <TextInput
-                      placeholder="New password"
-                      placeholderTextColor="white"
-                      style={input_box}
-                      onChangeText={newPassword => this.setState({newPassword})}
-                      value={this.state.newPassword}
-                      secureTextEntry={true}
-                    />
-                  </View>
-                  <View style={[row, fields]}>
-                    <Image
-                      source={require('../../assets/password_white.png')}
-                      style={input_field_icons}
-                    />
-                    <TextInput
-                      placeholder="Confirm new password"
-                      placeholderTextColor="white"
-                      style={input_box}
-                      onChangeText={confirmPassword =>
-                        this.setState({confirmPassword})
-                      }
-                      value={this.state.confirmPassword}
-                      secureTextEntry={true}
-                    />
-                  </View>
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    onPress={this.changePassword}>
-                    <View style={[button_container, around_spacing]}>
-                      <Text style={button_text}>Update</Text>
+                      <View style={[row, between_spacing, top_spacing]}>
+                        <View style={row}>
+                          <TouchableOpacity activeOpacity={0.7}>
+                            <View
+                              style={[
+                                pic_image_container,
+                                this.state.isImagePicked ? '' : {padding: 5},
+                              ]}>
+                              <Image
+                                resizeMode="stretch"
+                                source={
+                                  this.state.isImagePicked
+                                    ? {uri: this.state.file.uri}
+                                    : require('../../assets/profile.png')
+                                }
+                                style={profile_image}
+                              />
+                            </View>
+                          </TouchableOpacity>
+                          <TouchableOpacity activeOpacity={0.6}>
+                            <View style={edit_container}>
+                              <Image
+                                resizeMode="stretch"
+                                source={require('../../assets/edit_black.png')}
+                                style={edit_icon}
+                              />
+                            </View>
+                          </TouchableOpacity>
+                        </View>
+                        <View style={update_button_container}>
+                          <Text style={update_text_style}>Update</Text>
+                        </View>
+                      </View>
                     </View>
-                  </TouchableOpacity>
+                  ) : (
+                    <View>
+                      <View style={[row, fields]}>
+                        <Image
+                          source={require('../../assets/password_white.png')}
+                          style={input_field_icons}
+                        />
+                        <TextInput
+                          placeholder="Old password"
+                          placeholderTextColor="white"
+                          style={input_box}
+                          onChangeText={password => this.setState({password})}
+                          value={this.state.password}
+                        />
+                      </View>
+                      <View style={[row, fields]}>
+                        <Image
+                          source={require('../../assets/password_white.png')}
+                          style={input_field_icons}
+                        />
+                        <TextInput
+                          placeholder="New password"
+                          placeholderTextColor="white"
+                          style={input_box}
+                          onChangeText={newPassword =>
+                            this.setState({newPassword})
+                          }
+                          value={this.state.newPassword}
+                          secureTextEntry={true}
+                        />
+                      </View>
+                      <View style={[row, fields]}>
+                        <Image
+                          source={require('../../assets/password_white.png')}
+                          style={input_field_icons}
+                        />
+                        <TextInput
+                          placeholder="Confirm new password"
+                          placeholderTextColor="white"
+                          style={input_box}
+                          onChangeText={confirmPassword =>
+                            this.setState({confirmPassword})
+                          }
+                          value={this.state.confirmPassword}
+                          secureTextEntry={true}
+                        />
+                      </View>
+                      <TouchableOpacity
+                        activeOpacity={0.8}
+                        onPress={this.changePassword}>
+                        <View style={[button_container, around_spacing]}>
+                          <Text style={button_text}>Update</Text>
+                        </View>
+                      </TouchableOpacity>
+                    </View>
+                  )}
                   <TouchableOpacity onPress={this.hideCard}>
                     <Text style={close_style}>Close</Text>
                   </TouchableOpacity>
                 </View>
               </LinearGradient>
             </Animated.View>
+
             <View style={{position: 'absolute', top: '50%', right: 0, left: 0}}>
               <ActivityIndicator
                 animating={this.state.isVisibleLoading}
@@ -503,49 +622,45 @@ export default class profile extends Component {
   }
 }
 
-
-
-
-
 // onLogOutSubmit = async () => {
-  //   await this.setState({isVisibleLoading: true});
-  //   let body = {};
-  //   try {
-  //     let response = Service.postDataApi(
-  //       Url.LOGOUT_URL,
-  //       body,
-  //       this.state.userToken,
-  //     );
-  //     response
-  //       .then(res => {
-  //         if (res.message) {
-  //           utility.removeAuthKey('token');
-  //           utility.removeAuthKey('userId');
-  //           utility.removeAuthKey('rembemberMe');
+//   await this.setState({isVisibleLoading: true});
+//   let body = {};
+//   try {
+//     let response = Service.postDataApi(
+//       Url.LOGOUT_URL,
+//       body,
+//       this.state.userToken,
+//     );
+//     response
+//       .then(res => {
+//         if (res.message) {
+//           utility.removeAuthKey('token');
+//           utility.removeAuthKey('userId');
+//           utility.removeAuthKey('rembemberMe');
 
-  //           this.setState({
-  //             isVisibleLoading: false,
-  //             name: '',
-  //             email: '',
-  //             phone: '',
-  //             profileImage: '',
-  //           });
-  //           this.props.navigation.navigate('Login');
-  //           this.closeMenu();
-  //         } else {
-  //           this.setState({isVisibleLoading: false});
-  //           console.log('no data found', res.error);
-  //         }
-  //       })
-  //       .catch(error => {
-  //         this.setState({isVisibleLoading: false});
-  //         this.props.navigation.navigate('Login');
-  //         console.log('error in try-catch', error);
-  //         alert(error.error);
-  //       });
-  //   } catch (err) {
-  //     this.setState({isVisibleLoading: false});
-  //     console.log('another problem:', err);
-  //     alert('Something went wrong');
-  //   }
-  // };
+//           this.setState({
+//             isVisibleLoading: false,
+//             name: '',
+//             email: '',
+//             phone: '',
+//             profileImage: '',
+//           });
+//           this.props.navigation.navigate('Login');
+//           this.closeMenu();
+//         } else {
+//           this.setState({isVisibleLoading: false});
+//           console.log('no data found', res.error);
+//         }
+//       })
+//       .catch(error => {
+//         this.setState({isVisibleLoading: false});
+//         this.props.navigation.navigate('Login');
+//         console.log('error in try-catch', error);
+//         alert(error.error);
+//       });
+//   } catch (err) {
+//     this.setState({isVisibleLoading: false});
+//     console.log('another problem:', err);
+//     alert('Something went wrong');
+//   }
+// };

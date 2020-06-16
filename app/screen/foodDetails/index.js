@@ -130,7 +130,9 @@ export default class addPhotos extends Component {
       />
     );
   };
-
+  onBuy=async()=>{
+    this.props.navigation.navigate('Payment')
+  }
   render() {
     const {
       inner_container,
@@ -252,6 +254,7 @@ export default class addPhotos extends Component {
 
           <View style={[bottom_container, bottom_spacing]}>
             <Text />
+            <TouchableOpacity activeOpacity={0.7} onPress={this.onBuy}>
             <LinearGradient
               start={{x: 0, y: 0}}
               end={{x: 1, y: 0}}
@@ -259,7 +262,9 @@ export default class addPhotos extends Component {
               style={[button_container, centered_text]}>
               <Text style={button_text}>Buy food</Text>
             </LinearGradient>
+            </TouchableOpacity>
           </View>
+
           <View style={{position: 'absolute', top: '50%', right: 0, left: 0}}>
             <ActivityIndicator
               animating={this.state.isVisibleLoading}

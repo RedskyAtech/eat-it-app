@@ -25,6 +25,10 @@ import LikeDislikeFood from '../screen/likeDislikeFood';
 import ShareFood from '../screen/shareFood';
 import AddFood from '../screen/addFood';
 import PriceSelection from '../screen/priceSelection';
+import Messages from '../screen/messages';
+import ChatScreen from '../screen/chatScreen';
+import Payment from '../screen/payment';
+
 import Header from '../components/header';
 
 const TabNavigator = createBottomTabNavigator(
@@ -303,6 +307,24 @@ const AppStack = createStackNavigator(
     },
     PriceSelection: {
       screen: PriceSelection,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
+    Messages: {
+      screen: Messages,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
+    ChatScreen: {
+      screen: ChatScreen,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
+    Payment: {
+      screen: Payment,
       navigationOptions: {
         headerShown: false,
       },

@@ -57,9 +57,7 @@ const styles = {
     borderWidth: 2,
     marginTop: hp(0.6),
     elevation: 4,
-    backgroundColor:'#EDEDED'
-    
-    
+    backgroundColor: '#EDEDED',
   },
   user_details: {
     marginTop: hp(6.4),
@@ -89,7 +87,34 @@ const styles = {
     height: hp(2.2),
     width: hp(2.2),
   },
-
+  pic_image_container: {
+    height: hp(14.5),
+    width: hp(14.5),
+    borderWidth: 1.5,
+    borderColor: 'white',
+    borderRadius: 4,
+    marginBottom: hp(2),
+  },
+  profile_image: {
+    height: '100%',
+    width: '100%',
+    borderRadius: 3,
+  },
+  edit_container: {
+    height: hp(5.8),
+    width: hp(5.8),
+    backgroundColor: 'white',
+    borderRadius: hp(5.8) / 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: hp(-2),
+    marginLeft: wp(-6),
+  },
+  edit_icon: {
+    alignSelf: 'center',
+    height: hp(3),
+    width: hp(3),
+  },
   list_width: {
     width: wp(94),
     alignSelf: 'center',
@@ -133,6 +158,10 @@ const styles = {
     borderBottomRightRadius: 30,
     elevation: 6,
   },
+  profile_size: {
+    height: hp(48),
+    height: hp(67),
+  },
   slider_inner_box: {
     width: wp(86),
     alignSelf: 'center',
@@ -169,6 +198,21 @@ const styles = {
     alignSelf: 'center',
     textDecorationLine: 'underline',
     marginTop: hp(2),
+  },
+  update_button_container: {
+    height: hp(5.6),
+    width: wp(40),
+    borderRadius: 20,
+    elevation: 4,
+    backgroundColor: 'white',
+    alignItems:'center',
+    justifyContent:'center',
+  },
+  top_spacing:{
+    marginTop:hp(5)
+  },
+  update_text_style: {
+    color: colors.primaryColor,
   },
 };
 export default styles;

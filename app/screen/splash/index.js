@@ -16,6 +16,7 @@ export default class splash extends Component {
 
   retrieveData = async () => {
     try {
+      await utility.setItem('isSkipped', false);
       var token = await utility.getToken('token');
       console.log('Splash', token);
       if (token == null || token == '' || token == undefined) {

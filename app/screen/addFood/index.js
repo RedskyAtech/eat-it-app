@@ -305,7 +305,6 @@ export default class addFood extends Component {
 
     
   };
-
   onUploadImage = async file => {
     await this.setState({isVisibleLoading: true});
 
@@ -358,7 +357,6 @@ export default class addFood extends Component {
       alert('Something went wrong');
     }
   };
-
   showTimePicker = async from => {
     if (from == 'cookingTime') {
       await this.setState({isTimePickerVisible: true});
@@ -370,7 +368,6 @@ export default class addFood extends Component {
       await this.setState({isToTimePickerVisible: true});
     }
   };
-
   hideTimePicker = async from => {
     if (from == 'cookingTime') {
       await this.setState({isTimePickerVisible: false});
@@ -404,7 +401,6 @@ export default class addFood extends Component {
       });
     }
   };
-
   onBack = async () => {
     this.props.navigation.navigate('AttatchFoodPhotos');
   };
@@ -417,7 +413,6 @@ export default class addFood extends Component {
   openMenu = async () => {
     await this.setState({visibleCategory: true});
   };
-
   closeFromMenu = async () => {
     await this.setState({visibleFrom: false});
   };
@@ -487,7 +482,6 @@ export default class addFood extends Component {
   closeDialog = async () => {
     this.setState({isDeliveryPriceDialogVisible: false});
   };
-
   onCategoryChange = async value => {
     console.log('valueeeee:', value);
     if (value.name == 'Langar') {
