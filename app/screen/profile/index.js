@@ -23,6 +23,7 @@ export default class profile extends Component {
     this.state = {
       visible: false,
       top: new Animated.Value(-hp(50)),
+      profileTop: new Animated.Value(-hp(67)),
       userToken: '',
       userId: '',
       name: '',
@@ -31,6 +32,8 @@ export default class profile extends Component {
       password: '',
       newPassword: '',
       confirmPassword: '',
+      firstName: '',
+      lastName: '',
       isVisibleLoading: false,
       profileImage: '',
       isProfile: false,
@@ -63,6 +66,8 @@ export default class profile extends Component {
               image = res.data.image.resize_url;
             }
             this.setState({
+              firstName: res.data.firstName,
+              lastName: res.data.lastName,
               name: res.data.firstName + ' ' + res.data.lastName,
               email: res.data.email,
               phone: res.data.phone,
@@ -149,20 +154,32 @@ export default class profile extends Component {
   showCard = async from => {
     if (from == 'profile') {
       await this.setState({isProfile: true});
+      await this.setState({visible: false});
+      Animated.timing(this.state.profileTop, {
+        toValue: 0,
+        duration: 700,
+      }).start();
     } else {
       await this.setState({isProfile: false});
+      await this.setState({visible: false});
+      Animated.timing(this.state.top, {
+        toValue: 0,
+        duration: 700,
+      }).start();
     }
-    await this.setState({visible: false});
-    Animated.timing(this.state.top, {
-      toValue: 0,
-      duration: 700,
-    }).start();
   };
   hideCard = async () => {
-    Animated.timing(this.state.top, {
-      toValue: -hp(50),
-      duration: 700,
-    }).start();
+    if (this.state.isProfile) {
+      Animated.timing(this.state.profileTop, {
+        toValue: -hp(67),
+        duration: 700,
+      }).start();
+    } else {
+      Animated.timing(this.state.top, {
+        toValue: -hp(50),
+        duration: 700,
+      }).start();
+    }
   };
 
   onLogOutSubmit = async () => {
@@ -181,7 +198,16 @@ export default class profile extends Component {
     await this.closeMenu();
   };
   onMessages = async () => {
-    this.props.navigation.navigate('Messages');
+    await this.props.navigation.navigate('Messages');
+  };
+  onOrders = async () => {
+    await this.props.navigation.navigate('Orders');
+  };
+  onSellers = async () => {
+    await this.props.navigation.navigate('FollowedSellers');
+  };
+  onMyFood = async () => {
+    // await this.props.navigation.navigate('MyFood');
   };
 
   render() {
@@ -218,6 +244,7 @@ export default class profile extends Component {
       between_spacing,
       settings,
       profile_image,
+      profile_images,
       profile_container,
       capitalize_text,
       pic_image_container,
@@ -227,6 +254,7 @@ export default class profile extends Component {
       update_button_container,
       update_text_style,
       top_spacing,
+      animation_style,
     } = styles;
     return (
       <Provider>
@@ -326,7 +354,7 @@ export default class profile extends Component {
             <View style={horizontal_line} />
 
             <View style={list_width}>
-              <TouchableOpacity onPress={this.onMessages}>
+              <TouchableOpacity activeOpacity={0.7} onPress={this.onMessages}>
                 <View style={[row, between_spacing, rows_spacing]}>
                   <View style={[row, row_centered_text]}>
                     <Image
@@ -341,20 +369,21 @@ export default class profile extends Component {
                   />
                 </View>
               </TouchableOpacity>
-
-              <View style={[row, between_spacing, rows_spacing]}>
-                <View style={[row, row_centered_text]}>
+              <TouchableOpacity activeOpacity={0.7} onPress={this.onMyFood}>
+                <View style={[row, between_spacing, rows_spacing]}>
+                  <View style={[row, row_centered_text]}>
+                    <Image
+                      source={require('../../assets/my_food.png')}
+                      style={field_icons}
+                    />
+                    <Text style={[list_title, heading_color]}>My food</Text>
+                  </View>
                   <Image
-                    source={require('../../assets/my_food.png')}
+                    source={require('../../assets/next_arrow_grey.png')}
                     style={field_icons}
                   />
-                  <Text style={[list_title, heading_color]}>My food</Text>
                 </View>
-                <Image
-                  source={require('../../assets/next_arrow_grey.png')}
-                  style={field_icons}
-                />
-              </View>
+              </TouchableOpacity>
 
               <View style={[row, between_spacing, rows_spacing]}>
                 <View style={[row, row_centered_text]}>
@@ -372,37 +401,41 @@ export default class profile extends Component {
                 />
               </View>
 
-              <View style={[row, between_spacing, rows_spacing]}>
-                <View style={[row, row_centered_text]}>
+              <TouchableOpacity activeOpacity={0.7} onPress={this.onSellers}>
+                <View style={[row, between_spacing, rows_spacing]}>
+                  <View style={[row, row_centered_text]}>
+                    <Image
+                      source={require('../../assets/follow.png')}
+                      style={field_icons}
+                    />
+                    <Text style={[list_title, heading_color]}>
+                      Seller you follow
+                    </Text>
+                  </View>
                   <Image
-                    source={require('../../assets/follow.png')}
+                    source={require('../../assets/next_arrow_grey.png')}
                     style={field_icons}
                   />
-                  <Text style={[list_title, heading_color]}>
-                    Seller you follow
-                  </Text>
                 </View>
-                <Image
-                  source={require('../../assets/next_arrow_grey.png')}
-                  style={field_icons}
-                />
-              </View>
+              </TouchableOpacity>
 
-              <View style={[row, between_spacing, rows_spacing]}>
-                <View style={[row, row_centered_text]}>
+              <TouchableOpacity activeOpacity={0.7} onPress={this.onOrders}>
+                <View style={[row, between_spacing, rows_spacing]}>
+                  <View style={[row, row_centered_text]}>
+                    <Image
+                      source={require('../../assets/dish_yellow.png')}
+                      style={field_icons}
+                    />
+                    <Text style={[list_title, colored_text]}>
+                      Received orders
+                    </Text>
+                  </View>
                   <Image
-                    source={require('../../assets/dish_yellow.png')}
+                    source={require('../../assets/next_arrow.png')}
                     style={field_icons}
                   />
-                  <Text style={[list_title, colored_text]}>
-                    Received orders
-                  </Text>
                 </View>
-                <Image
-                  source={require('../../assets/next_arrow.png')}
-                  style={field_icons}
-                />
-              </View>
+              </TouchableOpacity>
             </View>
 
             <View style={horizontal_line} />
@@ -439,11 +472,12 @@ export default class profile extends Component {
 
             {/* change  password card */}
             <Animated.View
-              style={{
-                top: this.state.top,
-                position: 'absolute',
-                elevation: 10,
-              }}>
+              style={[
+                animation_style,
+                this.state.isProfile
+                  ? {top: this.state.profileTop}
+                  : {top: this.state.top},
+              ]}>
               <LinearGradient
                 start={this.state.isProfile ? {x: 0, y: 1} : {x: 0, y: 0}}
                 end={this.state.isProfile ? {x: 0, y: 0} : {x: 1, y: 0}}
@@ -517,16 +551,16 @@ export default class profile extends Component {
                             <View
                               style={[
                                 pic_image_container,
-                                this.state.isImagePicked ? '' : {padding: 5},
+                                this.state.profileImage ? '' : {padding: 5},
                               ]}>
                               <Image
                                 resizeMode="stretch"
                                 source={
-                                  this.state.isImagePicked
-                                    ? {uri: this.state.file.uri}
-                                    : require('../../assets/profile.png')
+                                  this.state.profileImage == ''
+                                    ? ''
+                                    : {uri: this.state.profileImage}
                                 }
-                                style={profile_image}
+                                style={profile_images}
                               />
                             </View>
                           </TouchableOpacity>

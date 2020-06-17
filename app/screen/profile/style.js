@@ -95,7 +95,7 @@ const styles = {
     borderRadius: 4,
     marginBottom: hp(2),
   },
-  profile_image: {
+  profile_images: {
     height: '100%',
     width: '100%',
     borderRadius: 3,
@@ -159,12 +159,16 @@ const styles = {
     elevation: 6,
   },
   profile_size: {
-    height: hp(48),
+    // height: hp(48),
     height: hp(67),
   },
   slider_inner_box: {
     width: wp(86),
     alignSelf: 'center',
+  },
+  animation_style:{
+    position: 'absolute',
+    elevation: 10,
   },
   fields: {
     borderBottomWidth: 1.4,

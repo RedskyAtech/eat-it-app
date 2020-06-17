@@ -9,37 +9,37 @@ export default class messages extends Component {
     this.state = {
       messages: [
         {
-          name: 'Jain Imam',
+          name: 'Zain Imam',
           orderCode: '#4523967',
           time: '02:00 pm',
         },
         {
-          name: 'Jain Imam',
+          name: 'Zain Imam',
           orderCode: '#4523982',
           time: '03:00 pm',
         },
         {
-          name: 'Jain Imam',
+          name: 'Zain Imam',
           orderCode: '#4523985',
           time: '06:00 pm',
         },
         {
-          name: 'Jain Imam',
+          name: 'Zain Imam',
           orderCode: '#4523987',
           time: 'Yesterday',
         },
         {
-          name: 'Jain Imam',
+          name: 'Zain Imam',
           orderCode: '#4523987',
           time: 'Yesterday',
         },
         {
-          name: 'Jain Imam',
+          name: 'Zain Imam',
           orderCode: '#4523987',
           time: '12/03/2020',
         },
         {
-          name: 'Jain Imam',
+          name: 'Zain Imam',
           orderCode: '#4523987',
           time: '10/03/2020',
         },

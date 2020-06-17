@@ -28,6 +28,11 @@ import PriceSelection from '../screen/priceSelection';
 import Messages from '../screen/messages';
 import ChatScreen from '../screen/chatScreen';
 import Payment from '../screen/payment';
+import Orders from '../screen/orders';
+import OrderDetails from '../screen/orderDetails';
+import ConfirmOrder from '../screen/confirmOrder';
+import FollowedSellers from '../screen/followedSellers';
+import Notifications from '../screen/notifications';
 
 import Header from '../components/header';
 
@@ -329,6 +334,36 @@ const AppStack = createStackNavigator(
         headerShown: false,
       },
     },
+    Orders: {
+      screen: Orders,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
+    OrderDetails: {
+      screen: OrderDetails,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
+    ConfirmOrder: {
+      screen: ConfirmOrder,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
+    FollowedSellers: {
+      screen: FollowedSellers,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
+    Notifications: {
+      screen: Notifications,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
     BottomTab: {
       screen: TabNavigator,
       navigationOptions: {
@@ -337,7 +372,7 @@ const AppStack = createStackNavigator(
     },
   },
   {
-    initialRouteName: 'Splash',
+    initialRouteName: 'Notifications',
     headerMode: 'none',
     mode: 'modal',
   },

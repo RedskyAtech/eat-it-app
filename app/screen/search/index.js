@@ -189,13 +189,6 @@ export default class search extends Component {
                 value={this.state.name}
               />
             </View>
-            {/* <TouchableOpacity>
-              <Image
-                resizeMode="contain"
-                source={require('../../assets/filter_yellow.png')}
-                style={icons}
-              />
-            </TouchableOpacity> */}
           </View>
           {this.state.dataExist ? (
             <View style={list_height}>
@@ -257,58 +250,9 @@ export default class search extends Component {
               color="#0000ff"
             />
           </View>
-          {/* <Accordion
-            style={accordian_style}
-            dataArray={this.state.dataArray}
-            animation={true}
-            expanded={true}
-            renderHeader={this._renderHeader}
-            renderContent={this._renderContent}
-          /> */}
         </View>
       </View>
     );
   }
 }
 
-// _renderHeader(item, expanded) {
-//   return (
-//     <View
-//       style={[
-//         styles.row,
-//         styles.between_spacing,
-//         styles.inner_container,
-//         styles.list_spacing,
-//       ]}>
-//       <Text style={expanded ? styles.colored_list_title : styles.list_title}>
-//         {' '}
-//         {item.title}
-//       </Text>
-//       {expanded ? (
-//         <Icon style={styles.down_icon} name="chevron-down" />
-//       ) : (
-//         <Icon style={styles.right_icon} name="chevron-right" />
-//       )}
-//     </View>
-//   );
-// }
-// _renderContent(item) {
-//   return (
-//     <>
-//       <View style={styles.horizontal_line} />
-//       {item.content.map(value => {
-//         return (
-//           <View
-//             style={[
-//               styles.row,
-//               styles.inner_container,
-//               styles.inner_list_spacing,
-//             ]}>
-//             <Text style={styles.inner_text}> {value.item}</Text>
-//           </View>
-//         );
-//       })}
-//       <View style={styles.horizontal_line} />
-//     </>
-//   );
-// }

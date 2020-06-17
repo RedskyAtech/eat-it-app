@@ -12,102 +12,39 @@ import Carousel, {Pagination} from 'react-native-snap-carousel';
 import {widthPercentageToDP as wp} from '../../utility/index';
 import * as colors from '../../constants/colors';
 import * as Service from '../../api/services';
+import ConfirmOrder from '../confirmOrder';
 
-export default class foodDetails extends Component {
+export default class orderDetails extends Component {
   constructor(props) {
     super(props);
     this.state = {
       foodId: '',
-      name: '',
-      address: '',
-      price: 0,
-      type: '',
-      cookingTime: '',
-      pickupTime: {
-        from: '',
-        to: '',
-      },
-      deliveryPrice: 0,
-      totalAmount: 0,
-      images: [],
+      name: 'Bolognese Baked Potato',
+      address: 'Amrit Sweets, Phase 5, Mohali',
+      price: 50,
+      orderId: '#4509673',
+      type: 'veg',
+      deliveryPrice: 10,
+      totalAmount: 60,
+      isDialogVisible: false,
+      images: [
+        {
+          image: require('../../assets/sweet.jpg'),
+        },
+        {
+          image: require('../../assets/burger.jpg'),
+        },
+        {
+          image: require('../../assets/food.jpg'),
+        },
+      ],
       isVisibleLoading: false,
     };
   }
-  componentDidMount = async () => {
-    let foodId;
-    if (this.props.navigation.state.params.foodId) {
-      foodId = this.props.navigation.state.params.foodId;
-    }
-    await this.setState({foodId: foodId});
-    await this.getFoodDetail();
-  };
-
-  getFoodDetail = async () => {
-    await this.setState({isVisibleLoading: true});
-    try {
-      let response = Service.getDataApi(`foods/${this.state.foodId}`, '');
-      response
-        .then(res => {
-          if (res.data) {
-            let deliveryPrice;
-            let price;
-            console.log('datata:', res.data);
-            if (
-              res.data.homeDeliveryPrice == '' ||
-              res.data.homeDeliveryPrice == undefined ||
-              res.data.homeDeliveryPrice == null ||
-              res.data.homeDeliveryPrice == 0
-            ) {
-              deliveryPrice = 0;
-            } else {
-              deliveryPrice = res.data.homeDeliveryPrice;
-            }
-            if (
-              res.data.price == '' ||
-              res.data.price == undefined ||
-              res.data.price == null ||
-              res.data.price == 0
-            ) {
-              price = 0;
-            } else {
-              price = res.data.price;
-            }
-            this.setState({
-              name: res.data.name,
-              address: res.data.address,
-              price: price,
-              type: res.data.type,
-              cookingTime: res.data.cookingTime,
-              pickupTime: {
-                from: res.data.pickupTime.from,
-                to: res.data.pickupTime.to,
-              },
-              deliveryPrice: deliveryPrice,
-              totalAmount: deliveryPrice + price,
-              images: res.data.images,
-            });
-
-            this.setState({isVisibleLoading: false});
-          } else {
-            this.setState({isVisibleLoading: false});
-            console.log('no data found:', res.error);
-            // alert(res.error);
-          }
-        })
-        .catch(error => {
-          this.setState({isVisibleLoading: false});
-          console.log('try-catch error:', error.error);
-          alert('Something went wrong');
-        });
-    } catch (err) {
-      this.setState({isVisibleLoading: false});
-      console.log('another problem:', err);
-      alert('Something went wrong');
-    }
-  };
+  componentDidMount = async () => {};
 
   onBack = async () => {
-    this.props.navigation.navigate('tab1');
+    this.props.navigation.navigate('Orders');
   };
   get pagination() {
     const {activeSlide} = this.state;
@@ -123,15 +60,14 @@ export default class foodDetails extends Component {
   }
   _renderItem = ({item, index}) => {
     return (
-      <Image
-        resizeMode="cover"
-        style={styles.images}
-        source={{uri: item.url}}
-      />
+      <Image resizeMode="cover" style={styles.images} source={item.image} />
     );
   };
-  onBuy = async () => {
-    this.props.navigation.navigate('Payment');
+  onConfirm = async () => {
+    await this.setState({isDialogVisible: true});
+  };
+  closeDialog = async () => {
+    await this.setState({isDialogVisible: false});
   };
   render() {
     const {
@@ -148,7 +84,6 @@ export default class foodDetails extends Component {
       price,
       address_style,
       bottom_spacing,
-      like_icon,
       product_name,
       detail_container,
       bottom_container,
@@ -161,6 +96,7 @@ export default class foodDetails extends Component {
       veg_icon,
       top_spacing,
       langar_icon,
+      id_heading,
     } = styles;
     return (
       <View>
@@ -172,7 +108,7 @@ export default class foodDetails extends Component {
               style={arrow}
             />
           </TouchableOpacity>
-          <Text style={heading_text}>Food detail</Text>
+          <Text style={heading_text}>Order detail</Text>
           <View>
             <Text> </Text>
           </View>
@@ -198,15 +134,14 @@ export default class foodDetails extends Component {
           <View
             style={
               this.state.images.length == 1
-                ? [row, between_spacing, bottom_spacing, top_spacing]
-                : [row, between_spacing, bottom_spacing]
+                ? [row, bottom_spacing, top_spacing]
+                : [row, bottom_spacing]
             }>
+            <Text style={id_heading}>Order id : </Text>
+            <Text style={[id_heading, colored_text]}>{this.state.orderId}</Text>
+          </View>
+          <View style={[row, between_spacing, bottom_spacing]}>
             <Text style={product_name}>{this.state.name}</Text>
-            <Image
-              resizeMode="cover"
-              style={like_icon}
-              source={require('../../assets/heart_fill.png')}
-            />
           </View>
 
           <Text style={[address_style, bottom_spacing]}>
@@ -230,17 +165,6 @@ export default class foodDetails extends Component {
               <Text style={type_text}>{this.state.type}</Text>
             </View>
           </View>
-
-          <View style={[row, bottom_spacing]}>
-            <Text style={timing_heading_style}>Cooking time : </Text>
-            <Text style={address_style}>{this.state.cookingTime}</Text>
-          </View>
-          <View style={[row, bottom_spacing]}>
-            <Text style={timing_heading_style}>Pickup time : </Text>
-            <Text style={address_style}>
-              {this.state.pickupTime.from + ' - ' + this.state.pickupTime.to}
-            </Text>
-          </View>
           <View style={[row, bottom_spacing]}>
             <Text style={timing_heading_style}>Delivery Charges : </Text>
             <Text style={address_style}>
@@ -260,17 +184,24 @@ export default class foodDetails extends Component {
 
           <View style={[bottom_container, bottom_spacing]}>
             <Text />
-            <TouchableOpacity activeOpacity={0.7} onPress={this.onBuy}>
+            <TouchableOpacity activeOpacity={0.7} onPress={this.onConfirm}>
               <LinearGradient
                 start={{x: 0, y: 0}}
                 end={{x: 1, y: 0}}
                 colors={[colors.gradientFirstColor, colors.gradientSecondColor]}
                 style={[button_container, centered_text]}>
-                <Text style={button_text}>Buy food</Text>
+                <Text style={button_text}>Confirm</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>
-
+          {this.state.isDialogVisible ? (
+            <ConfirmOrder
+              visible={this.state.isDialogVisible}
+              closeDialog={this.closeDialog}
+            />
+          ) : (
+            <View />
+          )}
           <View style={{position: 'absolute', top: '50%', right: 0, left: 0}}>
             <ActivityIndicator
               animating={this.state.isVisibleLoading}
