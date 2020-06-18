@@ -99,7 +99,7 @@ export default class orders extends Component {
     await this.props.navigation.navigate('tab5');
   };
   onOrder = async () => {
-    await this.props.navigation.navigate('OrderDetails');
+    await this.props.navigation.navigate('OrderDetails',{from:'orders'});
   };
   render() {
     const {

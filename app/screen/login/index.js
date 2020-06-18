@@ -24,6 +24,7 @@ export default class login extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      // isSkipped: false,
       isVisibleLoading: false,
       isLogin: true,
       checked: false,
@@ -49,6 +50,7 @@ export default class login extends Component {
       },
     };
   }
+  componentDidMount = async () => {};
   onChecked = async () => {
     if (this.state.checked) {
       await this.setState({checked: false});
@@ -169,7 +171,7 @@ export default class login extends Component {
       alert('Something went wrong');
     }
   };
-  onUploadImage = async (file) => {
+  onUploadImage = async file => {
     console.log('fileeeeeeeeeee:', file);
     await this.setState({isVisibleLoading: true});
 
@@ -257,17 +259,33 @@ export default class login extends Component {
   onRegisteration = async () => {
     if (
       utility.isFieldEmpty(
+        this.state.firstName ||
+          this.state.lastName ||
+          this.state.email ||
+          this.state.phone ||
+          this.state.password ||
+          this.state.confirmPassword,
+      ) &&
+      utility.isBooleanValid(this.state.regChecked || this.state.isImagePicked)
+    ) {
+      await utility.setItem('isSkipped', true);
+      this.props.navigation.navigate('tab1');
+    } else if (
+      utility.isFieldEmpty(
         this.state.firstName &&
           this.state.lastName &&
           this.state.email &&
           this.state.phone &&
           this.state.password &&
           this.state.confirmPassword,
-      )
+      ) &&
+      utility.isBooleanValid(this.state.regChecked && this.state.isImagePicked)
     ) {
+      await utility.setItem('isSkipped', false);
       alert('All fields are required');
       return;
     } else if (utility.isValidEmail(this.state.email)) {
+      await utility.setItem('isSkipped', false);
       alert('Please enter valid email address');
       return;
     } else if (
@@ -276,27 +294,36 @@ export default class login extends Component {
         this.state.confirmPassword,
       )
     ) {
+      await utility.setItem('isSkipped', false);
       alert('Password and confirm password should be same');
       return;
     } else if (!this.state.regChecked) {
+      await utility.setItem('isSkipped', false);
       alert('Please agree with terms and conditions');
       return;
     } else if (!this.state.isImagePicked) {
+      await utility.setItem('isSkipped', false);
       alert('Profile picture is required');
       return;
     } else {
+      await utility.setItem('isSkipped', false);
       await this.onUploadImage(this.state.file);
     }
-    
   };
   onLoginSubmit = async () => {
-    if (utility.isFieldEmpty(this.state.email && this.state.password)) {
+    if (utility.isFieldEmpty(this.state.email || this.state.password)) {
+      await utility.setItem('isSkipped', true);
+      this.props.navigation.navigate('tab1');
+    } else if (utility.isFieldEmpty(this.state.email && this.state.password)) {
+      await utility.setItem('isSkipped', false);
       alert('All fields are required');
       return;
     } else if (utility.isValidEmail(this.state.email)) {
+      await utility.setItem('isSkipped', false);
       alert('Please enter valid email address');
       return;
     } else {
+      await utility.setItem('isSkipped', false);
       this.setState({isVisibleLoading: true});
 
       let body = {
@@ -698,61 +725,61 @@ export default class login extends Component {
 //   alert('Something went wrong');
 // }
 // else {
-    //   await this.setState({isVisibleLoading: true});
-    //   // await this.onUploadImage(this.state.file);
+//   await this.setState({isVisibleLoading: true});
+//   // await this.onUploadImage(this.state.file);
 
-    //   let body = {
-    //     loginType: 'app',
-    //     firstName: this.state.firstName,
-    //     lastName: this.state.lastName,
-    //     email: this.state.email,
-    //     phone: this.state.phone,
-    //     password: this.state.password,
-    //     image: this.state.image,
-    //   };
-    //   try {
-    //     let response = Service.postDataApi(Url.REGISTRATION_URL, body, '');
-    //     response
-    //       .then(res => {
-    //         if (res.data) {
-    //           alert('Registered successfully');
-    //           this.setState({
-    //             isVisibleLoading: false,
-    //             isLogin: true,
-    //             regChecked: false,
-    //             firstName: '',
-    //             lastName: '',
-    //             email: '',
-    //             phone: '',
-    //             password: '',
-    //             confirmPassword: '',
-    //             isImagePicked: false,
-    //             fileUri: '',
-    //             image: {
-    //               url: '',
-    //               thumbnail: '',
-    //               resize_url: '',
-    //               resize_thumbnail: '',
-    //             },
-    //           });
-    //         } else {
-    //           this.setState({isVisibleLoading: false});
-    //           console.log('no data found:', res.error);
-    //           // alert(res.error);
-    //         }
-    //       })
-    //       .catch(error => {
-    //         this.setState({isVisibleLoading: false});
-    //         console.log('try-catch error:', error.error);
-    //         if (error.error == 'Error: USER_ALREADY_EXISTS') {
-    //           alert('User already exists');
-    //         } else {
-    //           alert('Something went wrong');
-    //         }
-    //       });
-    //   } catch (err) {
-    //     this.setState({isVisibleLoading: false});
-    //     console.log('another problem:', err);
-    //     alert('Something went wrong');
-    //   }
-    // }
+//   let body = {
+//     loginType: 'app',
+//     firstName: this.state.firstName,
+//     lastName: this.state.lastName,
+//     email: this.state.email,
+//     phone: this.state.phone,
+//     password: this.state.password,
+//     image: this.state.image,
+//   };
+//   try {
+//     let response = Service.postDataApi(Url.REGISTRATION_URL, body, '');
+//     response
+//       .then(res => {
+//         if (res.data) {
+//           alert('Registered successfully');
+//           this.setState({
+//             isVisibleLoading: false,
+//             isLogin: true,
+//             regChecked: false,
+//             firstName: '',
+//             lastName: '',
+//             email: '',
+//             phone: '',
+//             password: '',
+//             confirmPassword: '',
+//             isImagePicked: false,
+//             fileUri: '',
+//             image: {
+//               url: '',
+//               thumbnail: '',
+//               resize_url: '',
+//               resize_thumbnail: '',
+//             },
+//           });
+//         } else {
+//           this.setState({isVisibleLoading: false});
+//           console.log('no data found:', res.error);
+//           // alert(res.error);
+//         }
+//       })
+//       .catch(error => {
+//         this.setState({isVisibleLoading: false});
+//         console.log('try-catch error:', error.error);
+//         if (error.error == 'Error: USER_ALREADY_EXISTS') {
+//           alert('User already exists');
+//         } else {
+//           alert('Something went wrong');
+//         }
+//       });
+//   } catch (err) {
+//     this.setState({isVisibleLoading: false});
+//     console.log('another problem:', err);
+//     alert('Something went wrong');
+//   }
+// }

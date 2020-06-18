@@ -19,17 +19,28 @@ export default class attatchFoodPhotos extends Component {
     super(props);
     this.state = {
       photos: [],
-      isDialogVisible: true,
+      isDialogVisible: false,
       files: [],
       isVisibleLoading: false,
       images: [],
     };
   }
   componentDidMount = async () => {
-    this.showDialog();
+    let isSkipped = await utility.getItem('isSkipped');
+    console.log('skipped', isSkipped);
+
+    if (isSkipped == true) {
+      await this.setState({isDialogVisible: false});
+      alert('Please login or register first.');
+      await this.props.navigation.navigate('Login');
+      return;
+    } else {
+      await this.setState({isDialogVisible: true});
+      await this.showDialog();
+    }
   };
   showDialog = async () => {
-    await this.setState({isDialogVisible: !this.state.isDialogVisible});
+    await this.setState({isDialogVisible: true});
   };
   closeDialog = async () => {
     await this.setState({isDialogVisible: false});
@@ -81,12 +92,9 @@ export default class attatchFoodPhotos extends Component {
   };
   onNext = async () => {
     if (this.state.photos && this.state.photos != 0) {
-      await this.props.navigation.navigate('AddFood', {photos: this.state.photos});
-      // for (let file of this.state.photos) {
-      //   if (file) {
-      //     await this.onUploadImage(file);
-      //   }
-      // }
+      await this.props.navigation.navigate('AddFood', {
+        photos: this.state.photos,
+      });
     } else {
       alert('Select images first');
     }
@@ -172,12 +180,15 @@ export default class attatchFoodPhotos extends Component {
     return (
       <View style={[container, column, between_spacing]}>
         <View>
-          <ShareFood
-            visible={this.state.isDialogVisible}
-            closeDialog={this.closeDialog}
-            navigation={this.props.navigation}
-          />
-
+          {this.state.isDialogVisible ? (
+            <ShareFood
+              visible={this.state.isDialogVisible}
+              closeDialog={this.closeDialog}
+              navigation={this.props.navigation}
+            />
+          ) : (
+            <View />
+          )}
           <View style={[inner_container, row, between_spacing, spacing]}>
             <TouchableOpacity onPress={this.onBack}>
               <Image

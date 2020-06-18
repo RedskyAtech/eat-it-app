@@ -18,6 +18,7 @@ export default class orderDetails extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      from: '',
       foodId: '',
       name: 'Bolognese Baked Potato',
       address: 'Amrit Sweets, Phase 5, Mohali',
@@ -41,10 +42,20 @@ export default class orderDetails extends Component {
       isVisibleLoading: false,
     };
   }
-  componentDidMount = async () => {};
+  componentDidMount = async () => {
+    if (this.props.navigation.state.params) {
+      if (this.props.navigation.state.params.from) {
+        await this.setState({from: this.props.navigation.state.params.from});
+      }
+    }
+  };
 
   onBack = async () => {
-    this.props.navigation.navigate('Orders');
+    if (this.state.from == 'orders') {
+      this.props.navigation.navigate('Orders');
+    } else {
+      this.props.navigation.navigate('Notifications');
+    }
   };
   get pagination() {
     const {activeSlide} = this.state;
@@ -184,15 +195,22 @@ export default class orderDetails extends Component {
 
           <View style={[bottom_container, bottom_spacing]}>
             <Text />
-            <TouchableOpacity activeOpacity={0.7} onPress={this.onConfirm}>
-              <LinearGradient
-                start={{x: 0, y: 0}}
-                end={{x: 1, y: 0}}
-                colors={[colors.gradientFirstColor, colors.gradientSecondColor]}
-                style={[button_container, centered_text]}>
-                <Text style={button_text}>Confirm</Text>
-              </LinearGradient>
-            </TouchableOpacity>
+            {this.state.from == 'confirmedNotification' ? (
+              <View />
+            ) : (
+              <TouchableOpacity activeOpacity={0.7} onPress={this.onConfirm}>
+                <LinearGradient
+                  start={{x: 0, y: 0}}
+                  end={{x: 1, y: 0}}
+                  colors={[
+                    colors.gradientFirstColor,
+                    colors.gradientSecondColor,
+                  ]}
+                  style={[button_container, centered_text]}>
+                  <Text style={button_text}>Confirm</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            )}
           </View>
           {this.state.isDialogVisible ? (
             <ConfirmOrder

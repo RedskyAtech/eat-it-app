@@ -12,12 +12,12 @@ export default class ChatScreen extends Component {
       messages: [
         {
           from: 'other',
-          message: 'Hii Neil',
+          message: 'Hii sir',
           time: '02:30 pm',
         },
         {
           from: 'me',
-          message: 'Hii Jaidh',
+          message: 'Hii',
           time: '02:32 pm',
         },
         {
@@ -27,12 +27,12 @@ export default class ChatScreen extends Component {
         },
         {
           from: 'me',
-          message: 'I am fine',
+          message: 'Fine........................... What about you?',
           time: '02:37 pm',
         },
         {
           from: 'other',
-          message: 'shooping',
+          message: 'Shooping',
           time: '02:45 pm',
         },
       ],
@@ -85,7 +85,7 @@ export default class ChatScreen extends Component {
       next_arrow_container,
       icons,
       list_height,
-      triangle
+      triangle,
     } = styles;
     return (
       <View style={[container, column, between_spacing]}>

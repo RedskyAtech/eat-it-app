@@ -14,6 +14,12 @@ export const isFieldEmpty = text => {
   }
   return false;
 };
+export const isBooleanValid = text => {
+  if (text == false) {
+    return true;
+  }
+  return false;
+};
 export const isObjectEmpty = object => {
   var hasOwnProperty = Object.prototype.hasOwnProperty;
 

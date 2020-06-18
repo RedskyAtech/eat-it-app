@@ -99,7 +99,7 @@ export default class messages extends Component {
                     </Text>
                   </View>
                   <View style={[row, between_spacing]}>
-                    <Text style={message_style}>Hii jain</Text>
+                    <Text style={message_style}>Hii sir</Text>
                     <Text style={time_style}>{message.time}</Text>
                   </View>
                 </View>

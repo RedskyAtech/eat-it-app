@@ -29,7 +29,10 @@ class CellContainer extends React.Component {
     this.state = {};
   }
   showDetail = async () => {
-    this.props.navigation.navigate('FoodDetails', {foodId: this.props.data.id});
+    this.props.navigation.navigate('FoodDetails', {
+      foodId: this.props.data.id,
+      from: 'home',
+    });
   };
   render() {
     const {

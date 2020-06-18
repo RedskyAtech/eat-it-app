@@ -14,11 +14,13 @@ import LikeDislikeFood from '../likeDislikeFood';
 import * as Service from '../../api/services';
 import * as utility from '../../utility/index';
 import {widthPercentageToDP} from 'react-native-responsive-screen';
+import {isNullishCoalesce} from 'typescript';
 
 export default class myFood extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      from: '',
       visible: false,
       isDialogVisible: false,
       userId: '',
@@ -36,11 +38,120 @@ export default class myFood extends Component {
     };
   }
   componentDidMount = async () => {
-    const userId = await utility.getItem('userId');
-    const userToken = await utility.getToken('token');
-    this.setState({userId: userId, userToken: userToken});
-    await this.getPurchasedFood();
-    await this.getSharedFood();
+    if (this.props.navigation.state.params) {
+      let from;
+      if (
+        this.props.navigation.state.params.from != '' ||
+        this.props.navigation.state.params.from != undefined ||
+        this.props.navigation.state.params.from != null
+      ) {
+        from = this.props.navigation.state.params.from;
+        let array = [
+          {
+            content: [
+              {
+                id: '1',
+                foodId: '2',
+                name: 'Pasta',
+                price: '10',
+                time: '02:30 pm',
+                address: 'Mohali, Chandigarh',
+                image: require('../../assets/sweet.jpg'),
+                isLiked: 'none',
+                type: 'veg',
+                isVeg: true,
+              },
+              {
+                id: '1',
+                foodId: '2',
+                name: 'Burger',
+                price: '10',
+                time: '02:30 pm',
+                address: 'Mohali, Chandigarh',
+                image: require('../../assets/sweet.jpg'),
+                isLiked: 'none',
+                type: 'veg',
+                isVeg: true,
+              },
+              {
+                id: '1',
+                foodId: '2',
+                name: 'Piza',
+                price: '10',
+                time: '02:30 pm',
+                address: 'Mohali, Chandigarh',
+                image: require('../../assets/sweet.jpg'),
+                isLiked: 'none',
+                type: 'veg',
+                isVeg: true,
+              },
+              {
+                id: '1',
+                foodId: '2',
+                name: 'Poha',
+                price: '10',
+                time: '02:30 pm',
+                address: 'Mohali, Chandigarh',
+                image: require('../../assets/sweet.jpg'),
+                isLiked: 'none',
+                type: 'veg',
+                isVeg: true,
+              },
+              {
+                id: '1',
+                foodId: '2',
+                name: 'Pasta',
+                price: '10',
+                time: '02:30 pm',
+                address: 'Mohali, Chandigarh',
+                image: require('../../assets/sweet.jpg'),
+                isLiked: 'none',
+                type: 'veg',
+                isVeg: true,
+              },
+            ],
+          },
+          {
+            content: [
+              {
+                id: '1',
+                foodId: '2',
+                name: 'Pasta',
+                price: '10',
+                time: '02:30 pm',
+                address: 'Mohali, Chandigarh',
+                image: require('../../assets/sweet.jpg'),
+                isLiked: 'none',
+                type: 'veg',
+                isVeg: true,
+              },
+              {
+                id: '1',
+                foodId: '2',
+                name: 'Pasta',
+                price: '10',
+                time: '02:30 pm',
+                address: 'Mohali, Chandigarh',
+                image: require('../../assets/sweet.jpg'),
+                isLiked: 'none',
+                type: 'veg',
+                isVeg: true,
+              },
+            ],
+          },
+        ];
+        await this.setState({
+          from: from,
+          dataArray: array,
+        });
+      } else {
+        const userId = await utility.getItem('userId');
+        const userToken = await utility.getToken('token');
+        this.setState({userId: userId, userToken: userToken, from: ''});
+        await this.getPurchasedFood();
+        await this.getSharedFood();
+      }
+    }
   };
   getPurchasedFood = async () => {
     try {
@@ -228,7 +339,11 @@ export default class myFood extends Component {
                       <View style={styles.list_image_continer}>
                         <Image
                           resizeMode="cover"
-                          source={{uri: value.image}}
+                          source={
+                            this.state.from == ''
+                              ? {uri: value.image}
+                              : value.image
+                          }
                           style={styles.list_image}
                         />
                       </View>
@@ -299,7 +414,14 @@ export default class myFood extends Component {
     );
   };
   onBack = async () => {
-    this.props.navigation.navigate('tab1');
+    if (this.state.from == 'notification') {
+      this.props.navigation.navigate('Notifications');
+    } else if (this.state.from == 'profile') {
+      this.props.navigation.navigate('tab5');
+    } else {
+      this.props.navigation.navigate('tab1');
+    }
+    await this.setState({from: ''});
   };
   render() {
     const {

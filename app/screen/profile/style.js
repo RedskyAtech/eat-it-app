@@ -213,7 +213,7 @@ const styles = {
     justifyContent:'center',
   },
   top_spacing:{
-    marginTop:hp(5)
+    marginTop:hp(4.6)
   },
   update_text_style: {
     color: colors.primaryColor,

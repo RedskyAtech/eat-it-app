@@ -33,6 +33,9 @@ import OrderDetails from '../screen/orderDetails';
 import ConfirmOrder from '../screen/confirmOrder';
 import FollowedSellers from '../screen/followedSellers';
 import Notifications from '../screen/notifications';
+import Communication from '../screen/communication';
+import About from '../screen/about';
+import CustomerCare from '../screen/customerCare';
 
 import Header from '../components/header';
 
@@ -364,6 +367,24 @@ const AppStack = createStackNavigator(
         headerShown: false,
       },
     },
+    Communication: {
+      screen: Communication,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
+    About: {
+      screen: About,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
+    CustomerCare: {
+      screen: CustomerCare,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
     BottomTab: {
       screen: TabNavigator,
       navigationOptions: {
@@ -372,7 +393,7 @@ const AppStack = createStackNavigator(
     },
   },
   {
-    initialRouteName: 'Notifications',
+    initialRouteName: 'Splash',
     headerMode: 'none',
     mode: 'modal',
   },

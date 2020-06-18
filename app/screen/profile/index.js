@@ -16,6 +16,7 @@ import {heightPercentageToDP as hp} from '../../utility/index';
 import * as Service from '../../api/services';
 import * as utility from '../../utility/index';
 import * as Url from '../../constants/urls';
+import Communication from '../communication';
 
 export default class profile extends Component {
   constructor(props) {
@@ -38,17 +39,25 @@ export default class profile extends Component {
       profileImage: '',
       isProfile: false,
       isImagePicked: false,
+      isDialogVisible: false,
     };
   }
   componentDidMount = async () => {
-    const token = await utility.getToken('token');
-    const userId = await utility.getItem('userId');
-    await this.setState({userToken: token, userId: userId});
-    await this.getUser();
-    console.log('token', token);
-    console.log('id', userId);
+    let isSkipped = await utility.getItem('isSkipped');
+    console.log('issss:', isSkipped);
+    if (!isSkipped) {
+      const token = await utility.getToken('token');
+      const userId = await utility.getItem('userId');
+      await this.setState({userToken: token, userId: userId});
+      await this.getUser();
+    }
   };
-
+  onOpenDialog = async () => {
+    await this.setState({isDialogVisible: true});
+  };
+  closeDialog = async () => {
+    await this.setState({isDialogVisible: false});
+  };
   getUser = async () => {
     await this.setState({isVisibleLoading: true});
 
@@ -207,9 +216,18 @@ export default class profile extends Component {
     await this.props.navigation.navigate('FollowedSellers');
   };
   onMyFood = async () => {
-    // await this.props.navigation.navigate('MyFood');
+    await this.props.navigation.navigate('MyFood', {from: 'profile'});
   };
-
+  onNotification = async () => {
+    await this.props.navigation.navigate('Notifications');
+    await this.closeMenu();
+  };
+  onAbout = async () => {
+    await this.props.navigation.navigate('About');
+  };
+  onCustomerCare = async () => {
+    await this.props.navigation.navigate('CustomerCare');
+  };
   render() {
     const {
       container,
@@ -301,7 +319,7 @@ export default class profile extends Component {
                       <Menu.Item
                         titleStyle={[menu_list_title, heading_color]}
                         style={list_item_height}
-                        onPress={() => {}}
+                        onPress={this.onNotification}
                         title="Notifications"
                       />
                     </View>
@@ -385,22 +403,23 @@ export default class profile extends Component {
                 </View>
               </TouchableOpacity>
 
-              <View style={[row, between_spacing, rows_spacing]}>
-                <View style={[row, row_centered_text]}>
+              <TouchableOpacity activeOpacity={0.7} onPress={this.onOpenDialog}>
+                <View style={[row, between_spacing, rows_spacing]}>
+                  <View style={[row, row_centered_text]}>
+                    <Image
+                      source={require('../../assets/communication.png')}
+                      style={field_icons}
+                    />
+                    <Text style={[list_title, colored_text]}>
+                      Mode of communication
+                    </Text>
+                  </View>
                   <Image
-                    source={require('../../assets/communication.png')}
+                    source={require('../../assets/next_arrow.png')}
                     style={field_icons}
                   />
-                  <Text style={[list_title, colored_text]}>
-                    Mode of communication
-                  </Text>
                 </View>
-                <Image
-                  source={require('../../assets/next_arrow.png')}
-                  style={field_icons}
-                />
-              </View>
-
+              </TouchableOpacity>
               <TouchableOpacity activeOpacity={0.7} onPress={this.onSellers}>
                 <View style={[row, between_spacing, rows_spacing]}>
                   <View style={[row, row_centered_text]}>
@@ -441,33 +460,41 @@ export default class profile extends Component {
             <View style={horizontal_line} />
 
             <View style={list_width}>
-              <View style={[row, between_spacing, rows_spacing]}>
-                <View style={[row, row_centered_text]}>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={this.onCustomerCare}>
+                <View style={[row, between_spacing, rows_spacing]}>
+                  <View style={[row, row_centered_text]}>
+                    <Image
+                      source={require('../../assets/customer_care_gray.png')}
+                      style={field_icons}
+                    />
+                    <Text style={[list_title, heading_color]}>
+                      Customer care
+                    </Text>
+                  </View>
                   <Image
-                    source={require('../../assets/customer_care_gray.png')}
+                    source={require('../../assets/next_arrow_grey.png')}
                     style={field_icons}
                   />
-                  <Text style={[list_title, heading_color]}>Customer care</Text>
                 </View>
-                <Image
-                  source={require('../../assets/next_arrow_grey.png')}
-                  style={field_icons}
-                />
-              </View>
+              </TouchableOpacity>
 
-              <View style={[row, between_spacing, rows_spacing]}>
-                <View style={[row, row_centered_text]}>
+              <TouchableOpacity activeOpacity={0.7} onPress={this.onAbout}>
+                <View style={[row, between_spacing, rows_spacing]}>
+                  <View style={[row, row_centered_text]}>
+                    <Image
+                      source={require('../../assets/about-eat_it_orange.png')}
+                      style={field_icons}
+                    />
+                    <Text style={[list_title, colored_text]}>About Eat it</Text>
+                  </View>
                   <Image
-                    source={require('../../assets/about-eat_it_orange.png')}
+                    source={require('../../assets/next_arrow.png')}
                     style={field_icons}
                   />
-                  <Text style={[list_title, colored_text]}>About Eat it</Text>
                 </View>
-                <Image
-                  source={require('../../assets/next_arrow.png')}
-                  style={field_icons}
-                />
-              </View>
+              </TouchableOpacity>
             </View>
 
             {/* change  password card */}
@@ -557,7 +584,7 @@ export default class profile extends Component {
                                 resizeMode="stretch"
                                 source={
                                   this.state.profileImage == ''
-                                    ? ''
+                                    ? require('../../assets/profile_white.png')
                                     : {uri: this.state.profileImage}
                                 }
                                 style={profile_images}
@@ -642,6 +669,14 @@ export default class profile extends Component {
               </LinearGradient>
             </Animated.View>
 
+            {this.state.isDialogVisible ? (
+              <Communication
+                visible={this.state.isDialogVisible}
+                closeDialog={this.closeDialog}
+              />
+            ) : (
+              <View />
+            )}
             <View style={{position: 'absolute', top: '50%', right: 0, left: 0}}>
               <ActivityIndicator
                 animating={this.state.isVisibleLoading}

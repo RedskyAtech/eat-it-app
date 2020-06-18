@@ -17,6 +17,7 @@ export default class foodDetails extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      from: '',
       foodId: '',
       name: '',
       address: '',
@@ -35,11 +36,35 @@ export default class foodDetails extends Component {
   }
   componentDidMount = async () => {
     let foodId;
-    if (this.props.navigation.state.params.foodId) {
-      foodId = this.props.navigation.state.params.foodId;
+    if (this.props.navigation.state.params) {
+      if (this.props.navigation.state.params.from == 'home') {
+        if (this.props.navigation.state.params.foodId) {
+          foodId = this.props.navigation.state.params.foodId;
+        }
+        await this.setState({foodId: foodId, from: 'home'});
+        await this.getFoodDetail();
+      } else {
+        await this.setState({
+          from: 'notification',
+          name: 'Pasta',
+          address: 'Mohali, Chandigarh',
+          price: 100,
+          type: 'veg',
+          cookingTime: '02:30 pm',
+          pickupTime: {
+            from: '03:30 pm',
+            to: '07:30 pm',
+          },
+          deliveryPrice: 10,
+          totalAmount: 110,
+          images: [
+            {
+              url: require('../../assets/burger.jpg'),
+            },
+          ],
+        });
+      }
     }
-    await this.setState({foodId: foodId});
-    await this.getFoodDetail();
   };
 
   getFoodDetail = async () => {
@@ -107,7 +132,11 @@ export default class foodDetails extends Component {
   };
 
   onBack = async () => {
-    this.props.navigation.navigate('tab1');
+    if (this.state.from == 'home') {
+      this.props.navigation.navigate('tab1');
+    } else {
+      this.props.navigation.navigate('Notifications');
+    }
   };
   get pagination() {
     const {activeSlide} = this.state;
@@ -126,7 +155,7 @@ export default class foodDetails extends Component {
       <Image
         resizeMode="cover"
         style={styles.images}
-        source={{uri: item.url}}
+        source={this.state.from == 'home' ? {uri: item.url} : item.url}
       />
     );
   };
