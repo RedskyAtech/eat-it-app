@@ -59,6 +59,20 @@ const styles = {
     elevation: 4,
     backgroundColor: '#EDEDED',
   },
+  profile_style: {},
+  profile_temp: {
+    height: '100%',
+    width: '100%',
+    borderRadius: 90 / 2,
+  },
+  badge_style: {
+    borderWidth: 0,
+    backgroundColor: colors.primaryColor,
+    marginRight:wp(3)
+  },
+  badge_text_style: {
+    fontSize: fonts.FONT_NORMAL,
+  },
   user_details: {
     marginTop: hp(6.4),
     marginBottom: hp(2),
@@ -166,7 +180,7 @@ const styles = {
     width: wp(86),
     alignSelf: 'center',
   },
-  animation_style:{
+  animation_style: {
     position: 'absolute',
     elevation: 10,
   },
@@ -209,11 +223,11 @@ const styles = {
     borderRadius: 20,
     elevation: 4,
     backgroundColor: 'white',
-    alignItems:'center',
-    justifyContent:'center',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  top_spacing:{
-    marginTop:hp(4.6)
+  top_spacing: {
+    marginTop: hp(4.6),
   },
   update_text_style: {
     color: colors.primaryColor,

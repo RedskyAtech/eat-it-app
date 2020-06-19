@@ -17,6 +17,8 @@ import * as Service from '../../api/services';
 import * as utility from '../../utility/index';
 import * as Url from '../../constants/urls';
 import Communication from '../communication';
+import {NavigationActions, StackActions} from 'react-navigation';
+import {Badge} from 'react-native-elements';
 
 export default class profile extends Component {
   constructor(props) {
@@ -40,12 +42,14 @@ export default class profile extends Component {
       isProfile: false,
       isImagePicked: false,
       isDialogVisible: false,
+      isSkipped: false,
     };
   }
   componentDidMount = async () => {
     let isSkipped = await utility.getItem('isSkipped');
-    console.log('issss:', isSkipped);
-    if (!isSkipped) {
+    await this.setState({isSkipped: isSkipped});
+
+    if (this.state.isSkipped == false) {
       const token = await utility.getToken('token');
       const userId = await utility.getItem('userId');
       await this.setState({userToken: token, userId: userId});
@@ -216,7 +220,14 @@ export default class profile extends Component {
     await this.props.navigation.navigate('FollowedSellers');
   };
   onMyFood = async () => {
-    await this.props.navigation.navigate('MyFood', {from: 'profile'});
+    this.props.navigation.dispatch(
+      StackActions.reset({
+        index: 0,
+        actions: [NavigationActions.navigate({routeName: 'BottomTab'})],
+      }),
+    );
+    // this.props.navigation.navigate('tab1');
+    await this.props.navigation.navigate('tab4', {from: 'profile'});
   };
   onNotification = async () => {
     await this.props.navigation.navigate('Notifications');
@@ -273,6 +284,10 @@ export default class profile extends Component {
       update_text_style,
       top_spacing,
       animation_style,
+      profile_temp,
+      profile_style,
+      badge_style,
+      badge_text_style,
     } = styles;
     return (
       <Provider>
@@ -291,7 +306,11 @@ export default class profile extends Component {
                     visible={this.state.visible}
                     onDismiss={this.closeMenu}
                     anchor={
-                      <TouchableOpacity onPress={this.openMenu}>
+                      <TouchableOpacity
+                        activeOpacity={0.7}
+                        onPress={
+                          !this.state.isSkipped ? this.openMenu : () => {}
+                        }>
                         <Image
                           resizeMode="stretch"
                           source={require('../../assets/settings.png')}
@@ -322,6 +341,12 @@ export default class profile extends Component {
                         onPress={this.onNotification}
                         title="Notifications"
                       />
+                      <Badge
+                        value="5"
+                        status="success"
+                        badgeStyle={badge_style}
+                        textStyle={badge_text_style}
+                      />
                     </View>
                     <View style={[row, {alignItems: 'center'}]}>
                       <Image
@@ -349,15 +374,22 @@ export default class profile extends Component {
                     </View>
                   </Menu>
                 </View>
-                <Image
-                  resizeMode="cover"
-                  source={
+                <View
+                  style={
                     this.state.profileImage == ''
-                      ? ''
-                      : {uri: this.state.profileImage}
-                  }
-                  style={profile_image}
-                />
+                      ? [profile_image, {padding: 3}]
+                      : profile_image
+                  }>
+                  <Image
+                    resizeMode="cover"
+                    source={
+                      this.state.profileImage == ''
+                        ? require('../../assets/profile.png')
+                        : {uri: this.state.profileImage}
+                    }
+                    style={profile_temp}
+                  />
+                </View>
               </LinearGradient>
 
               <View style={user_details}>
@@ -372,7 +404,9 @@ export default class profile extends Component {
             <View style={horizontal_line} />
 
             <View style={list_width}>
-              <TouchableOpacity activeOpacity={0.7} onPress={this.onMessages}>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={!this.state.isSkipped ? this.onMessages : () => {}}>
                 <View style={[row, between_spacing, rows_spacing]}>
                   <View style={[row, row_centered_text]}>
                     <Image
@@ -387,7 +421,9 @@ export default class profile extends Component {
                   />
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity activeOpacity={0.7} onPress={this.onMyFood}>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={!this.state.isSkipped ? this.onMyFood : () => {}}>
                 <View style={[row, between_spacing, rows_spacing]}>
                   <View style={[row, row_centered_text]}>
                     <Image
@@ -403,7 +439,9 @@ export default class profile extends Component {
                 </View>
               </TouchableOpacity>
 
-              <TouchableOpacity activeOpacity={0.7} onPress={this.onOpenDialog}>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={!this.state.isSkipped ? this.onOpenDialog : () => {}}>
                 <View style={[row, between_spacing, rows_spacing]}>
                   <View style={[row, row_centered_text]}>
                     <Image
@@ -420,7 +458,9 @@ export default class profile extends Component {
                   />
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity activeOpacity={0.7} onPress={this.onSellers}>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={!this.state.isSkipped ? this.onSellers : () => {}}>
                 <View style={[row, between_spacing, rows_spacing]}>
                   <View style={[row, row_centered_text]}>
                     <Image
@@ -438,7 +478,9 @@ export default class profile extends Component {
                 </View>
               </TouchableOpacity>
 
-              <TouchableOpacity activeOpacity={0.7} onPress={this.onOrders}>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={!this.state.isSkipped ? this.onOrders : () => {}}>
                 <View style={[row, between_spacing, rows_spacing]}>
                   <View style={[row, row_centered_text]}>
                     <Image

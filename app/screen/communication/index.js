@@ -126,7 +126,7 @@ export default class confirmOrder extends Component {
                     colors.gradientSecondColor,
                   ]}
                   style={[button, centered_text]}>
-                  <Text style={button_text}>Confirm</Text>
+                  <Text style={button_text}>Done</Text>
                 </LinearGradient>
               </TouchableOpacity>
             </View>

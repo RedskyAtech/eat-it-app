@@ -65,7 +65,7 @@ export default class followedSellers extends Component {
                       <View style={[row, horizontally_centered]}>
                         <Image
                           resizeMode="cover"
-                          source={require('../../assets/picture.jpg')}
+                          source={require('../../assets/pic.jpg')}
                           style={profile_image}
                         />
                         <Text style={name_heading}>Zain Imam</Text>

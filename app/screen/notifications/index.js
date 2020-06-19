@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import styles from './style';
+import {NavigationActions, StackActions} from 'react-navigation';
 
 export default class notifications extends Component {
   constructor(props) {
@@ -75,6 +76,13 @@ export default class notifications extends Component {
         from: 'notification',
       });
     } else if (from == 'delivered') {
+      this.props.navigation.dispatch(
+        StackActions.reset({
+          index: 0,
+          actions: [NavigationActions.navigate({routeName: 'BottomTab'})],
+        }),
+      );
+      // this.props.navigation.navigate('tab1');
       await this.props.navigation.navigate('tab4', {from: 'notification'});
     } else if (from == 'received') {
       await this.props.navigation.navigate('OrderDetails', {

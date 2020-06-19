@@ -49,6 +49,9 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
   },
+  skipped_content: {
+    height: hp(80),
+  },
   row_center_align: {
     alignItems: 'center',
   },
@@ -101,7 +104,7 @@ const styles = {
   product_heading: {
     fontSize: fonts.FONT_TEXT,
     fontWeight: fonts.FONT_BOLD,
-    textTransform: 'capitalize'
+    textTransform: 'capitalize',
   },
   like_dislike_icon: {
     height: hp(3),

@@ -145,7 +145,7 @@ export default class home extends Component {
               for (let i = 0; i < res.data.length; i++) {
                 let image;
                 if (res.data[i].images) {
-                  image = res.data[i].images[0].url;
+                  image = res.data[i].images[0].resize_url;
                 }
                 this.products.push({
                   id: res.data[i]._id,

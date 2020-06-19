@@ -19,6 +19,7 @@ import * as Url from '../../constants/urls';
 import * as Service from '../../api/services';
 import ImagePicker from 'react-native-image-picker';
 import {TextInputMask} from 'react-native-masked-text';
+import {NavigationActions, StackActions} from 'react-navigation';
 
 export default class login extends Component {
   constructor(props) {
@@ -269,7 +270,13 @@ export default class login extends Component {
       utility.isBooleanValid(this.state.regChecked || this.state.isImagePicked)
     ) {
       await utility.setItem('isSkipped', true);
-      this.props.navigation.navigate('tab1');
+      this.props.navigation.dispatch(
+        StackActions.reset({
+          index: 0,
+          actions: [NavigationActions.navigate({routeName: 'BottomTab'})],
+        }),
+      );
+      await this.props.navigation.navigate('tab1');
     } else if (
       utility.isFieldEmpty(
         this.state.firstName &&
@@ -311,9 +318,18 @@ export default class login extends Component {
     }
   };
   onLoginSubmit = async () => {
-    if (utility.isFieldEmpty(this.state.email || this.state.password)) {
+    if (
+      utility.isFieldEmpty(this.state.email || this.state.password) &&
+      utility.isBooleanValid(this.state.checked)
+    ) {
       await utility.setItem('isSkipped', true);
-      this.props.navigation.navigate('tab1');
+      this.props.navigation.dispatch(
+        StackActions.reset({
+          index: 0,
+          actions: [NavigationActions.navigate({routeName: 'BottomTab'})],
+        }),
+      );
+      await this.props.navigation.navigate('tab1');
     } else if (utility.isFieldEmpty(this.state.email && this.state.password)) {
       await utility.setItem('isSkipped', false);
       alert('All fields are required');
@@ -347,6 +363,12 @@ export default class login extends Component {
           password: '',
           checked: false,
         });
+        this.props.navigation.dispatch(
+          StackActions.reset({
+            index: 0,
+            actions: [NavigationActions.navigate({routeName: 'BottomTab'})],
+          }),
+        );
         await this.props.navigation.navigate('tab1');
       } else {
         this.setState({isVisibleLoading: false});

@@ -1,7 +1,15 @@
 import React, {Component} from 'react';
-import {View, Text, TouchableOpacity, Image, TextInput} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  TextInput,
+  KeyboardAvoidingView,
+} from 'react-native';
 import styles from './style';
 import {ScrollView} from 'react-native-gesture-handler';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 export default class ChatScreen extends Component {
   constructor(props) {
@@ -54,12 +62,14 @@ export default class ChatScreen extends Component {
     await this.setState({message: value});
   };
   onForwardMessage = async () => {
-    let joined = this.state.messages.concat({
-      from: 'me',
-      message: this.state.message,
-      time: '02:30 pm',
-    });
-    await this.setState({messages: joined, message: ''});
+    if (this.state.message != '') {
+      let joined = this.state.messages.concat({
+        from: 'me',
+        message: this.state.message,
+        time: '02:30 pm',
+      });
+      await this.setState({messages: joined, message: ''});
+    }
   };
   render() {
     const {
@@ -120,7 +130,6 @@ export default class ChatScreen extends Component {
                         <Text style={time_style}>{message.time}</Text>
                       </View>
                     </View>
-                    {/* <View style={styles.triangle} /> */}
                   </>
                 );
               })}

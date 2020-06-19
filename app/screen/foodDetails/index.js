@@ -12,6 +12,7 @@ import Carousel, {Pagination} from 'react-native-snap-carousel';
 import {widthPercentageToDP as wp} from '../../utility/index';
 import * as colors from '../../constants/colors';
 import * as Service from '../../api/services';
+import * as utility from '../../utility/index';
 
 export default class foodDetails extends Component {
   constructor(props) {
@@ -32,10 +33,14 @@ export default class foodDetails extends Component {
       totalAmount: 0,
       images: [],
       isVisibleLoading: false,
+      isSkipped: false,
     };
   }
   componentDidMount = async () => {
     let foodId;
+    let isSkipped = await utility.getItem('isSkipped');
+    await this.setState({isSkipped: isSkipped});
+
     if (this.props.navigation.state.params) {
       if (this.props.navigation.state.params.from == 'home') {
         if (this.props.navigation.state.params.foodId) {
@@ -160,7 +165,11 @@ export default class foodDetails extends Component {
     );
   };
   onBuy = async () => {
-    this.props.navigation.navigate('Payment');
+    await this.props.navigation.navigate('Payment');
+  };
+  onLogin = async () => {
+    alert('Please login or register first.');
+    await this.props.navigation.navigate('Login');
   };
   render() {
     const {
@@ -289,7 +298,9 @@ export default class foodDetails extends Component {
 
           <View style={[bottom_container, bottom_spacing]}>
             <Text />
-            <TouchableOpacity activeOpacity={0.7} onPress={this.onBuy}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={!this.state.isSkipped ? this.onBuy : this.onLogin}>
               <LinearGradient
                 start={{x: 0, y: 0}}
                 end={{x: 1, y: 0}}

@@ -14,7 +14,6 @@ import LikeDislikeFood from '../likeDislikeFood';
 import * as Service from '../../api/services';
 import * as utility from '../../utility/index';
 import {widthPercentageToDP} from 'react-native-responsive-screen';
-import {isNullishCoalesce} from 'typescript';
 
 export default class myFood extends Component {
   constructor(props) {
@@ -35,122 +34,32 @@ export default class myFood extends Component {
           content: [],
         },
       ],
+      isSkipped: false,
     };
   }
   componentDidMount = async () => {
-    if (this.props.navigation.state.params) {
-      let from;
-      if (
-        this.props.navigation.state.params.from != '' ||
-        this.props.navigation.state.params.from != undefined ||
-        this.props.navigation.state.params.from != null
-      ) {
-        from = this.props.navigation.state.params.from;
-        let array = [
-          {
-            content: [
-              {
-                id: '1',
-                foodId: '2',
-                name: 'Pasta',
-                price: '10',
-                time: '02:30 pm',
-                address: 'Mohali, Chandigarh',
-                image: require('../../assets/sweet.jpg'),
-                isLiked: 'none',
-                type: 'veg',
-                isVeg: true,
-              },
-              {
-                id: '1',
-                foodId: '2',
-                name: 'Burger',
-                price: '10',
-                time: '02:30 pm',
-                address: 'Mohali, Chandigarh',
-                image: require('../../assets/sweet.jpg'),
-                isLiked: 'none',
-                type: 'veg',
-                isVeg: true,
-              },
-              {
-                id: '1',
-                foodId: '2',
-                name: 'Piza',
-                price: '10',
-                time: '02:30 pm',
-                address: 'Mohali, Chandigarh',
-                image: require('../../assets/sweet.jpg'),
-                isLiked: 'none',
-                type: 'veg',
-                isVeg: true,
-              },
-              {
-                id: '1',
-                foodId: '2',
-                name: 'Poha',
-                price: '10',
-                time: '02:30 pm',
-                address: 'Mohali, Chandigarh',
-                image: require('../../assets/sweet.jpg'),
-                isLiked: 'none',
-                type: 'veg',
-                isVeg: true,
-              },
-              {
-                id: '1',
-                foodId: '2',
-                name: 'Pasta',
-                price: '10',
-                time: '02:30 pm',
-                address: 'Mohali, Chandigarh',
-                image: require('../../assets/sweet.jpg'),
-                isLiked: 'none',
-                type: 'veg',
-                isVeg: true,
-              },
-            ],
-          },
-          {
-            content: [
-              {
-                id: '1',
-                foodId: '2',
-                name: 'Pasta',
-                price: '10',
-                time: '02:30 pm',
-                address: 'Mohali, Chandigarh',
-                image: require('../../assets/sweet.jpg'),
-                isLiked: 'none',
-                type: 'veg',
-                isVeg: true,
-              },
-              {
-                id: '1',
-                foodId: '2',
-                name: 'Pasta',
-                price: '10',
-                time: '02:30 pm',
-                address: 'Mohali, Chandigarh',
-                image: require('../../assets/sweet.jpg'),
-                isLiked: 'none',
-                type: 'veg',
-                isVeg: true,
-              },
-            ],
-          },
-        ];
-        await this.setState({
-          from: from,
-          dataArray: array,
-        });
+    let isSkipped = await utility.getItem('isSkipped');
+    await this.setState({isSkipped: isSkipped});
+
+    if (this.state.isSkipped == false) {
+      if (this.props.navigation.state.params) {
+        let from;
+        if (
+          this.props.navigation.state.params.from != '' ||
+          this.props.navigation.state.params.from != undefined ||
+          this.props.navigation.state.params.from != null
+        ) {
+          from = this.props.navigation.state.params.from;
+          await this.setState({from: from});
+        }
       } else {
-        const userId = await utility.getItem('userId');
-        const userToken = await utility.getToken('token');
-        this.setState({userId: userId, userToken: userToken, from: ''});
-        await this.getPurchasedFood();
-        await this.getSharedFood();
+        await this.setState({from: ''});
       }
+      const userId = await utility.getItem('userId');
+      const userToken = await utility.getToken('token');
+      this.setState({userId: userId, userToken: userToken});
+      await this.getPurchasedFood();
+      await this.getSharedFood();
     }
   };
   getPurchasedFood = async () => {
@@ -220,6 +129,7 @@ export default class myFood extends Component {
         .then(res => {
           if (res.data) {
             if (res.data.length != 0) {
+              console.log('datattatatata:', res.data);
               let shared = [
                 {
                   content: [],
@@ -313,113 +223,129 @@ export default class myFood extends Component {
     return (
       <>
         <View style={styles.list_height}>
-          <ScrollView>
-            {item.content.map(value => {
-              console.log('typeee:', value.favoriteType);
-              return (
-                <TouchableOpacity
-                  onPress={
-                    index == 0
-                      ? () =>
-                          this.showDialog(
-                            value.foodId,
-                            value.sellerId,
-                            value.isLiked,
-                          )
-                      : () => {}
-                  }>
-                  <View
-                    style={[
-                      styles.row,
-                      styles.column_between_spaceing,
-                      styles.inner_container,
-                      styles.inner_list_spacing,
-                    ]}>
-                    <View style={styles.row}>
-                      <View style={styles.list_image_continer}>
-                        <Image
-                          resizeMode="cover"
-                          source={
-                            this.state.from == ''
-                              ? {uri: value.image}
-                              : value.image
-                          }
-                          style={styles.list_image}
-                        />
+          {item.content.length != 0 ? (
+            <ScrollView>
+              {item.content.map(value => {
+                return (
+                  <TouchableOpacity
+                    onPress={
+                      index == 0
+                        ? () =>
+                            this.showDialog(
+                              value.foodId,
+                              value.sellerId,
+                              value.isLiked,
+                            )
+                        : () => {}
+                    }>
+                    <View
+                      style={[
+                        styles.row,
+                        styles.column_between_spaceing,
+                        styles.inner_container,
+                        styles.inner_list_spacing,
+                      ]}>
+                      <View style={styles.row}>
+                        <View style={styles.list_image_continer}>
+                          <Image
+                            resizeMode="cover"
+                            source={
+                              this.state.from == ''
+                                ? {uri: value.image}
+                                : value.image
+                            }
+                            style={styles.list_image}
+                          />
+                        </View>
+                        <View
+                          style={[
+                            styles.column,
+                            styles.column_between_spaceing,
+                          ]}>
+                          <View style={{width: widthPercentageToDP(45)}}>
+                            <View style={[styles.row]}>
+                              <Text style={styles.product_heading}>
+                                {value.name}
+                              </Text>
+                            </View>
+                            <Text style={styles.address_text} numberOfLines={1}>
+                              {value.address}
+                            </Text>
+                          </View>
+
+                          <View style={[styles.row, styles.between_spacing]}>
+                            <View style={[styles.row, styles.row_center_align]}>
+                              <View
+                                style={
+                                  value.type == 'veg'
+                                    ? [styles.non_veg_icon, styles.green_color]
+                                    : [styles.non_veg_icon, styles.red_color]
+                                }
+                              />
+                              <Text style={styles.text_style}>
+                                {value.type == 'veg' ? 'Veg' : 'Non-veg'}
+                              </Text>
+                            </View>
+                            <View style={[styles.row, styles.row_center_align]}>
+                              <Image
+                                resizeMode="stretch"
+                                source={require('../../assets/clock.png')}
+                                style={styles.clock}
+                              />
+                              <Text style={styles.text_style}>
+                                {value.time}
+                              </Text>
+                            </View>
+                          </View>
+                        </View>
                       </View>
                       <View
                         style={[styles.column, styles.column_between_spaceing]}>
-                        <View style={{width: widthPercentageToDP(45)}}>
-                          <View style={[styles.row]}>
-                            <Text style={styles.product_heading}>
-                              {value.name}
-                            </Text>
-                          </View>
-                          <Text style={styles.address_text} numberOfLines={1}>
-                            {value.address}
-                          </Text>
-                        </View>
-
-                        <View style={[styles.row, styles.between_spacing]}>
-                          <View style={[styles.row, styles.row_center_align]}>
-                            <View
-                              style={
-                                value.type == 'veg'
-                                  ? [styles.non_veg_icon, styles.green_color]
-                                  : [styles.non_veg_icon, styles.red_color]
-                              }
-                            />
-                            <Text style={styles.text_style}>
-                              {value.type == 'veg' ? 'Veg' : 'Non-veg'}
-                            </Text>
-                          </View>
-                          <View style={[styles.row, styles.row_center_align]}>
-                            <Image
-                              resizeMode="stretch"
-                              source={require('../../assets/clock.png')}
-                              style={styles.clock}
-                            />
-                            <Text style={styles.text_style}>{value.time}</Text>
-                          </View>
-                        </View>
+                        {value.isLiked == 'none' ? (
+                          <View />
+                        ) : (
+                          <Image
+                            resizeMode="stretch"
+                            source={
+                              value.isLiked == 'like'
+                                ? require('../../assets/like.png')
+                                : require('../../assets/dislike.png')
+                            }
+                            style={[
+                              styles.like_dislike_icon,
+                              {alignSelf: 'flex-end'},
+                            ]}
+                          />
+                        )}
+                        <Text style={styles.price_text}>Rs {value.price}</Text>
                       </View>
                     </View>
-                    <View
-                      style={[styles.column, styles.column_between_spaceing]}>
-                      {value.isLiked == 'none' ? (
-                        <View />
-                      ) : (
-                        <Image
-                          resizeMode="stretch"
-                          source={
-                            value.isLiked == 'like'
-                              ? require('../../assets/like.png')
-                              : require('../../assets/dislike.png')
-                          }
-                          style={[
-                            styles.like_dislike_icon,
-                            {alignSelf: 'flex-end'},
-                          ]}
-                        />
-                      )}
-                      <Text style={styles.price_text}>Rs {value.price}</Text>
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          ) : (
+            <View style={[styles.centered_text, {height: '100%'}]}>
+              <Text>No food found</Text>
+            </View>
+          )}
         </View>
       </>
     );
   };
   onBack = async () => {
     if (this.state.from == 'notification') {
-      this.props.navigation.navigate('Notifications');
-    } else if (this.state.from == 'profile') {
-      this.props.navigation.navigate('tab5');
-    } else {
-      this.props.navigation.navigate('tab1');
+      await this.props.navigation.navigate('Notifications');
+    }
+    if (this.state.from == 'profile') {
+      await this.props.navigation.navigate('tab5');
+    }
+    if (
+      this.state.from == '' ||
+      this.state.from == undefined ||
+      this.state.from == null
+    ) {
+      await this.props.navigation.navigate('tab1');
     }
     await this.setState({from: ''});
   };
@@ -433,6 +359,8 @@ export default class myFood extends Component {
       column,
       heading_text,
       between_spacing,
+      centered_text,
+      skipped_content,
     } = styles;
     return (
       <View style={[container, column, between_spacing]}>
@@ -450,15 +378,20 @@ export default class myFood extends Component {
               <Text> </Text>
             </View>
           </View>
-
-          <Accordion
-            style={{border: 'none'}}
-            dataArray={this.state.dataArray}
-            animation={true}
-            expanded={true}
-            renderHeader={this.renderHeader}
-            renderContent={this.renderContent}
-          />
+          {!this.state.isSkipped ? (
+            <Accordion
+              style={{border: 'none'}}
+              dataArray={this.state.dataArray}
+              animation={true}
+              expanded={true}
+              renderHeader={this.renderHeader}
+              renderContent={this.renderContent}
+            />
+          ) : (
+            <View style={[skipped_content, centered_text]}>
+              <Text>You have to login first to access this page</Text>
+            </View>
+          )}
           {this.state.isDialogVisible ? (
             <LikeDislikeFood
               visible={this.state.isDialogVisible}
@@ -474,3 +407,107 @@ export default class myFood extends Component {
     );
   }
 }
+
+// if (from == 'profile') {
+//   const userId = await utility.getItem('userId');
+//   const userToken = await utility.getToken('token');
+//   this.setState({userId: userId, userToken: userToken});
+//   await this.getPurchasedFood();
+//   await this.getSharedFood();
+// } else {
+//   let array = [
+//     {
+//       content: [
+//         {
+//           id: '1',
+//           foodId: '2',
+//           name: 'Pasta',
+//           price: '10',
+//           time: '02:30 pm',
+//           address: 'Mohali, Chandigarh',
+//           image: require('../../assets/sweet.jpg'),
+//           isLiked: 'none',
+//           type: 'veg',
+//           isVeg: true,
+//         },
+//         {
+//           id: '1',
+//           foodId: '2',
+//           name: 'Burger',
+//           price: '10',
+//           time: '02:30 pm',
+//           address: 'Mohali, Chandigarh',
+//           image: require('../../assets/sweet.jpg'),
+//           isLiked: 'none',
+//           type: 'veg',
+//           isVeg: true,
+//         },
+//         {
+//           id: '1',
+//           foodId: '2',
+//           name: 'Piza',
+//           price: '10',
+//           time: '02:30 pm',
+//           address: 'Mohali, Chandigarh',
+//           image: require('../../assets/sweet.jpg'),
+//           isLiked: 'none',
+//           type: 'veg',
+//           isVeg: true,
+//         },
+//         {
+//           id: '1',
+//           foodId: '2',
+//           name: 'Poha',
+//           price: '10',
+//           time: '02:30 pm',
+//           address: 'Mohali, Chandigarh',
+//           image: require('../../assets/sweet.jpg'),
+//           isLiked: 'none',
+//           type: 'veg',
+//           isVeg: true,
+//         },
+//         {
+//           id: '1',
+//           foodId: '2',
+//           name: 'Pasta',
+//           price: '10',
+//           time: '02:30 pm',
+//           address: 'Mohali, Chandigarh',
+//           image: require('../../assets/sweet.jpg'),
+//           isLiked: 'none',
+//           type: 'veg',
+//           isVeg: true,
+//         },
+//       ],
+//     },
+//     {
+//       content: [
+//         {
+//           id: '1',
+//           foodId: '2',
+//           name: 'Pasta',
+//           price: '10',
+//           time: '02:30 pm',
+//           address: 'Mohali, Chandigarh',
+//           image: require('../../assets/sweet.jpg'),
+//           isLiked: 'none',
+//           type: 'veg',
+//           isVeg: true,
+//         },
+//         {
+//           id: '1',
+//           foodId: '2',
+//           name: 'Pasta',
+//           price: '10',
+//           time: '02:30 pm',
+//           address: 'Mohali, Chandigarh',
+//           image: require('../../assets/sweet.jpg'),
+//           isLiked: 'none',
+//           type: 'veg',
+//           isVeg: true,
+//         },
+//       ],
+//     },
+//   ];
+//   await this.setState({dataArray: array});
+// }

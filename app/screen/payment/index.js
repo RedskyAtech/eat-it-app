@@ -14,12 +14,15 @@ export default class payment extends Component {
       selected: '',
       cardNumber: '',
       code: '',
-      year:'',
-      month:''
+      year: '',
+      month: '',
     };
   }
   onBack = async () => {
-    this.props.navigation.navigate('FoodDetails');
+    await this.props.navigation.navigate('FoodDetails');
+  };
+  onPlaceOrder = async () => {
+    await this.props.navigation.navigate('tab1');
   };
   render() {
     const {
@@ -51,7 +54,7 @@ export default class payment extends Component {
       month_input,
       expiration_input_container,
       code_input,
-      year_input
+      year_input,
     } = styles;
     return (
       <View style={[container]}>
@@ -196,7 +199,7 @@ export default class payment extends Component {
                         keyboardType="numeric"
                         onChangeText={month => this.setState({month})}
                         value={this.state.month}
-                        style={[expiration_input_container,month_input]}
+                        style={[expiration_input_container, month_input]}
                       />
                       <Image
                         resizeMode="contain"
@@ -223,7 +226,7 @@ export default class payment extends Component {
                         keyboardType="numeric"
                         onChangeText={year => this.setState({year})}
                         value={this.state.year}
-                        style={[expiration_input_container,year_input]}
+                        style={[expiration_input_container, year_input]}
                       />
                       <Image
                         resizeMode="contain"
@@ -254,7 +257,7 @@ export default class payment extends Component {
                         keyboardType="numeric"
                         onChangeText={code => this.setState({code})}
                         value={this.state.code}
-                        style={[expiration_input_container,code_input]}
+                        style={[expiration_input_container, code_input]}
                       />
                     </View>
                     <Image
@@ -270,7 +273,7 @@ export default class payment extends Component {
             <View />
           )}
 
-          <TouchableOpacity activeOpacity={0.7}>
+          <TouchableOpacity activeOpacity={0.7} onPress={this.onPlaceOrder}>
             <LinearGradient
               start={{x: 0, y: 0}}
               end={{x: 1, y: 0}}
@@ -284,4 +287,3 @@ export default class payment extends Component {
     );
   }
 }
-
