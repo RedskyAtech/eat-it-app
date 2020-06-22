@@ -13,10 +13,12 @@ import {Menu, Provider} from 'react-native-paper';
 import * as Service from '../../api/services';
 import * as utility from '../../utility/index';
 import * as Url from '../../constants/urls';
+import * as colors from '../../constants/colors';
 import {DatePicker, CheckBox} from 'native-base';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
 import {NavigationActions, StackActions} from 'react-navigation';
+// import RNDurationPicker from 'react-native-duration-picker';
 
 export default class addFood extends Component {
   constructor(props) {
@@ -32,6 +34,10 @@ export default class addFood extends Component {
       isFromTimePickerVisible: false,
       fromPickupTime: '',
       fromPickupDateTime: Date(),
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+      isCookingTime: false,
 
       itemValue: '',
       pickupTime: '',
@@ -302,8 +308,6 @@ export default class addFood extends Component {
         }
       }
     }
-
-    
   };
   onUploadImage = async file => {
     await this.setState({isVisibleLoading: true});
@@ -380,7 +384,6 @@ export default class addFood extends Component {
     }
   };
   handleConfirm = async (date, from) => {
-    console.log('dateeeeeeeee::::', date);
     let time = moment(date).format('hh:mm a');
     if (from == 'cookingTime') {
       await this.setState({cookingTime: time, isTimePickerVisible: false});
@@ -391,7 +394,6 @@ export default class addFood extends Component {
         isFromTimePickerVisible: false,
         fromPickupDateTime: date,
       });
-      console.log('frommmmm:', this.state.fromPickupDateTime);
     }
     if (from == 'toPickupTime') {
       await this.setState({
@@ -501,6 +503,24 @@ export default class addFood extends Component {
     console.log('noooo:', this.state.noHomeDelivery);
     await this.setState({homedelivery: value.name, visibleHomeDelivery: false});
   };
+  // onDuration = async () => {
+  //   RNDurationPicker.open({
+  //     hour: 3,
+  //     minute: 16,
+  //     interval: 1,
+  //     title: 'Austin',
+  //   }).then(result => {
+  //     if (result.action === 'setAction') {
+  //       const hours = result.hour;
+  //       const minutes = result.minute;
+  //       const cookingTime =
+  //         result.hour + ' ' + 'hours' + ' ' + result.minute + ' ' + 'min';
+  //       this.setState({
+  //         cookingTime: cookingTime,
+  //       });
+  //     }
+  //   });
+  // };
   render() {
     const {
       container,
@@ -526,9 +546,7 @@ export default class addFood extends Component {
       menu_background,
       menu_list_title,
       list_item_height,
-      date_picker_text,
       placeholder_text,
-      input_box_style,
       ckeckbox,
       price_input_box_style,
       checkbox_container,
@@ -536,6 +554,7 @@ export default class addFood extends Component {
       disabled_color,
       extra_bottom_spacing,
       extra_top_spacing,
+      loader,
     } = styles;
     return (
       <Provider>
@@ -582,12 +601,6 @@ export default class addFood extends Component {
                           titleStyle={[menu_list_title]}
                           style={list_item_height}
                           onPress={() => this.onCategoryChange(value)}
-                          // onPress={() => {
-                          //   this.setState({
-                          //     category: value.name,
-                          //     visibleCategory: false,
-                          //   });
-                          // }}
                           title={value.name}
                         />
                       );
@@ -631,7 +644,6 @@ export default class addFood extends Component {
                     {this.state.cuisions.map(value => {
                       let index = this.state.cuisions.indexOf(value);
                       return (
-                        // <TouchableOpacity activeOpacity={1} onPress={() => this.onChecked(index, value)}>
                         <View style={[row, checkbox_container]}>
                           <CheckBox
                             checked={this.state.isChecked[index]}
@@ -706,19 +718,23 @@ export default class addFood extends Component {
 
                 <View style={[row, between_spacing, fields_between_spacing]}>
                   <Text style={field_label}>Cooking time</Text>
-                  <View style={[row, picker_style, between_spacing]}>
-                    <DateTimePickerModal
-                      isVisible={this.state.isTimePickerVisible}
-                      mode="time"
-                      placeHolderText="Select Time"
-                      is24Hour={false}
-                      onConfirm={date =>
-                        this.handleConfirm(date, 'cookingTime')
-                      }
-                      onCancel={() => this.hideTimePicker('cookingTime')}
-                    />
-                    <TouchableOpacity
-                      onPress={() => this.showTimePicker('cookingTime')}>
+
+                  <TouchableOpacity
+                    onPress={() => this.showTimePicker('cookingTime')}
+                    // onPress={this.onDuration}
+                  >
+                    <View style={[row, picker_style, between_spacing]}>
+                      <DateTimePickerModal
+                        isVisible={this.state.isTimePickerVisible}
+                        mode="time"
+                        placeHolderText="Select Time"
+                        is24Hour={false}
+                        onConfirm={date =>
+                          this.handleConfirm(date, 'cookingTime')
+                        }
+                        onCancel={() => this.hideTimePicker('cookingTime')}
+                      />
+
                       {this.state.cookingTime == '' ? (
                         <Text style={placeholder_text}>Select time</Text>
                       ) : (
@@ -726,12 +742,12 @@ export default class addFood extends Component {
                           {this.state.cookingTime}
                         </Text>
                       )}
-                    </TouchableOpacity>
-                    <Image
-                      source={require('../../assets/clock_black.png')}
-                      style={picker_icons}
-                    />
-                  </View>
+                      <Image
+                        source={require('../../assets/clock_black.png')}
+                        style={picker_icons}
+                      />
+                    </View>
+                  </TouchableOpacity>
                 </View>
 
                 <View style={[row, between_spacing, fields_between_spacing]}>
@@ -790,25 +806,26 @@ export default class addFood extends Component {
                 <View style={[row, between_spacing, fields_between_spacing]}>
                   <Text style={field_label}>Pickup time</Text>
                   <View style={column}>
-                    <View
-                      style={[
-                        row,
-                        picker_style,
-                        between_spacing,
-                        extra_bottom_spacing,
-                      ]}>
-                      <DateTimePickerModal
-                        isVisible={this.state.isFromTimePickerVisible}
-                        mode="time"
-                        placeHolderText="From Time"
-                        is24Hour={false}
-                        onConfirm={date =>
-                          this.handleConfirm(date, 'fromPickupTime')
-                        }
-                        onCancel={() => this.hideTimePicker('fromPickupTime')}
-                      />
-                      <TouchableOpacity
-                        onPress={() => this.showTimePicker('fromPickupTime')}>
+                    <TouchableOpacity
+                      onPress={() => this.showTimePicker('fromPickupTime')}>
+                      <View
+                        style={[
+                          row,
+                          picker_style,
+                          between_spacing,
+                          extra_bottom_spacing,
+                        ]}>
+                        <DateTimePickerModal
+                          isVisible={this.state.isFromTimePickerVisible}
+                          mode="time"
+                          placeHolderText="From Time"
+                          is24Hour={false}
+                          onConfirm={date =>
+                            this.handleConfirm(date, 'fromPickupTime')
+                          }
+                          onCancel={() => this.hideTimePicker('fromPickupTime')}
+                        />
+
                         {this.state.fromPickupTime == '' ? (
                           <Text style={placeholder_text}>From time</Text>
                         ) : (
@@ -816,31 +833,32 @@ export default class addFood extends Component {
                             {this.state.fromPickupTime}
                           </Text>
                         )}
-                      </TouchableOpacity>
-                      <Image
-                        source={require('../../assets/clock_black.png')}
-                        style={picker_icons}
-                      />
-                    </View>
-                    <View
-                      style={[
-                        row,
-                        picker_style,
-                        between_spacing,
-                        extra_top_spacing,
-                      ]}>
-                      <DateTimePickerModal
-                        isVisible={this.state.isToTimePickerVisible}
-                        mode="time"
-                        placeHolderText="To Time"
-                        is24Hour={false}
-                        onConfirm={date =>
-                          this.handleConfirm(date, 'toPickupTime')
-                        }
-                        onCancel={() => this.hideTimePicker('toPickupTime')}
-                      />
-                      <TouchableOpacity
-                        onPress={() => this.showTimePicker('toPickupTime')}>
+                        <Image
+                          source={require('../../assets/clock_black.png')}
+                          style={picker_icons}
+                        />
+                      </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => this.showTimePicker('toPickupTime')}>
+                      <View
+                        style={[
+                          row,
+                          picker_style,
+                          between_spacing,
+                          extra_top_spacing,
+                        ]}>
+                        <DateTimePickerModal
+                          isVisible={this.state.isToTimePickerVisible}
+                          mode="time"
+                          placeHolderText="To Time"
+                          is24Hour={false}
+                          onConfirm={date =>
+                            this.handleConfirm(date, 'toPickupTime')
+                          }
+                          onCancel={() => this.hideTimePicker('toPickupTime')}
+                        />
+
                         {this.state.toPickupTime == '' ? (
                           <Text style={placeholder_text}>To time</Text>
                         ) : (
@@ -848,12 +866,12 @@ export default class addFood extends Component {
                             {this.state.toPickupTime}
                           </Text>
                         )}
-                      </TouchableOpacity>
-                      <Image
-                        source={require('../../assets/clock_black.png')}
-                        style={picker_icons}
-                      />
-                    </View>
+                        <Image
+                          source={require('../../assets/clock_black.png')}
+                          style={picker_icons}
+                        />
+                      </View>
+                    </TouchableOpacity>
                   </View>
                 </View>
 
@@ -1041,11 +1059,11 @@ export default class addFood extends Component {
                 </View>
               </TouchableOpacity>
             </View>
-            <View style={{position: 'absolute', top: '50%', right: 0, left: 0}}>
+            <View style={loader}>
               <ActivityIndicator
                 animating={this.state.isVisibleLoading}
                 size="large"
-                color="#0000ff"
+                color={colors.primaryColor}
               />
             </View>
           </View>
@@ -1055,136 +1073,112 @@ export default class addFood extends Component {
   }
 }
 
-
-
-
-
-
-
-
 // let type;
-    // let foodCooked;
-    // let price;
-    // let body;
+// let foodCooked;
+// let price;
+// let body;
 
-    // if (this.state.category == 'Non-veg') {
-    //   type = 'nonVeg';
-    // } else if (this.state.category == 'Langar') {
-    //   type = 'langar';
-    // } else {
-    //   type = 'veg';
-    // }
-    // if (this.state.from == 'Restaurant') {
-    //   foodCooked = 'restaurant';
-    // } else {
-    //   foodCooked = 'homemade';
-    // }
-    // if (this.state.isLangar) {
-    //   price = 0;
-    //   body = {
-    //     type: type,
-    //     cookingTime: this.state.cookingTime,
-    //     pickupTime: {
-    //       from: this.state.fromPickupTime,
-    //       to: this.state.toPickupTime,
-    //     },
-    //     name: this.state.dishName,
-    //     address: this.state.dishAddress,
-    //     description: this.state.description,
-    //     images: this.state.images,
-    //     price: price,
-    //   };
-    // } else {
-    //   price = this.state.price;
-    //   body = {
-    //     name: this.state.dishName,
-    //     type: type,
-    //     homeDelivery: this.state.homedelivery.toLowerCase(),
-    //     homeDeliveryPrice: this.state.deliveryPrice,
-    //     portion: this.state.portion.toLowerCase(),
-    //     cookingTime: this.state.cookingTime,
-    //     pickupTime: {
-    //       from: this.state.fromPickupTime,
-    //       to: this.state.toPickupTime,
-    //     },
-    //     foodCooked: foodCooked,
-    //     price: price,
-    //     address: this.state.dishAddress,
-    //     description: this.state.description,
-    //     cuisine: this.state.selectedLists,
-    //     images: this.state.images,
-    //   };
-    // }
-    // this.setState({isVisibleLoading: true});
+// if (this.state.category == 'Non-veg') {
+//   type = 'nonVeg';
+// } else if (this.state.category == 'Langar') {
+//   type = 'langar';
+// } else {
+//   type = 'veg';
+// }
+// if (this.state.from == 'Restaurant') {
+//   foodCooked = 'restaurant';
+// } else {
+//   foodCooked = 'homemade';
+// }
+// if (this.state.isLangar) {
+//   price = 0;
+//   body = {
+//     type: type,
+//     cookingTime: this.state.cookingTime,
+//     pickupTime: {
+//       from: this.state.fromPickupTime,
+//       to: this.state.toPickupTime,
+//     },
+//     name: this.state.dishName,
+//     address: this.state.dishAddress,
+//     description: this.state.description,
+//     images: this.state.images,
+//     price: price,
+//   };
+// } else {
+//   price = this.state.price;
+//   body = {
+//     name: this.state.dishName,
+//     type: type,
+//     homeDelivery: this.state.homedelivery.toLowerCase(),
+//     homeDeliveryPrice: this.state.deliveryPrice,
+//     portion: this.state.portion.toLowerCase(),
+//     cookingTime: this.state.cookingTime,
+//     pickupTime: {
+//       from: this.state.fromPickupTime,
+//       to: this.state.toPickupTime,
+//     },
+//     foodCooked: foodCooked,
+//     price: price,
+//     address: this.state.dishAddress,
+//     description: this.state.description,
+//     cuisine: this.state.selectedLists,
+//     images: this.state.images,
+//   };
+// }
+// this.setState({isVisibleLoading: true});
 
-    // try {
-    //   let response = Service.postDataApi(
-    //     Url.ADD_FOOD,
-    //     body,
-    //     this.state.userToken,
-    //   );
-    //   response
-    //     .then(res => {
-    //       if (res.data) {
-    //         if (res.isSuccess == true) {
-    //           alert('Added successfully');
+// try {
+//   let response = Service.postDataApi(
+//     Url.ADD_FOOD,
+//     body,
+//     this.state.userToken,
+//   );
+//   response
+//     .then(res => {
+//       if (res.data) {
+//         if (res.isSuccess == true) {
+//           alert('Added successfully');
 
-    //           this.setState({
-    //             cuision: '',
-    //             category: 'Veg',
-    //             from: 'Restaurant',
-    //             cookingTime: '',
-    //             portion: 'One',
-    //             toPickupDateTime: Date(),
-    //             fromPickupDateTime: Date(),
-    //             homedelivery: 'Yes',
-    //             deliveryPrice: 0,
-    //             price: 0,
-    //             isVisibleLoading: false,
-    //           });
-    //           this.props.navigation.dispatch(
-    //             StackActions.reset({
-    //               index: 0,
-    //               actions: [
-    //                 NavigationActions.navigate({routeName: 'BottomTab'}),
-    //               ],
-    //             }),
-    //           );
-    //           this.props.navigation.navigate('DashBoard');
-    //           this.props.navigation.navigate('tab1');
-    //         }
-    //       } else {
-    //         this.setState({isVisibleLoading: false});
-    //         console.log('no data found', res.error);
-    //       }
-    //     })
-    //     .catch(error => {
-    //       this.setState({isVisibleLoading: false});
-    //       console.log('error in try-catch', error.error);
-    //       alert('Something went wrong');
-    //     });
-    // } catch (err) {
-    //   this.setState({isVisibleLoading: false});
-    //   console.log('another problem:', err);
-    //   alert('Something went wrong');
-    // }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//           this.setState({
+//             cuision: '',
+//             category: 'Veg',
+//             from: 'Restaurant',
+//             cookingTime: '',
+//             portion: 'One',
+//             toPickupDateTime: Date(),
+//             fromPickupDateTime: Date(),
+//             homedelivery: 'Yes',
+//             deliveryPrice: 0,
+//             price: 0,
+//             isVisibleLoading: false,
+//           });
+//           this.props.navigation.dispatch(
+//             StackActions.reset({
+//               index: 0,
+//               actions: [
+//                 NavigationActions.navigate({routeName: 'BottomTab'}),
+//               ],
+//             }),
+//           );
+//           this.props.navigation.navigate('DashBoard');
+//           this.props.navigation.navigate('tab1');
+//         }
+//       } else {
+//         this.setState({isVisibleLoading: false});
+//         console.log('no data found', res.error);
+//       }
+//     })
+//     .catch(error => {
+//       this.setState({isVisibleLoading: false});
+//       console.log('error in try-catch', error.error);
+//       alert('Something went wrong');
+//     });
+// } catch (err) {
+//   this.setState({isVisibleLoading: false});
+//   console.log('another problem:', err);
+//   alert('Something went wrong');
+// }
 
 // visiblePurpose: false,
 // purpose: 'Sale',

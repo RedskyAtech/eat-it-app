@@ -6,6 +6,12 @@ import {
 } from '../../utility/index';
 
 const styles = {
+  loader: {
+    position: 'absolute',
+    top: '50%',
+    right: 0,
+    left: 0,
+  },
   container: {
     width: '100%',
     height: '100%',
@@ -106,7 +112,7 @@ const styles = {
     height: hp(5.4),
     borderRadius: 20,
     marginTop: hp(2),
-    elevation:6
+    elevation: 6,
   },
   button_text: {
     color: 'white',

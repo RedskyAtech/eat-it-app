@@ -6,6 +6,7 @@ import {
 } from '../../utility/index';
 
 const styles = {
+  loader: {position: 'absolute', top: '50%', right: 0, left: 0},
   container: {
     width: '100%',
     height: '100%',
@@ -87,9 +88,9 @@ const styles = {
   heading_width: {
     width: wp(61.2),
   },
-  icons_style:{
-   height:hp(3.2),
-   width:hp(3.2)
+  icons_style: {
+    height: hp(3.2),
+    width: hp(3.2),
   },
   colored_text: {
     color: colors.primaryColor,

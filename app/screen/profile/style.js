@@ -6,6 +6,7 @@ import {
 } from '../../utility/index';
 
 const styles = {
+  loader: {position: 'absolute', top: '50%', right: 0, left: 0},
   container: {
     width: '100%',
     height: '100%',
@@ -68,7 +69,7 @@ const styles = {
   badge_style: {
     borderWidth: 0,
     backgroundColor: colors.primaryColor,
-    marginRight:wp(3)
+    marginRight: wp(3),
   },
   badge_text_style: {
     fontSize: fonts.FONT_NORMAL,

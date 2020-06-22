@@ -6,6 +6,7 @@ import {
 } from '../../utility/index';
 
 const styles = {
+  loader: {position: 'absolute', top: '50%', right: 0, left: 0},
   container: {
     width: '100%',
     height: '100%',
@@ -35,9 +36,9 @@ const styles = {
     width: wp(96),
     alignSelf: 'center',
   },
-  list_height:{
-    marginTop:hp(2),
-    height:hp(82),
+  list_height: {
+    marginTop: hp(2),
+    height: hp(82),
   },
   row_list: {
     flexWrap: 'wrap',
@@ -49,7 +50,7 @@ const styles = {
     borderColor: colors.primaryColor,
     borderRadius: 25,
     backgroundColor: '#ECECEC',
-    marginTop:hp(1.6)
+    marginTop: hp(1.6),
   },
   photo_continer: {
     height: hp(14.6),
@@ -61,10 +62,10 @@ const styles = {
     marginBottom: hp(1),
     marginHorizontal: wp(2),
   },
-  cuision_text:{
+  cuision_text: {
     marginBottom: hp(2.6),
-    color:colors.gradientFirstColor,
-    alignSelf:'center'
+    color: colors.gradientFirstColor,
+    alignSelf: 'center',
   },
   centered_text: {
     justifyContent: 'center',

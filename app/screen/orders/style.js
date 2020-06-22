@@ -6,6 +6,7 @@ import {
 } from '../../utility/index';
 
 const styles = {
+  loader: {position: 'absolute', top: '50%', right: 0, left: 0},
   container: {
     width: '100%',
     height: '100%',
@@ -138,6 +139,11 @@ const styles = {
     fontSize: 16,
     fontWeight: fonts.FONT_BOLD,
     color: colors.primaryColor,
+  },
+  free_text: {
+    fontSize: 16,
+    fontWeight: fonts.FONT_BOLD,
+    color: 'green',
   },
   row_center_align: {
     alignItems: 'center',

@@ -6,6 +6,13 @@ import {
 } from '../../utility/index';
 
 const styles = {
+  loader: {
+    position: 'absolute',
+    top: '50%',
+    right: 0,
+    left: 0,
+  },
+
   container: {
     height: '100%',
     width: '100%',
@@ -75,7 +82,8 @@ const styles = {
     padding: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: wp(2.4),
+    // marginRight: wp(1.2),/
+    marginHorizontal: wp(0.7),
   },
   filter_text: {
     fontSize: 12,
@@ -92,7 +100,7 @@ const styles = {
   list_container: {
     height: hp(78),
     width: wp(100),
-    paddingBottom:hp(4)
+    paddingBottom: hp(4),
   },
 
   containerGridLeft: {
@@ -115,13 +123,23 @@ const styles = {
     fontWeight: fonts.FONT_BOLD,
     width: wp(28),
     textWrap: 'wrap',
-    textTransform: 'capitalize'
+    textTransform: 'capitalize',
   },
   centered_text: {justifyContent: 'center', alignItems: 'center'},
   colored_text: {
     fontSize: 12,
     fontWeight: fonts.FONT_BOLD,
     color: colors.primaryColor,
+  },
+  yellow_color: {
+    fontSize: 12,
+    fontWeight: fonts.FONT_BOLD,
+    color: '#FED704',
+  },
+  free_text: {
+    fontSize: 12,
+    fontWeight: fonts.FONT_BOLD,
+    color: 'green',
   },
   grey_text: {
     fontSize: fonts.Font_MIN,

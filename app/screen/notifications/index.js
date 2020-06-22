@@ -9,12 +9,14 @@ import {
 } from 'react-native';
 import styles from './style';
 import {NavigationActions, StackActions} from 'react-navigation';
+import * as colors from '../../constants/colors';
 
 export default class notifications extends Component {
   constructor(props) {
     super(props);
     this.state = {
       isVisibleLoading: false,
+      from:'',
       notifications: [
         {
           from: 'add',
@@ -67,8 +69,30 @@ export default class notifications extends Component {
       ],
     };
   }
+  componentDidMount = async () => {
+    if (this.props.navigation.state.params) {
+      let from;
+      if (this.props.navigation.state.params.from) {
+        from = this.props.navigation.state.params.from;
+        await this.setState({from: from});
+      }
+    } else {
+      await this.setState({from: ''});
+    }
+  };
   onBack = async () => {
-    await this.props.navigation.navigate('tab5');
+    if (this.state.from == 'home') {
+      this.props.navigation.dispatch(
+        StackActions.reset({
+          index: 0,
+          actions: [NavigationActions.navigate({routeName: 'BottomTab'})],
+        }),
+      );
+      await this.props.navigation.navigate('tab1');
+    }
+    if (this.state.from == 'profile') {
+      await this.props.navigation.navigate('tab5');
+    }
   };
   onNotification = async from => {
     if (from == 'add') {
@@ -82,7 +106,6 @@ export default class notifications extends Component {
           actions: [NavigationActions.navigate({routeName: 'BottomTab'})],
         }),
       );
-      // this.props.navigation.navigate('tab1');
       await this.props.navigation.navigate('tab4', {from: 'notification'});
     } else if (from == 'received') {
       await this.props.navigation.navigate('OrderDetails', {
@@ -117,6 +140,7 @@ export default class notifications extends Component {
       colored_text,
       heading_width,
       icons_style,
+      loader,
     } = styles;
     return (
       <View style={[container, column, between_spacing]}>
@@ -205,11 +229,11 @@ export default class notifications extends Component {
               <Text style={{textAlign: 'center'}}>No food found</Text>
             </View>
           )}
-          <View style={{position: 'absolute', top: '50%', right: 0, left: 0}}>
+          <View style={loader}>
             <ActivityIndicator
               animating={this.state.isVisibleLoading}
               size="large"
-              color="#0000ff"
+              color={colors.primaryColor}
             />
           </View>
         </View>

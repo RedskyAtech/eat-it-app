@@ -14,6 +14,7 @@ import LikeDislikeFood from '../likeDislikeFood';
 import * as Service from '../../api/services';
 import * as utility from '../../utility/index';
 import {widthPercentageToDP} from 'react-native-responsive-screen';
+import {NavigationActions, StackActions} from 'react-navigation';
 
 export default class myFood extends Component {
   constructor(props) {
@@ -147,6 +148,7 @@ export default class myFood extends Component {
                 tempContent.push({
                   id: res.data[i]._id,
                   name: res.data[i].name,
+                  type: res.data[i].type,
                   price: res.data[i].price,
                   time: res.data[i].cookingTime,
                   address: res.data[i].address,
@@ -279,11 +281,17 @@ export default class myFood extends Component {
                                 style={
                                   value.type == 'veg'
                                     ? [styles.non_veg_icon, styles.green_color]
+                                    : value.type == 'langar'
+                                    ? [styles.non_veg_icon, styles.yellow_color]
                                     : [styles.non_veg_icon, styles.red_color]
                                 }
                               />
                               <Text style={styles.text_style}>
-                                {value.type == 'veg' ? 'Veg' : 'Non-veg'}
+                                {value.type == 'veg'
+                                  ? 'Veg'
+                                  : value.type == 'langar'
+                                  ? 'Langar'
+                                  : 'Non-veg'}
                               </Text>
                             </View>
                             <View style={[styles.row, styles.row_center_align]}>
@@ -317,7 +325,16 @@ export default class myFood extends Component {
                             ]}
                           />
                         )}
-                        <Text style={styles.price_text}>Rs {value.price}</Text>
+                        {value.type == 'langar' ? (
+                          <View />
+                        ) : value.price == 0 ? (
+                          <Text style={styles.free_text}>Free</Text>
+                        ) : (
+                          <Text style={styles.price_text}>
+                            Rs {value.price}
+                          </Text>
+                        )}
+                        {/* <Text style={styles.price_text}>Rs {value.price}</Text> */}
                       </View>
                     </View>
                   </TouchableOpacity>
@@ -345,6 +362,13 @@ export default class myFood extends Component {
       this.state.from == undefined ||
       this.state.from == null
     ) {
+      await this.setState({isVisible: !this.state.isVisible});
+      this.props.navigation.dispatch(
+        StackActions.reset({
+          index: 0,
+          actions: [NavigationActions.navigate({routeName: 'BottomTab'})],
+        }),
+      );
       await this.props.navigation.navigate('tab1');
     }
     await this.setState({from: ''});

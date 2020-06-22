@@ -16,6 +16,7 @@ import HandleBack from '../../components/HandleBack';
 import * as Service from '../../api/services';
 import * as utility from '../../utility/index';
 import * as Url from '../../constants/urls';
+import * as colors from '../../constants/colors';
 
 const ViewTypes = {
   HALF_LEFT: 1,
@@ -44,6 +45,8 @@ class CellContainer extends React.Component {
       colored_text,
       grey_text,
       image,
+      yellow_color,
+      free_text,
     } = styles;
     return (
       <>
@@ -61,7 +64,13 @@ class CellContainer extends React.Component {
             {this.props.data.name}
           </Text>
           <View style={[row, between_spacing]}>
-            <Text style={colored_text}>Rs {this.props.data.price}</Text>
+            {this.props.data.type == 'langar' ? (
+              <Text style={yellow_color}>Langar</Text>
+            ) : this.props.data.price == 0 ? (
+              <Text style={free_text}>Free</Text>
+            ) : (
+              <Text style={colored_text}>Rs {this.props.data.price}</Text>
+            )}
             <Text style={grey_text}>{this.props.data.time}</Text>
           </View>
           <Text style={grey_text} numberOfLines={1}>
@@ -119,10 +128,25 @@ export default class home extends Component {
     this.getFood();
 
     this.state = {
-      forYou: true,
-      lastSearch: false,
-      nearYou: false,
-      follow: false,
+      query: '',
+      filtersList: [
+        {
+          name: 'For you',
+        },
+        {
+          name: 'Free',
+        },
+        {
+          name: 'Last search',
+        },
+        {
+          name: 'Near you',
+        },
+        {
+          name: 'Follow',
+        },
+      ],
+      selectedIndex: 0,
       name: '',
       isVisibleLoading: false,
       noDataExist: false,
@@ -131,12 +155,34 @@ export default class home extends Component {
       ),
     };
   }
+  onListItem = async index => {
+    if (index == 0) {
+      await this.setState({query: ''});
+      await this.getFood();
+    }
+    if (index == 1) {
+      await this.setState({query: 'isFoodFree=true&&searchType=food'});
+      await this.getFood();
+    }
+    await this.setState({selectedIndex: index});
+  };
 
   getFood = async () => {
     this.products = [];
     await this.setState({isVisibleLoading: true});
+
     try {
-      let response = Service.getDataApi(Url.GET_FOODS, '');
+      let url;
+      if (
+        this.state.query == '' ||
+        this.state.query == null ||
+        this.state.query == undefined
+      ) {
+        url = Url.GET_FOODS;
+      } else {
+        url = Url.SEARCH_FOOD + `?${this.state.query}`;
+      }
+      let response = Service.getDataApi(url, '');
       response
         .then(res => {
           if (res.data) {
@@ -149,6 +195,7 @@ export default class home extends Component {
                 }
                 this.products.push({
                   id: res.data[i]._id,
+                  type: res.data[i].type,
                   name: res.data[i].name,
                   price: res.data[i].price,
                   time: res.data[i].cookingTime,
@@ -223,38 +270,6 @@ export default class home extends Component {
     }
   }
 
-  onForYou = async () => {
-    await this.setState({
-      forYou: true,
-      lastSearch: false,
-      nearYou: false,
-      follow: false,
-    });
-  };
-  onLastSearch = async () => {
-    await this.setState({
-      forYou: false,
-      lastSearch: true,
-      nearYou: false,
-      follow: false,
-    });
-  };
-  onNearYou = async () => {
-    await this.setState({
-      forYou: false,
-      lastSearch: false,
-      nearYou: true,
-      follow: false,
-    });
-  };
-  onFollow = async () => {
-    await this.setState({
-      forYou: false,
-      lastSearch: false,
-      nearYou: false,
-      follow: true,
-    });
-  };
   onBack = async () => {
     const rembemberMe = await utility.getItem('rembemberMe');
     console.log('meeeeeeeeeeeeeeeee:', rembemberMe);
@@ -275,7 +290,9 @@ export default class home extends Component {
   closeDialog = async () => {
     this.setState({isVisible: false});
   };
-
+  onNotification = async () => {
+    await this.props.navigation.navigate('Notifications', {from: 'home'});
+  };
   render() {
     const {
       container,
@@ -299,6 +316,8 @@ export default class home extends Component {
       search_input,
       search_container,
       centered_text,
+      loader,
+      loader_color,
     } = styles;
     return (
       <HandleBack onBack={this.onBack}>
@@ -326,63 +345,41 @@ export default class home extends Component {
                     />
                   </View>
                 </TouchableOpacity>
-
-                <View style={[row, center_align]}>
-                  <Image
-                    resizeMode="contain"
-                    source={require('../../assets/notification_solid_yellow.png')}
-                    style={icons}
-                  />
-                  <Badge
-                    value="1"
-                    status="success"
-                    badgeStyle={badge_style}
-                    textStyle={badge_text_style}
-                  />
-                </View>
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={this.onNotification}>
+                  <View style={[row, center_align]}>
+                    <Image
+                      resizeMode="contain"
+                      source={require('../../assets/notification_solid_yellow.png')}
+                      style={icons}
+                    />
+                    <Badge
+                      value="1"
+                      status="success"
+                      badgeStyle={badge_style}
+                      textStyle={badge_text_style}
+                    />
+                  </View>
+                </TouchableOpacity>
               </View>
 
               <View style={[row, filter_container]}>
-                <TouchableOpacity onPress={this.onForYou}>
-                  <View
-                    style={
-                      this.state.forYou
-                        ? [filters, selected_color]
-                        : [filters, unselected_color]
-                    }>
-                    <Text style={filter_text}>For you</Text>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={this.onLastSearch}>
-                  <View
-                    style={
-                      this.state.lastSearch
-                        ? [filters, selected_color]
-                        : [filters, unselected_color]
-                    }>
-                    <Text style={filter_text}>Last search</Text>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={this.onNearYou}>
-                  <View
-                    style={
-                      this.state.nearYou
-                        ? [filters, selected_color]
-                        : [filters, unselected_color]
-                    }>
-                    <Text style={filter_text}>Near you</Text>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={this.onFollow}>
-                  <View
-                    style={
-                      this.state.follow
-                        ? [filters, selected_color]
-                        : [filters, unselected_color]
-                    }>
-                    <Text style={filter_text}>Follow</Text>
-                  </View>
-                </TouchableOpacity>
+                {this.state.filtersList.map(item => {
+                  let index = this.state.filtersList.indexOf(item);
+                  return (
+                    <TouchableOpacity onPress={() => this.onListItem(index)}>
+                      <View
+                        style={
+                          this.state.selectedIndex == index
+                            ? [filters, selected_color]
+                            : [filters, unselected_color]
+                        }>
+                        <Text style={filter_text}>{item.name}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
             </View>
           </View>
@@ -401,11 +398,11 @@ export default class home extends Component {
               </Text>
             </View>
           )}
-          <View style={{position: 'absolute', top: '50%', right: 0, left: 0}}>
+          <View style={loader}>
             <ActivityIndicator
               animating={this.state.isVisibleLoading}
               size="large"
-              color="#0000ff"
+              color={colors.primaryColor}
             />
           </View>
         </View>

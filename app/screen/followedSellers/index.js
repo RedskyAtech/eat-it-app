@@ -8,6 +8,9 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import styles from './style';
+import * as colors from '../../constants/colors';
+import { widthPercentageToDP } from 'react-native-responsive-screen';
+import { heightPercentageToDP } from '../../utility';
 
 export default class followedSellers extends Component {
   constructor(props) {
@@ -35,9 +38,12 @@ export default class followedSellers extends Component {
       heading_text,
       profile_image,
       like_icon,
+      text_style,
+      list_text_style,
       horizontally_centered,
       bottom_margin,
       name_heading,
+      loader,
     } = styles;
     return (
       <View style={[container, column, between_spacing]}>
@@ -62,13 +68,20 @@ export default class followedSellers extends Component {
                 {this.state.sellers.map(value => {
                   return (
                     <View style={[row, between_spacing, bottom_margin]}>
-                      <View style={[row, horizontally_centered]}>
+                      <View style={[row]}>
                         <Image
                           resizeMode="cover"
                           source={require('../../assets/pic.jpg')}
                           style={profile_image}
                         />
-                        <Text style={name_heading}>Zain Imam</Text>
+                        <View style={[column, list_text_style]}>
+                          <Text style={name_heading}>Zain Imam</Text>
+                          <View style={[row, {justifyContent:'space-between'}]}>
+                            <Text style={text_style}>100 followers</Text>
+                            <Text style={text_style}>40 dishes added</Text>
+                          </View>
+                        </View>
+
                       </View>
                       <Image
                         resizeMode="cover"
@@ -85,11 +98,11 @@ export default class followedSellers extends Component {
               <Text style={{textAlign: 'center'}}>No food found</Text>
             </View>
           )}
-          <View style={{position: 'absolute', top: '50%', right: 0, left: 0}}>
+          <View style={loader}>
             <ActivityIndicator
               animating={this.state.isVisibleLoading}
               size="large"
-              color="#0000ff"
+              color={colors.primaryColor}
             />
           </View>
         </View>

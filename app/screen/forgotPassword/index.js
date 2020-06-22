@@ -230,6 +230,7 @@ export default class ForgotPassword extends Component {
       text,
       fields_container,
       input_box,
+      loader
     } = styles;
     return (
       <View style={{flex: 1, backgroundColor: 'white'}}>
@@ -412,11 +413,11 @@ export default class ForgotPassword extends Component {
                 )}
               </View>
             )}
-            <View style={{position: 'absolute', top: '50%', right: 0, left: 0}}>
+            <View style={loader}>
               <ActivityIndicator
                 animating={this.state.isVisibleLoading}
                 size="large"
-                color="#0000ff"
+                color={colors.primaryColor}
               />
             </View>
           </View>

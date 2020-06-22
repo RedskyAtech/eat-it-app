@@ -13,6 +13,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from '../../utility/index';
+import * as colors from '../../constants/colors';
 
 export default class orders extends Component {
   constructor(props) {
@@ -55,7 +56,7 @@ export default class orders extends Component {
         {
           image: require('../../assets/burger.jpg'),
           name: 'Chilli Potato',
-          price: 100,
+          price: 0,
           time: '03:30 pm',
           orderId: '#4521274',
           type: 'nonVeg',
@@ -79,7 +80,7 @@ export default class orders extends Component {
         {
           image: require('../../assets/burger.jpg'),
           name: 'Chilli Potato',
-          price: 100,
+          price: 0,
           time: '03:30 pm',
           orderId: '#4521274',
           type: 'nonVeg',
@@ -99,7 +100,7 @@ export default class orders extends Component {
     await this.props.navigation.navigate('tab5');
   };
   onOrder = async () => {
-    await this.props.navigation.navigate('OrderDetails',{from:'orders'});
+    await this.props.navigation.navigate('OrderDetails', {from: 'orders'});
   };
   render() {
     const {
@@ -129,6 +130,8 @@ export default class orders extends Component {
       arrow,
       heading_text,
       end_align,
+      free_text,
+      loader
     } = styles;
     return (
       <View style={[container, column, between_spacing]}>
@@ -208,7 +211,13 @@ export default class orders extends Component {
                         <View
                           style={[column, column_between_spacing, end_align]}>
                           <Text style={text_style}>{value.time}</Text>
-                          <Text style={price_text}>Rs {value.price}</Text>
+                          {value.type == 'langar' ? (
+                            <View />
+                          ) : value.price == 0 ? (
+                            <Text style={free_text}>Free</Text>
+                          ) : (
+                            <Text style={price_text}>Rs {value.price}</Text>
+                          )}
                         </View>
                       </View>
                     </TouchableOpacity>
@@ -221,11 +230,11 @@ export default class orders extends Component {
               <Text style={{textAlign: 'center'}}>No food found</Text>
             </View>
           )}
-          <View style={{position: 'absolute', top: '50%', right: 0, left: 0}}>
+          <View style={loader}>
             <ActivityIndicator
               animating={this.state.isVisibleLoading}
               size="large"
-              color="#0000ff"
+              color={colors.primaryColor}
             />
           </View>
         </View>

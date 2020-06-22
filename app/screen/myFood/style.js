@@ -45,6 +45,9 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'space-evenly',
   },
+  yellow_color: {
+    backgroundColor: '#FED704',
+  },
   centered_text: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -139,6 +142,11 @@ const styles = {
     fontSize: 16,
     fontWeight: fonts.FONT_BOLD,
     color: colors.primaryColor,
+  },
+  free_text: {
+    fontSize: 16,
+    fontWeight: fonts.FONT_BOLD,
+    color: 'green',
   },
 };
 export default styles;

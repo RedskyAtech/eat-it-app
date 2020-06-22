@@ -6,6 +6,12 @@ import {
 } from '../../utility/index';
 
 const styles = {
+  loader: {
+    position: 'absolute',
+    top: '50%',
+    right: 0,
+    left: 0,
+  },
   container: {
     width: '100%',
     height: '100%',
@@ -79,8 +85,8 @@ const styles = {
     fontSize: 13,
     marginLeft: wp(-1),
   },
-  extra_bottom_spacing: {marginBottom:hp(1.3)},
-  extra_top_spacing: {marginTop:hp(1.3)},
+  extra_bottom_spacing: {marginBottom: hp(1.3)},
+  extra_top_spacing: {marginTop: hp(1.3)},
   price_input_box_style: {
     width: wp(23.8),
     height: hp(6),

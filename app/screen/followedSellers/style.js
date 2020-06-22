@@ -6,9 +6,19 @@ import {
 } from '../../utility/index';
 
 const styles = {
+  loader: {
+    position: 'absolute',
+    top: '50%',
+    right: 0,
+    left: 0,
+  },
   container: {
     width: '100%',
     height: '100%',
+  },
+  text_style: {
+    fontSize: fonts.FONT_NORMAL,
+    color: colors.greyText,
   },
   row: {
     display: 'flex',
@@ -25,6 +35,11 @@ const styles = {
   around_spacing: {
     alignItems: 'center',
     justifyContent: 'space-evenly',
+  },
+  list_text_style: {
+    justifyContent: 'space-between',
+    marginVertical: hp(0.6),
+    width: wp(50),
   },
   centered_text: {justifyContent: 'center', alignItems: 'center'},
   top_container: {
@@ -74,12 +89,12 @@ const styles = {
   horizontally_centered: {
     alignItems: 'center',
   },
-  bottom_margin:{
-      marginBottom:hp(3.4)
+  bottom_margin: {
+    marginBottom: hp(3.4),
   },
-  name_heading:{
-      fontSize:fonts.FONT_TEXT,
-      fontWeight:fonts.FONT_BOLD
-  }
+  name_heading: {
+    fontSize: fonts.FONT_TEXT,
+    fontWeight: fonts.FONT_BOLD,
+  },
 };
 export default styles;

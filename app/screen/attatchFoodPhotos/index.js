@@ -13,6 +13,8 @@ import ShareFood from '../shareFood';
 import * as utility from '../../utility/index';
 import * as Url from '../../constants/urls';
 import * as Service from '../../api/services';
+import {NavigationActions, StackActions} from 'react-navigation';
+import * as colors from '../../constants/colors';
 
 export default class attatchFoodPhotos extends Component {
   constructor(props) {
@@ -31,13 +33,16 @@ export default class attatchFoodPhotos extends Component {
 
     if (isSkipped == true) {
       await this.setState({isDialogVisible: false});
-      alert('Please login or register first.');
-      await this.props.navigation.navigate('Login');
+      await utility.showAlert('Please login or register first.', this.onLogin);
+      await this.props.navigation.navigate('tab1');
       return;
     } else {
       await this.setState({isDialogVisible: true});
       await this.showDialog();
     }
+  };
+  onLogin = async () => {
+    await this.props.navigation.navigate('Login');
   };
   showDialog = async () => {
     await this.setState({isDialogVisible: true});
@@ -88,7 +93,13 @@ export default class attatchFoodPhotos extends Component {
     await this.setState({photos: joined});
   };
   onBack = async () => {
-    this.props.navigation.navigate('tab1');
+    this.props.navigation.dispatch(
+      StackActions.reset({
+        index: 0,
+        actions: [NavigationActions.navigate({routeName: 'BottomTab'})],
+      }),
+    );
+    await this.props.navigation.navigate('tab1');
   };
   onNext = async () => {
     if (this.state.photos && this.state.photos != 0) {
@@ -176,6 +187,7 @@ export default class attatchFoodPhotos extends Component {
       heading_text,
       between_spacing,
       add_style,
+      loader,
     } = styles;
     return (
       <View style={[container, column, between_spacing]}>
@@ -253,11 +265,11 @@ export default class attatchFoodPhotos extends Component {
             </View>
           </TouchableOpacity>
         </View>
-        <View style={{position: 'absolute', top: '50%', right: 0, left: 0}}>
+        <View style={loader}>
           <ActivityIndicator
             animating={this.state.isVisibleLoading}
             size="large"
-            color="#0000ff"
+            color={colors.primaryColor}
           />
         </View>
       </View>

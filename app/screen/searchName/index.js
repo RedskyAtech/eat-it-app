@@ -10,8 +10,8 @@ import {
 } from 'react-native';
 import styles from './style';
 import * as Service from '../../api/services';
-import * as utility from '../../utility/index';
 import * as Url from '../../constants/urls';
+import * as colors from '../../constants/colors';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -460,6 +460,7 @@ export default class searchName extends Component {
                 }
                 tempProducts.push({
                   id: res.data[i]._id,
+                  type: res.data[i].type,
                   name: res.data[i].name,
                   price: res.data[i].price,
                   time: res.data[i].cookingTime,
@@ -531,6 +532,8 @@ export default class searchName extends Component {
       centered_text,
       search_icon,
       yellow_color,
+      free_text,
+      loader
     } = styles;
     return (
       <View style={[container, column, between_spacing]}>
@@ -551,7 +554,8 @@ export default class searchName extends Component {
                 value={this.state.name}
               />
             </View>
-            <TouchableOpacity onPress={!this.state.isLangar?this.onFilter:()=>{}}>
+            <TouchableOpacity
+              onPress={!this.state.isLangar ? this.onFilter : () => {}}>
               <Image
                 resizeMode="contain"
                 source={require('../../assets/filter_yellow.png')}
@@ -620,7 +624,13 @@ export default class searchName extends Component {
                       </View>
                       <View style={[column, column_between_spacing]}>
                         <View />
-                        <Text style={price_text}>Rs {value.price}</Text>
+                        {value.type == 'langar' ? (
+                          <View />
+                        ) : value.price == 0 ? (
+                          <Text style={free_text}>Free</Text>
+                        ) : (
+                          <Text style={price_text}>Rs {value.price}</Text>
+                        )}
                       </View>
                     </View>
                   );
@@ -632,11 +642,11 @@ export default class searchName extends Component {
               <Text style={{textAlign: 'center'}}>No food found</Text>
             </View>
           )}
-          <View style={{position: 'absolute', top: '50%', right: 0, left: 0}}>
+          <View style={loader}>
             <ActivityIndicator
               animating={this.state.isVisibleLoading}
               size="large"
-              color="#0000ff"
+              color={colors.primaryColor}
             />
           </View>
         </View>

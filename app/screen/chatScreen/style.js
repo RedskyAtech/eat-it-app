@@ -132,6 +132,10 @@ const styles = {
   },
   list_height:{
     height:hp(82)
+  },
+  input_position:{
+    position:'absolute',
+    bottom:0
   }
 };
 export default styles;

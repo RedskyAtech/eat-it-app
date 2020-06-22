@@ -226,11 +226,10 @@ export default class profile extends Component {
         actions: [NavigationActions.navigate({routeName: 'BottomTab'})],
       }),
     );
-    // this.props.navigation.navigate('tab1');
     await this.props.navigation.navigate('tab4', {from: 'profile'});
   };
   onNotification = async () => {
-    await this.props.navigation.navigate('Notifications');
+    await this.props.navigation.navigate('Notifications',{from:'profile'});
     await this.closeMenu();
   };
   onAbout = async () => {
@@ -288,6 +287,7 @@ export default class profile extends Component {
       profile_style,
       badge_style,
       badge_text_style,
+      loader
     } = styles;
     return (
       <Provider>
@@ -719,11 +719,11 @@ export default class profile extends Component {
             ) : (
               <View />
             )}
-            <View style={{position: 'absolute', top: '50%', right: 0, left: 0}}>
+            <View style={loader}>
               <ActivityIndicator
                 animating={this.state.isVisibleLoading}
                 size="large"
-                color="#0000ff"
+                color={colors.primaryColor}
               />
             </View>
           </View>

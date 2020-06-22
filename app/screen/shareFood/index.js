@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {View, Text, Image, TouchableOpacity} from 'react-native';
 import styles from './style';
 import Modal from 'react-native-modal';
+import {NavigationActions, StackActions} from 'react-navigation';
 
 export default class shareFood extends Component {
   constructor(props) {
@@ -16,7 +17,13 @@ export default class shareFood extends Component {
 
   close = async () => {
     await this.setState({isVisible: !this.state.isVisible});
-    this.props.navigation.navigate('tab1');
+    this.props.navigation.dispatch(
+      StackActions.reset({
+        index: 0,
+        actions: [NavigationActions.navigate({routeName: 'BottomTab'})],
+      }),
+    );
+    await this.props.navigation.navigate('tab1');
   };
 
   forward = async () => {

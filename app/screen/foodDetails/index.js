@@ -13,6 +13,8 @@ import {widthPercentageToDP as wp} from '../../utility/index';
 import * as colors from '../../constants/colors';
 import * as Service from '../../api/services';
 import * as utility from '../../utility/index';
+import {NavigationActions, StackActions} from 'react-navigation';
+import {color} from 'react-native-reanimated';
 
 export default class foodDetails extends Component {
   constructor(props) {
@@ -34,6 +36,7 @@ export default class foodDetails extends Component {
       images: [],
       isVisibleLoading: false,
       isSkipped: false,
+      isPriceShow: false,
     };
   }
   componentDidMount = async () => {
@@ -117,7 +120,7 @@ export default class foodDetails extends Component {
               images: res.data.images,
             });
 
-            this.setState({isVisibleLoading: false});
+            this.setState({isVisibleLoading: false, isPriceShow: true});
           } else {
             this.setState({isVisibleLoading: false});
             console.log('no data found:', res.error);
@@ -138,7 +141,13 @@ export default class foodDetails extends Component {
 
   onBack = async () => {
     if (this.state.from == 'home') {
-      this.props.navigation.navigate('tab1');
+      this.props.navigation.dispatch(
+        StackActions.reset({
+          index: 0,
+          actions: [NavigationActions.navigate({routeName: 'BottomTab'})],
+        }),
+      );
+      await this.props.navigation.navigate('tab1');
     } else {
       this.props.navigation.navigate('Notifications');
     }
@@ -167,8 +176,10 @@ export default class foodDetails extends Component {
   onBuy = async () => {
     await this.props.navigation.navigate('Payment');
   };
+  onAlert = async () => {
+    await utility.showAlert('Please login or register first.', this.onLogin);
+  };
   onLogin = async () => {
-    alert('Please login or register first.');
     await this.props.navigation.navigate('Login');
   };
   render() {
@@ -199,6 +210,8 @@ export default class foodDetails extends Component {
       veg_icon,
       top_spacing,
       langar_icon,
+      free_text,
+      loader,
     } = styles;
     return (
       <View>
@@ -252,7 +265,16 @@ export default class foodDetails extends Component {
           </Text>
 
           <View style={[row, between_spacing, bottom_spacing]}>
-            <Text style={[price, colored_text]}>Rs {this.state.price}</Text>
+            {!this.state.isPriceShow ? (
+              <View />
+            ) : this.state.type == 'langar' ? (
+              <View />
+            ) : this.state.price == 0 ? (
+              <Text style={[price, free_text]}>Free</Text>
+            ) : (
+              <Text style={[price, colored_text]}>Rs {this.state.price}</Text>
+            )}
+
             <View style={[row, {alignItems: 'center'}]}>
               <View
                 style={
@@ -300,7 +322,7 @@ export default class foodDetails extends Component {
             <Text />
             <TouchableOpacity
               activeOpacity={0.7}
-              onPress={!this.state.isSkipped ? this.onBuy : this.onLogin}>
+              onPress={!this.state.isSkipped ? this.onBuy : this.onAlert}>
               <LinearGradient
                 start={{x: 0, y: 0}}
                 end={{x: 1, y: 0}}
@@ -311,11 +333,11 @@ export default class foodDetails extends Component {
             </TouchableOpacity>
           </View>
 
-          <View style={{position: 'absolute', top: '50%', right: 0, left: 0}}>
+          <View style={loader}>
             <ActivityIndicator
               animating={this.state.isVisibleLoading}
               size="large"
-              color="#0000ff"
+              color={colors.primaryColor}
             />
           </View>
         </View>

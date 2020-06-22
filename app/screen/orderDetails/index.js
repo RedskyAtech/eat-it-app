@@ -11,7 +11,6 @@ import LinearGradient from 'react-native-linear-gradient';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
 import {widthPercentageToDP as wp} from '../../utility/index';
 import * as colors from '../../constants/colors';
-import * as Service from '../../api/services';
 import ConfirmOrder from '../confirmOrder';
 
 export default class orderDetails extends Component {
@@ -40,6 +39,7 @@ export default class orderDetails extends Component {
         },
       ],
       isVisibleLoading: false,
+      isPriceShow: true,
     };
   }
   componentDidMount = async () => {
@@ -100,6 +100,7 @@ export default class orderDetails extends Component {
       bottom_container,
       spacing,
       row,
+      free_text,
       arrow,
       heading_text,
       between_spacing,
@@ -108,6 +109,7 @@ export default class orderDetails extends Component {
       top_spacing,
       langar_icon,
       id_heading,
+      loader
     } = styles;
     return (
       <View>
@@ -160,7 +162,16 @@ export default class orderDetails extends Component {
           </Text>
 
           <View style={[row, between_spacing, bottom_spacing]}>
-            <Text style={[price, colored_text]}>Rs {this.state.price}</Text>
+            {!this.state.isPriceShow ? (
+              <View />
+            ) : this.state.type == 'langar' ? (
+              <View />
+            ) : this.state.price == 0 ? (
+              <Text style={[price, free_text]}>Free</Text>
+            ) : (
+              <Text style={[price, colored_text]}>Rs {this.state.price}</Text>
+            )}
+            {/* <Text style={[price, colored_text]}>Rs {this.state.price}</Text> */}
             <View style={[row, {alignItems: 'center'}]}>
               <View
                 style={
@@ -220,11 +231,11 @@ export default class orderDetails extends Component {
           ) : (
             <View />
           )}
-          <View style={{position: 'absolute', top: '50%', right: 0, left: 0}}>
+          <View style={loader}>
             <ActivityIndicator
               animating={this.state.isVisibleLoading}
               size="large"
-              color="#0000ff"
+              color={colors.primaryColor}
             />
           </View>
         </View>

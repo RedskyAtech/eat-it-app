@@ -86,11 +86,14 @@ export const getOS = () => {
   return 'android';
 };
 
-export const showAlert = message => {
+export const showAlert = (message, onLogin) => {
   Alert.alert(
     titles.APP_NAME,
     message,
-    [{text: 'OK', onPress: () => console.log('OK Pressed')}],
+    [
+      {text: 'Cancel', onPress: () => {}},
+      {text: 'OK', onPress: () => onLogin()},
+    ],
     {cancelable: false},
   );
 };

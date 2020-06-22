@@ -6,6 +6,12 @@ import {
 } from '../../utility/index';
 
 const styles = {
+  loader: {
+    position: 'absolute',
+    top: '50%',
+    right: 0,
+    left: 0,
+  },
   container: {
     width: '100%',
     height: '100%',
@@ -111,8 +117,8 @@ const styles = {
   veg_icon: {
     backgroundColor: '#12FF01',
   },
-  langar_icon:{
-    backgroundColor: '#FED704'
+  langar_icon: {
+    backgroundColor: '#FED704',
   },
   type_text: {
     color: colors.greyText,
@@ -144,6 +150,9 @@ const styles = {
     marginTop: hp(2),
     alignSelf: 'flex-end',
     elevation: 4,
+  },
+  free_text: {
+    color: 'green',
   },
   button_text: {
     color: 'white',

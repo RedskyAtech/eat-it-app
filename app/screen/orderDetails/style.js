@@ -6,6 +6,7 @@ import {
 } from '../../utility/index';
 
 const styles = {
+  loader: {position: 'absolute', top: '50%', right: 0, left: 0},
   container: {
     width: '100%',
     height: '100%',
@@ -133,7 +134,9 @@ const styles = {
   top_spacing: {
     marginTop: hp(4),
   },
-
+  free_text: {
+    color: 'green',
+  },
   bottom_container: {
     flexDirection: 'row',
     justifyContent: 'space-between',

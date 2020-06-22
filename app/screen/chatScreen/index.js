@@ -5,18 +5,24 @@ import {
   TouchableOpacity,
   Image,
   TextInput,
-  KeyboardAvoidingView,
+  Keyboard,
+  ScrollView,
 } from 'react-native';
 import styles from './style';
-import {ScrollView} from 'react-native-gesture-handler';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from '../../utility/index';
 export default class ChatScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      keyboardOffset: 0,
       code: '',
       message: '',
+      height: hp(82),
+      iskeyboard: false,
       messages: [
         {
           from: 'other',
@@ -47,6 +53,14 @@ export default class ChatScreen extends Component {
     };
   }
   componentDidMount = async () => {
+    this.keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      this._keyboardDidShow,
+    );
+    this.keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      this._keyboardDidHide,
+    );
     let code;
     if (this.props.navigation.state.params) {
       if (this.props.navigation.state.params.code) {
@@ -55,6 +69,18 @@ export default class ChatScreen extends Component {
       await this.setState({code: code});
     }
   };
+  componentWillUnmount() {
+    this.keyboardDidShowListener.remove();
+    this.keyboardDidHideListener.remove();
+  }
+  _keyboardDidShow = async event => {
+    let value = event.endCoordinates.height;
+    await this.setState({keyboardOffset: value, iskeyboard: true});
+  };
+  _keyboardDidHide = async () => {
+    await this.setState({keyboardOffset: 0, iskeyboard: false});
+  };
+
   onBack = async () => {
     this.props.navigation.navigate('Messages');
   };
@@ -85,17 +111,13 @@ export default class ChatScreen extends Component {
       message_style,
       time_style,
       right_list,
-      bottom_spacing,
-      bottom_container,
       top_container,
       search_container,
       around_spacing,
-      search_icon,
       search_input,
       next_arrow_container,
       icons,
       list_height,
-      triangle,
     } = styles;
     return (
       <View style={[container, column, between_spacing]}>
@@ -114,7 +136,8 @@ export default class ChatScreen extends Component {
             </View>
           </View>
 
-          <View style={list_height}>
+          <View
+            style={this.state.iskeyboard ? {height: hp(50)} : {height: hp(82)}}>
             <ScrollView>
               {this.state.messages.map(message => {
                 return (
@@ -137,7 +160,13 @@ export default class ChatScreen extends Component {
           </View>
         </View>
 
-        <View style={[row, between_spacing, top_container]}>
+        <View
+          style={[
+            row,
+            between_spacing,
+            top_container,
+            {position: 'absolute', bottom: this.state.keyboardOffset},
+          ]}>
           <View style={[search_container, row, around_spacing]}>
             <TextInput
               placeholder="Type a message"

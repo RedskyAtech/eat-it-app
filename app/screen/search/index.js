@@ -11,6 +11,7 @@ import {
 import styles from './style';
 import * as Service from '../../api/services';
 import * as Url from '../../constants/urls';
+import * as colors from '../../constants/colors';
 
 export default class search extends Component {
   constructor(props) {
@@ -171,6 +172,7 @@ export default class search extends Component {
       photo_style,
       cuision_text,
       list_height,
+      loader
     } = styles;
     return (
       <View style={[container, column, between_spacing]}>
@@ -243,11 +245,11 @@ export default class search extends Component {
             </View>
           )}
 
-          <View style={{position: 'absolute', top: '50%', right: 0, left: 0}}>
+          <View style={loader}>
             <ActivityIndicator
               animating={this.state.isVisibleLoading}
               size="large"
-              color="#0000ff"
+              color={colors.primaryColor}
             />
           </View>
         </View>

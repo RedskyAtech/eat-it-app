@@ -5,6 +5,7 @@ import {RadioButton} from 'react-native-paper';
 import * as colors from '../../constants/colors';
 import {TextInputMask} from 'react-native-masked-text';
 import LinearGradient from 'react-native-linear-gradient';
+import {NavigationActions, StackActions} from 'react-navigation';
 
 export default class payment extends Component {
   constructor(props) {
@@ -22,6 +23,13 @@ export default class payment extends Component {
     await this.props.navigation.navigate('FoodDetails');
   };
   onPlaceOrder = async () => {
+    await this.setState({isVisible: !this.state.isVisible});
+    this.props.navigation.dispatch(
+      StackActions.reset({
+        index: 0,
+        actions: [NavigationActions.navigate({routeName: 'BottomTab'})],
+      }),
+    );
     await this.props.navigation.navigate('tab1');
   };
   render() {

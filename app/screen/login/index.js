@@ -17,6 +17,7 @@ import HandleBack from '../../components/HandleBack';
 import * as utility from '../../utility/index';
 import * as Url from '../../constants/urls';
 import * as Service from '../../api/services';
+import * as colors from '../../constants/colors';
 import ImagePicker from 'react-native-image-picker';
 import {TextInputMask} from 'react-native-masked-text';
 import {NavigationActions, StackActions} from 'react-navigation';
@@ -417,6 +418,7 @@ export default class login extends Component {
       fields_container,
       input_box,
       between_spacing,
+      loader
     } = styles;
     return (
       <HandleBack onBack={this.onBack}>
@@ -690,11 +692,11 @@ export default class login extends Component {
                 </TouchableOpacity>
               </View>
               <View
-                style={{position: 'absolute', top: '50%', right: 0, left: 0}}>
+                style={loader}>
                 <ActivityIndicator
                   animating={this.state.isVisibleLoading}
                   size="large"
-                  color="#0000ff"
+                  color={colors.primaryColor}
                 />
               </View>
             </ImageBackground>

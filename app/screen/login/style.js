@@ -6,6 +6,7 @@ import {
 } from '../../utility/index';
 
 const styles = {
+  loader: {position: 'absolute', top: '50%', right: 0, left: 0},
   container: {
     width: '100%',
     height: '100%',
@@ -132,7 +133,7 @@ const styles = {
     alignItems: 'center',
     alignSelf: 'flex-end',
     marginTop: hp(6),
-    elevation:4
+    elevation: 4,
   },
   profile_container: {
     height: hp(14.5),
