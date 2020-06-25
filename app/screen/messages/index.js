@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {View, Text, TouchableOpacity, Image} from 'react-native';
 import styles from './style';
-import * as utility from '../../utility/index';
+import SocketIOClient from 'socket.io-client';
 
 export default class messages extends Component {
   constructor(props) {
@@ -45,8 +45,13 @@ export default class messages extends Component {
         },
       ],
     };
+    this.socket = SocketIOClient('http://localhost:6600');
   }
-  componentDidMount() {}
+  componentDidMount() {
+    var currentRoom = 'meenu' + '-' + 'zain';
+    var reverseRoom = 'zain' + '-' + 'meenu';
+    this.socket.emit('set-room', {name1: currentRoom, name2: reverseRoom});
+  }
   onBack = async () => {
     this.props.navigation.navigate('tab5');
   };

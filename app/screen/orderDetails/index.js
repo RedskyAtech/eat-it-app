@@ -12,41 +12,108 @@ import Carousel, {Pagination} from 'react-native-snap-carousel';
 import {widthPercentageToDP as wp} from '../../utility/index';
 import * as colors from '../../constants/colors';
 import ConfirmOrder from '../confirmOrder';
+import * as Service from '../../api/services';
+import * as utility from '../../utility/index';
 
 export default class orderDetails extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      userToken: '',
       from: '',
       foodId: '',
-      name: 'Bolognese Baked Potato',
-      address: 'Amrit Sweets, Phase 5, Mohali',
-      price: 50,
-      orderId: '#4509673',
-      type: 'veg',
-      deliveryPrice: 10,
-      totalAmount: 60,
+      name: '',
+      address: '',
+      price: 0,
+      orderId: '',
+      type: '',
+      deliveryPrice: 0,
+      totalAmount: 0,
       isDialogVisible: false,
-      images: [
-        {
-          image: require('../../assets/sweet.jpg'),
-        },
-        {
-          image: require('../../assets/burger.jpg'),
-        },
-        {
-          image: require('../../assets/food.jpg'),
-        },
-      ],
+      images: [],
       isVisibleLoading: false,
       isPriceShow: true,
+      id: '',
     };
   }
   componentDidMount = async () => {
+    const token = await utility.getToken('token');
+    await this.setState({userToken: token});
+
     if (this.props.navigation.state.params) {
       if (this.props.navigation.state.params.from) {
         await this.setState({from: this.props.navigation.state.params.from});
+        if (this.state.from == 'orders') {
+          if (this.props.navigation.state.params.orderId) {
+            await this.setState({
+              id: this.props.navigation.state.params.orderId,
+            });
+            await this.getOrderDetail();
+          }
+        }
       }
+    }
+  };
+
+  getOrderDetail = async () => {
+    await this.setState({isVisibleLoading: true});
+
+    try {
+      let response = Service.getDataApi(
+        `orders/${this.state.id}`,
+        this.state.userToken,
+      );
+      response
+        .then(res => {
+          if (res.data) {
+            let deliveryPrice;
+            let price;
+            console.log('datata:', res.data);
+            if (
+              res.data.homeDeliveryPrice == '' ||
+              res.data.homeDeliveryPrice == undefined ||
+              res.data.homeDeliveryPrice == null ||
+              res.data.homeDeliveryPrice == 0
+            ) {
+              deliveryPrice = 0;
+            } else {
+              deliveryPrice = res.data.homeDeliveryPrice;
+            }
+            if (
+              res.data.price == '' ||
+              res.data.price == undefined ||
+              res.data.price == null ||
+              res.data.price == 0
+            ) {
+              price = 0;
+            } else {
+              price = res.data.price;
+            }
+            this.setState({
+              name: res.data.name,
+              address: res.data.address,
+              price: price,
+              orderId: res.data.orderId,
+              type: res.data.type,
+              deliveryPrice: deliveryPrice,
+              totalAmount: price + deliveryPrice,
+              images: res.data.images,
+              isVisibleLoading: false,
+            });
+          } else {
+            this.setState({isVisibleLoading: false});
+            console.log('no data found', res.error);
+          }
+        })
+        .catch(error => {
+          this.setState({isVisibleLoading: false});
+          console.log('error in try-catch', error.error);
+          alert('Something went wrong');
+        });
+    } catch (err) {
+      this.setState({isVisibleLoading: false});
+      console.log('another problem:', err);
+      alert('Something went wrong');
     }
   };
 
@@ -71,11 +138,51 @@ export default class orderDetails extends Component {
   }
   _renderItem = ({item, index}) => {
     return (
-      <Image resizeMode="cover" style={styles.images} source={item.image} />
+      <Image
+        resizeMode="cover"
+        style={styles.images}
+        source={{uri: item.url}}
+      />
     );
   };
   onConfirm = async () => {
     await this.setState({isDialogVisible: true});
+  };
+  onOrderConfirmation = async () => {
+    this.setState({isVisibleLoading: true});
+    let body = {
+      status: 'confirmed',
+    };
+    try {
+      let response = Service.putDataApi(
+        `orders/${this.state.id}`,
+        body,
+        this.state.userToken,
+      );
+      response
+        .then(res => {
+          if (res.data) {
+            this.setState({isVisibleLoading: false});
+            this.closeDialog();
+            alert('update successfully');
+          } else {
+            this.setState({isVisibleLoading: false});
+            this.closeDialog();
+            console.log('no data found', res.error);
+          }
+        })
+        .catch(error => {
+          this.setState({isVisibleLoading: false});
+          this.closeDialog();
+          console.log('error in try-catch', error);
+          alert('Something went wrong');
+        });
+    } catch (err) {
+      this.setState({isVisibleLoading: false});
+      this.closeDialog();
+      console.log('another problem:', err);
+      alert('Something went wrong');
+    }
   };
   closeDialog = async () => {
     await this.setState({isDialogVisible: false});
@@ -109,7 +216,7 @@ export default class orderDetails extends Component {
       top_spacing,
       langar_icon,
       id_heading,
-      loader
+      loader,
     } = styles;
     return (
       <View>
@@ -151,7 +258,9 @@ export default class orderDetails extends Component {
                 : [row, bottom_spacing]
             }>
             <Text style={id_heading}>Order id : </Text>
-            <Text style={[id_heading, colored_text]}>{this.state.orderId}</Text>
+            <Text style={[id_heading, colored_text]}>
+              #{this.state.orderId}
+            </Text>
           </View>
           <View style={[row, between_spacing, bottom_spacing]}>
             <Text style={product_name}>{this.state.name}</Text>
@@ -227,6 +336,8 @@ export default class orderDetails extends Component {
             <ConfirmOrder
               visible={this.state.isDialogVisible}
               closeDialog={this.closeDialog}
+              onOrderConfirmation={this.onOrderConfirmation}
+              orderId={this.state.orderId}
             />
           ) : (
             <View />

@@ -3,7 +3,6 @@ import {
   View,
   Text,
   Image,
-  TextInput,
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
@@ -14,93 +13,88 @@ import {
   heightPercentageToDP as hp,
 } from '../../utility/index';
 import * as colors from '../../constants/colors';
+import * as Service from '../../api/services';
+import * as utility from '../../utility/index';
 
 export default class orders extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      token: '',
+      userId: '',
+      noDataExist: false,
       isVisibleLoading: false,
-      orders: [
-        {
-          image: require('../../assets/sweet.jpg'),
-          name: 'Bolognese baked Potato',
-          price: 50,
-          time: '02:30 pm',
-          orderId: '#4529874',
-          type: 'veg',
-        },
-        {
-          image: require('../../assets/burger.jpg'),
-          name: 'Chilli Potato',
-          price: 100,
-          time: '03:30 pm',
-          orderId: '#4521274',
-          type: 'nonVeg',
-        },
-        {
-          image: require('../../assets/food.jpg'),
-          name: 'Merlin Super Jumbo',
-          price: 0,
-          time: '01:30 pm',
-          orderId: '#5629874',
-          type: 'langar',
-        },
-        {
-          image: require('../../assets/sweet.jpg'),
-          name: 'Bolognese baked Potato',
-          price: 50,
-          time: '02:30 pm',
-          orderId: '#4529874',
-          type: 'veg',
-        },
-        {
-          image: require('../../assets/burger.jpg'),
-          name: 'Chilli Potato',
-          price: 0,
-          time: '03:30 pm',
-          orderId: '#4521274',
-          type: 'nonVeg',
-        },
-        {
-          image: require('../../assets/food.jpg'),
-          name: 'Merlin Super Jumbo',
-          price: 0,
-          time: '01:30 pm',
-          orderId: '#5629874',
-          type: 'langar',
-        },
-        {
-          image: require('../../assets/sweet.jpg'),
-          name: 'Bolognese baked Potato',
-          price: 50,
-          time: '02:30 pm',
-          orderId: '#4529874',
-          type: 'veg',
-        },
-        {
-          image: require('../../assets/burger.jpg'),
-          name: 'Chilli Potato',
-          price: 0,
-          time: '03:30 pm',
-          orderId: '#4521274',
-          type: 'nonVeg',
-        },
-        {
-          image: require('../../assets/food.jpg'),
-          name: 'Merlin Super Jumbo',
-          price: 0,
-          time: '01:30 pm',
-          orderId: '#5629874',
-          type: 'langar',
-        },
-      ],
+      orders: [],
     };
   }
+  componentDidMount = async () => {
+    const token = await utility.getToken('token');
+    const userId = await utility.getItem('userId');
+    await this.setState({userToken: token, userId: userId});
+    await this.getReceivedOrders();
+  };
+  getReceivedOrders = async () => {
+    await this.setState({isVisibleLoading: true, orders: []});
+    try {
+      let response = Service.getDataApi(
+        `orders?sellerId=${this.state.userId}&status=pending`,
+        this.state.userToken,
+      );
+      response
+        .then(res => {
+          if (res.data) {
+            if (res.data.orders && res.data.orders.length != 0) {
+              let tempOrders = [];
+              for (let item of res.data.orders) {
+                if (item) {
+                  let image;
+                  if (item.images && item.images.length != 0) {
+                    image = item.images[0].resize_url;
+                  }
+                  tempOrders.push({
+                    id: item.id,
+                    image: image,
+                    name: item.name,
+                    price: item.price,
+                    time: item.cookingTime,
+                    orderId: item.orderId,
+                    type: item.type,
+                  });
+                }
+              }
+              this.setState({
+                isVisibleLoading: false,
+                noDataExist: false,
+                orders: tempOrders,
+              });
+            } else {
+              this.setState({isVisibleLoading: false, noDataExist: true});
+              console.log('no data found');
+            }
+          } else {
+            this.setState({isVisibleLoading: false});
+            console.log('no data found', res.error);
+          }
+        })
+        .catch(error => {
+          this.setState({isVisibleLoading: false});
+          console.log('error in try-catch', error.error);
+          alert('Something went wrong');
+        });
+    } catch (err) {
+      this.setState({isVisibleLoading: false});
+      console.log('another problem:', err);
+      alert('Something went wrong');
+    }
+  };
   onBack = async () => {
     await this.props.navigation.navigate('tab5');
   };
-  onOrder = async () => {
-    await this.props.navigation.navigate('OrderDetails', {from: 'orders'});
+  onOrder = async id => {
+    await this.props.navigation.navigate('OrderDetails', {
+      from: 'orders',
+      orderId: id,
+    });
   };
   render() {
     const {
@@ -131,7 +125,7 @@ export default class orders extends Component {
       heading_text,
       end_align,
       free_text,
-      loader
+      loader,
     } = styles;
     return (
       <View style={[container, column, between_spacing]}>
@@ -157,7 +151,7 @@ export default class orders extends Component {
                   return (
                     <TouchableOpacity
                       activeOpacity={0.6}
-                      onPress={this.onOrder}>
+                      onPress={() => this.onOrder(value.id)}>
                       <View
                         style={[
                           row,
@@ -169,7 +163,7 @@ export default class orders extends Component {
                           <View style={list_image_continer}>
                             <Image
                               resizeMode="cover"
-                              source={value.image}
+                              source={{uri: value.image}}
                               style={list_image}
                             />
                           </View>
@@ -178,7 +172,7 @@ export default class orders extends Component {
                             <View style={{width: wp(48)}}>
                               <View style={[row]}>
                                 <Text style={product_heading}>
-                                  {value.orderId}
+                                  #{value.orderId}
                                 </Text>
                               </View>
                               <Text style={[product_heading, address_text]}>
@@ -242,3 +236,78 @@ export default class orders extends Component {
     );
   }
 }
+
+// orders: [
+//   {
+//     image: require('../../assets/sweet.jpg'),
+//     name: 'Bolognese baked Potato',
+//     price: 50,
+//     time: '02:30 pm',
+//     orderId: '#4529874',
+//     type: 'veg',
+//   },
+//   {
+//     image: require('../../assets/burger.jpg'),
+//     name: 'Chilli Potato',
+//     price: 100,
+//     time: '03:30 pm',
+//     orderId: '#4521274',
+//     type: 'nonVeg',
+//   },
+//   {
+//     image: require('../../assets/food.jpg'),
+//     name: 'Merlin Super Jumbo',
+//     price: 0,
+//     time: '01:30 pm',
+//     orderId: '#5629874',
+//     type: 'langar',
+//   },
+//   {
+//     image: require('../../assets/sweet.jpg'),
+//     name: 'Bolognese baked Potato',
+//     price: 50,
+//     time: '02:30 pm',
+//     orderId: '#4529874',
+//     type: 'veg',
+//   },
+//   {
+//     image: require('../../assets/burger.jpg'),
+//     name: 'Chilli Potato',
+//     price: 0,
+//     time: '03:30 pm',
+//     orderId: '#4521274',
+//     type: 'nonVeg',
+//   },
+//   {
+//     image: require('../../assets/food.jpg'),
+//     name: 'Merlin Super Jumbo',
+//     price: 0,
+//     time: '01:30 pm',
+//     orderId: '#5629874',
+//     type: 'langar',
+//   },
+//   {
+//     image: require('../../assets/sweet.jpg'),
+//     name: 'Bolognese baked Potato',
+//     price: 50,
+//     time: '02:30 pm',
+//     orderId: '#4529874',
+//     type: 'veg',
+//   },
+//   {
+//     image: require('../../assets/burger.jpg'),
+//     name: 'Chilli Potato',
+//     price: 0,
+//     time: '03:30 pm',
+//     orderId: '#4521274',
+//     type: 'nonVeg',
+//   },
+//   {
+//     image: require('../../assets/food.jpg'),
+//     name: 'Merlin Super Jumbo',
+//     price: 0,
+//     time: '01:30 pm',
+//     orderId: '#5629874',
+//     type: 'langar',
+//   },
+// ],

@@ -418,7 +418,7 @@ export default class login extends Component {
       fields_container,
       input_box,
       between_spacing,
-      loader
+      loader,
     } = styles;
     return (
       <HandleBack onBack={this.onBack}>
@@ -691,8 +691,7 @@ export default class login extends Component {
                   </View>
                 </TouchableOpacity>
               </View>
-              <View
-                style={loader}>
+              <View style={loader}>
                 <ActivityIndicator
                   animating={this.state.isVisibleLoading}
                   size="large"

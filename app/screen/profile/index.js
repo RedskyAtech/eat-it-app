@@ -19,6 +19,7 @@ import * as Url from '../../constants/urls';
 import Communication from '../communication';
 import {NavigationActions, StackActions} from 'react-navigation';
 import {Badge} from 'react-native-elements';
+import ImagePicker from 'react-native-image-picker';
 
 export default class profile extends Component {
   constructor(props) {
@@ -38,11 +39,22 @@ export default class profile extends Component {
       firstName: '',
       lastName: '',
       isVisibleLoading: false,
-      profileImage: '',
+      isCardVisible: false,
       isProfile: false,
       isImagePicked: false,
       isDialogVisible: false,
       isSkipped: false,
+      file: {
+        uri: '',
+        fileName: '',
+        type: '',
+      },
+      image: {
+        url: '',
+        resize_url: '',
+        thumbnail: '',
+        resize_thumbnail: '',
+      },
     };
   }
   componentDidMount = async () => {
@@ -62,6 +74,7 @@ export default class profile extends Component {
   closeDialog = async () => {
     await this.setState({isDialogVisible: false});
   };
+
   getUser = async () => {
     await this.setState({isVisibleLoading: true});
 
@@ -84,7 +97,8 @@ export default class profile extends Component {
               name: res.data.firstName + ' ' + res.data.lastName,
               email: res.data.email,
               phone: res.data.phone,
-              profileImage: image,
+              image: res.data.image,
+              // profileImage: image,
             });
             this.setState({isVisibleLoading: false});
           } else {
@@ -103,10 +117,13 @@ export default class profile extends Component {
       alert('Something went wrong');
     }
   };
+
   changePassword = async () => {
     if (
       utility.isFieldEmpty(
-        this.state.password && this.state.newPassword && this.state.oldPassword,
+        this.state.password &&
+          this.state.newPassword &&
+          this.state.confirmPassword,
       )
     ) {
       alert('All fields are required');
@@ -159,22 +176,165 @@ export default class profile extends Component {
       }
     }
   };
+  onUploadImage = async file => {
+    console.log('fileeeeeeeeeee:', file);
+    await this.setState({isVisibleLoading: true});
 
+    var formData = new FormData();
+    let fileData = {
+      uri: file.uri,
+      name: file.fileName,
+      type: file.type,
+    };
+    formData.append('file', fileData);
+    const headers = {
+      'Content-Type': 'multipart/form-data',
+      Accept: 'application/json',
+    };
+    try {
+      let response = Service.uploadImageApi(
+        Url.UPLOAD_IMAGE,
+        formData,
+        headers,
+      );
+      response
+        .then(res => {
+          if (res.data) {
+            if (res.data != null) {
+              if (res.data.image != null) {
+                this.setState({
+                  isImagePicked: true,
+                  image: {
+                    url: res.data.image.url,
+                    thumbnail: res.data.image.thumbnail,
+                    resize_url: res.data.image.resize_url,
+                    resize_thumbnail: res.data.image.resize_thumbnail,
+                  },
+                });
+                this.editProfile();
+                this.setState({isVisibleLoading: false});
+              }
+            }
+          } else {
+            this.setState({isVisibleLoading: false});
+            console.log('no data found', res.error);
+          }
+        })
+        .catch(error => {
+          this.setState({isVisibleLoading: false});
+          console.log('error in try-catch', error.error);
+          alert('Something went wrong');
+        });
+    } catch (err) {
+      this.setState({isVisibleLoading: false});
+      console.log('another problem:', err);
+      alert('Something went wrong');
+    }
+  };
+  onLaunchCamera = () => {
+    let options = {
+      cameraType: 'front',
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+      },
+    };
+    ImagePicker.showImagePicker(options, response => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+        alert(response.customButton);
+      } else {
+        const source = {uri: response.uri};
+        let file = {
+          uri: response.uri,
+          fileName: response.fileName,
+          type: response.type,
+        };
+        console.log('fileee::::::', file);
+        this.setState({isImagePicked: true, file: file});
+      }
+    });
+  };
+  editProfile = async () => {
+    this.setState({isVisibleLoading: true});
+    let body = {
+      firstName: this.state.firstName,
+      lastName: this.state.lastName,
+      email: this.state.email,
+      phone: this.state.phone,
+      image: this.state.image,
+    };
+    try {
+      let response = Service.putDataApi(
+        `users/${this.state.userId}`,
+        body,
+        this.state.userToken,
+      );
+      response
+        .then(res => {
+          if (res.data) {
+            this.setState({isVisibleLoading: false, isImagePicked: false});
+            alert('Profile update successfully');
+            this.getUser();
+            this.hideCard();
+          } else {
+            this.setState({isVisibleLoading: false});
+            console.log('no data found', res.error);
+          }
+        })
+        .catch(error => {
+          this.setState({isVisibleLoading: false});
+          console.log('error in try-catch', error);
+          alert('Something went wrong');
+        });
+    } catch (err) {
+      this.setState({isVisibleLoading: false});
+      console.log('another problem:', err);
+      alert('Something went wrong');
+    }
+  };
+  editProfileValidations = async () => {
+    if (
+      utility.isFieldEmpty(
+        this.state.firstName &&
+          this.state.lastName &&
+          this.state.email &&
+          this.state.phone,
+      )
+    ) {
+      alert('All fields are required');
+      return;
+    } else if (this.state.isImagePicked) {
+      await this.onUploadImage(this.state.file);
+    } else {
+      await this.editProfile();
+    }
+  };
   openMenu = () => this.setState({visible: true});
 
   closeMenu = () => this.setState({visible: false});
 
   showCard = async from => {
     if (from == 'profile') {
-      await this.setState({isProfile: true});
-      await this.setState({visible: false});
+      await this.setState({
+        isProfile: true,
+        isCardVisible: true,
+        visible: false,
+      });
       Animated.timing(this.state.profileTop, {
         toValue: 0,
         duration: 700,
       }).start();
     } else {
-      await this.setState({isProfile: false});
-      await this.setState({visible: false});
+      await this.setState({
+        isProfile: false,
+        isCardVisible: true,
+        visible: false,
+      });
       Animated.timing(this.state.top, {
         toValue: 0,
         duration: 700,
@@ -193,6 +353,7 @@ export default class profile extends Component {
         duration: 700,
       }).start();
     }
+    await this.setState({isCardVisible: false});
   };
 
   onLogOutSubmit = async () => {
@@ -205,7 +366,8 @@ export default class profile extends Component {
       name: '',
       email: '',
       phone: '',
-      profileImage: '',
+      image: {},
+      file: '',
     });
     await this.props.navigation.navigate('Login');
     await this.closeMenu();
@@ -229,7 +391,7 @@ export default class profile extends Component {
     await this.props.navigation.navigate('tab4', {from: 'profile'});
   };
   onNotification = async () => {
-    await this.props.navigation.navigate('Notifications',{from:'profile'});
+    await this.props.navigation.navigate('Notifications', {from: 'profile'});
     await this.closeMenu();
   };
   onAbout = async () => {
@@ -287,7 +449,7 @@ export default class profile extends Component {
       profile_style,
       badge_style,
       badge_text_style,
-      loader
+      loader,
     } = styles;
     return (
       <Provider>
@@ -376,16 +538,16 @@ export default class profile extends Component {
                 </View>
                 <View
                   style={
-                    this.state.profileImage == ''
+                    this.state.image.resize_url == ''
                       ? [profile_image, {padding: 3}]
                       : profile_image
                   }>
                   <Image
                     resizeMode="cover"
                     source={
-                      this.state.profileImage == ''
+                      this.state.image.resize_url == ''
                         ? require('../../assets/profile.png')
-                        : {uri: this.state.profileImage}
+                        : {uri: this.state.image.resize_url}
                     }
                     style={profile_temp}
                   />
@@ -598,6 +760,7 @@ export default class profile extends Component {
                           style={input_box}
                           onChangeText={email => this.setState({email})}
                           value={this.state.email}
+                          editable={false}
                         />
                       </View>
                       <View style={[row, fields]}>
@@ -616,24 +779,30 @@ export default class profile extends Component {
 
                       <View style={[row, between_spacing, top_spacing]}>
                         <View style={row}>
-                          <TouchableOpacity activeOpacity={0.7}>
+                          <TouchableOpacity
+                            activeOpacity={0.7}
+                            onPress={this.onLaunchCamera}>
                             <View
                               style={[
                                 pic_image_container,
-                                this.state.profileImage ? '' : {padding: 5},
+                                this.state.image.resize_url ? '' : {padding: 5},
                               ]}>
                               <Image
                                 resizeMode="stretch"
                                 source={
-                                  this.state.profileImage == ''
+                                  this.state.image.resize_url == ''
                                     ? require('../../assets/profile_white.png')
-                                    : {uri: this.state.profileImage}
+                                    : this.state.isImagePicked
+                                    ? {uri: this.state.file.uri}
+                                    : {uri: this.state.image.resize_url}
                                 }
                                 style={profile_images}
                               />
                             </View>
                           </TouchableOpacity>
-                          <TouchableOpacity activeOpacity={0.6}>
+                          <TouchableOpacity
+                            activeOpacity={0.6}
+                            onPress={this.onLaunchCamera}>
                             <View style={edit_container}>
                               <Image
                                 resizeMode="stretch"
@@ -643,9 +812,13 @@ export default class profile extends Component {
                             </View>
                           </TouchableOpacity>
                         </View>
-                        <View style={update_button_container}>
-                          <Text style={update_text_style}>Update</Text>
-                        </View>
+                        <TouchableOpacity
+                          activeOpacity={0.8}
+                          onPress={this.editProfileValidations}>
+                          <View style={update_button_container}>
+                            <Text style={update_text_style}>Update</Text>
+                          </View>
+                        </TouchableOpacity>
                       </View>
                     </View>
                   ) : (
@@ -723,7 +896,7 @@ export default class profile extends Component {
               <ActivityIndicator
                 animating={this.state.isVisibleLoading}
                 size="large"
-                color={colors.primaryColor}
+                color={this.state.isCardVisible ? 'white' : colors.primaryColor}
               />
             </View>
           </View>

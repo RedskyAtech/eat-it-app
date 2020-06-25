@@ -66,14 +66,14 @@ export default class myFood extends Component {
   getPurchasedFood = async () => {
     try {
       let response = Service.getDataApi(
-        `payments?userId=${this.state.userId}`,
+        `orders?buyerId=${this.state.userId}&status=delivered`,
         this.state.userToken,
       );
       response
         .then(res => {
           if (res.data) {
-            if (res.data.payments) {
-              if (res.data.payments.length != 0) {
+            if (res.data.orders) {
+              if (res.data.orders.length != 0) {
                 let shared = [
                   {
                     content: [],
@@ -83,22 +83,21 @@ export default class myFood extends Component {
                   },
                 ];
                 let tempContent = [];
-                for (let i = 0; i < res.data.payments.length; i++) {
+                for (let i = 0; i < res.data.orders.length; i++) {
                   let image;
-                  if (res.data.payments[i].images) {
-                    image = res.data.payments[i].images[0].url;
+                  if (res.data.orders[i].images) {
+                    image = res.data.orders[i].images[0].url;
                   }
                   tempContent.push({
-                    id: res.data.payments[i].id,
-                    foodId: res.data.payments[i].foodId,
-                    name: res.data.payments[i].name,
-                    price: res.data.payments[i].price,
-                    time: res.data.payments[i].cookingTime,
-                    address: res.data.payments[i].address,
+                    id: res.data.orders[i].id,
+                    foodId: res.data.orders[i].foodId,
+                    name: res.data.orders[i].name,
+                    price: res.data.orders[i].price,
+                    time: res.data.orders[i].cookingTime,
+                    address: res.data.orders[i].address,
                     image: image,
-                    isLiked: res.data.payments[i].favoriteType,
-                    type: res.data.payments[i].type,
-                    isVeg: true,
+                    isLiked: res.data.orders[i].favoriteType,
+                    type: res.data.orders[i].type,
                   });
                 }
                 shared[0].content = tempContent;
@@ -120,6 +119,7 @@ export default class myFood extends Component {
       alert('Something went wrong');
     }
   };
+
   getSharedFood = async () => {
     try {
       let response = Service.getDataApi(
@@ -130,7 +130,7 @@ export default class myFood extends Component {
         .then(res => {
           if (res.data) {
             if (res.data.length != 0) {
-              console.log('datattatatata:', res.data);
+              // console.log('datattatatata:', res.data);
               let shared = [
                 {
                   content: [],
@@ -431,107 +431,3 @@ export default class myFood extends Component {
     );
   }
 }
-
-// if (from == 'profile') {
-//   const userId = await utility.getItem('userId');
-//   const userToken = await utility.getToken('token');
-//   this.setState({userId: userId, userToken: userToken});
-//   await this.getPurchasedFood();
-//   await this.getSharedFood();
-// } else {
-//   let array = [
-//     {
-//       content: [
-//         {
-//           id: '1',
-//           foodId: '2',
-//           name: 'Pasta',
-//           price: '10',
-//           time: '02:30 pm',
-//           address: 'Mohali, Chandigarh',
-//           image: require('../../assets/sweet.jpg'),
-//           isLiked: 'none',
-//           type: 'veg',
-//           isVeg: true,
-//         },
-//         {
-//           id: '1',
-//           foodId: '2',
-//           name: 'Burger',
-//           price: '10',
-//           time: '02:30 pm',
-//           address: 'Mohali, Chandigarh',
-//           image: require('../../assets/sweet.jpg'),
-//           isLiked: 'none',
-//           type: 'veg',
-//           isVeg: true,
-//         },
-//         {
-//           id: '1',
-//           foodId: '2',
-//           name: 'Piza',
-//           price: '10',
-//           time: '02:30 pm',
-//           address: 'Mohali, Chandigarh',
-//           image: require('../../assets/sweet.jpg'),
-//           isLiked: 'none',
-//           type: 'veg',
-//           isVeg: true,
-//         },
-//         {
-//           id: '1',
-//           foodId: '2',
-//           name: 'Poha',
-//           price: '10',
-//           time: '02:30 pm',
-//           address: 'Mohali, Chandigarh',
-//           image: require('../../assets/sweet.jpg'),
-//           isLiked: 'none',
-//           type: 'veg',
-//           isVeg: true,
-//         },
-//         {
-//           id: '1',
-//           foodId: '2',
-//           name: 'Pasta',
-//           price: '10',
-//           time: '02:30 pm',
-//           address: 'Mohali, Chandigarh',
-//           image: require('../../assets/sweet.jpg'),
-//           isLiked: 'none',
-//           type: 'veg',
-//           isVeg: true,
-//         },
-//       ],
-//     },
-//     {
-//       content: [
-//         {
-//           id: '1',
-//           foodId: '2',
-//           name: 'Pasta',
-//           price: '10',
-//           time: '02:30 pm',
-//           address: 'Mohali, Chandigarh',
-//           image: require('../../assets/sweet.jpg'),
-//           isLiked: 'none',
-//           type: 'veg',
-//           isVeg: true,
-//         },
-//         {
-//           id: '1',
-//           foodId: '2',
-//           name: 'Pasta',
-//           price: '10',
-//           time: '02:30 pm',
-//           address: 'Mohali, Chandigarh',
-//           image: require('../../assets/sweet.jpg'),
-//           isLiked: 'none',
-//           type: 'veg',
-//           isVeg: true,
-//         },
-//       ],
-//     },
-//   ];
-//   await this.setState({dataArray: array});
-// }

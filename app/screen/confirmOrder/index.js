@@ -22,8 +22,8 @@ export default class confirmOrder extends Component {
   };
 
   onSubmit = async () => {
-    await this.props.closeDialog();
-    this.props.navigation.navigate('OrderDetail');
+    await this.props.onOrderConfirmation();
+    this.props.navigation.navigate('Orders');
   };
 
   render() {
@@ -56,7 +56,7 @@ export default class confirmOrder extends Component {
                 Want to confirm order with id{' '}
               </Text>
               <Text style={[text_style, bottom_margin, colored_text]}>
-                #5734983
+                #{this.props.orderId}
               </Text>
             </View>
             <View style={[row, button_container]}>
