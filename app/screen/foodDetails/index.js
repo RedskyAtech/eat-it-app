@@ -37,12 +37,16 @@ export default class foodDetails extends Component {
       isVisibleLoading: false,
       isSkipped: false,
       isPriceShow: false,
+      userId: '',
+      sellerId: '',
+      isSeller: true,
     };
   }
   componentDidMount = async () => {
     let foodId;
     let isSkipped = await utility.getItem('isSkipped');
-    await this.setState({isSkipped: isSkipped});
+    const userId = await utility.getItem('userId');
+    await this.setState({isSkipped: isSkipped, userId: userId});
 
     if (this.props.navigation.state.params) {
       if (this.props.navigation.state.params.from == 'home') {
@@ -118,8 +122,13 @@ export default class foodDetails extends Component {
               deliveryPrice: deliveryPrice,
               totalAmount: deliveryPrice + price,
               images: res.data.images,
+              sellerId: res.data.userId,
             });
-
+            if (this.state.userId == this.state.sellerId) {
+              this.setState({isSeller: true});
+            } else {
+              this.setState({isSeller: false});
+            }
             this.setState({isVisibleLoading: false, isPriceShow: true});
           } else {
             this.setState({isVisibleLoading: false});
@@ -320,17 +329,24 @@ export default class foodDetails extends Component {
 
           <View style={[bottom_container, bottom_spacing]}>
             <Text />
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={!this.state.isSkipped ? this.onBuy : this.onAlert}>
-              <LinearGradient
-                start={{x: 0, y: 0}}
-                end={{x: 1, y: 0}}
-                colors={[colors.gradientFirstColor, colors.gradientSecondColor]}
-                style={[button_container, centered_text]}>
-                <Text style={button_text}>Buy food</Text>
-              </LinearGradient>
-            </TouchableOpacity>
+            {!this.state.isSeller ? (
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={!this.state.isSkipped ? this.onBuy : this.onAlert}>
+                <LinearGradient
+                  start={{x: 0, y: 0}}
+                  end={{x: 1, y: 0}}
+                  colors={[
+                    colors.gradientFirstColor,
+                    colors.gradientSecondColor,
+                  ]}
+                  style={[button_container, centered_text]}>
+                  <Text style={button_text}>Buy food</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            ) : (
+              <View />
+            )}
           </View>
 
           <View style={loader}>

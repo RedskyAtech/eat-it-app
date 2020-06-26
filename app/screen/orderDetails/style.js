@@ -152,6 +152,24 @@ const styles = {
     alignSelf: 'flex-end',
     elevation: 4,
   },
+  otp_fields: {
+    marginVertical: hp(2.4),
+    width: wp(55),
+    alignSelf: 'center',
+  },
+  otp_input_box: {
+    padding: 0,
+    height: hp(5.4),
+    width: hp(5.4),
+    borderRadius: 4,
+    backgroundColor: '#696969',
+    textAlign: 'center',
+    color: 'white',
+    fontSize: 20,
+  },
+  background_theme_color: {
+    backgroundColor: colors.primaryColor,
+  },
   button_text: {
     color: 'white',
   },
@@ -159,5 +177,11 @@ const styles = {
     justifyContent: 'space-around',
     alignItems: 'center',
   },
+  otp_container:{
+    marginVertical:hp(1)
+  },
+  text_style:{
+    fontSize: fonts.FONT_TEXT,
+  }
 };
 export default styles;

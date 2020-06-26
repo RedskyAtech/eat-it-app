@@ -9,6 +9,8 @@ import {
 } from 'react-native';
 import styles from './style';
 import * as colors from '../../constants/colors';
+import * as Service from '../../api/services';
+import * as utility from '../../utility/index';
 
 export default class followedSellers extends Component {
   constructor(props) {
@@ -17,7 +19,8 @@ export default class followedSellers extends Component {
       isVisibleLoading: false,
       userId: '',
       userToken: '',
-      sellers: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'],
+      followedSellers: [],
+      noDataExist: false,
     };
   }
   componentDidMount = async () => {
@@ -31,7 +34,7 @@ export default class followedSellers extends Component {
     try {
       let response = Service.getDataApi(
         `favorites?buyerId=${this.state.userId}`,
-        this.state.userToken,
+        '',
       );
       response
         .then(res => {
@@ -41,22 +44,73 @@ export default class followedSellers extends Component {
               for (let item of res.data.favorites) {
                 if (item) {
                   tempFavourites.push({
+                    sellerId: item.sellerId,
                     name: item.firstName + ' ' + item.lastName,
+                    image: item.image.resize_url,
                     totalFollowers: item.followerCount,
                     totalDishes: item.totalDishes,
                   });
                 }
               }
+              this.setState({
+                isVisibleLoading: false,
+                followedSellers: tempFavourites,
+                noDataExist: false,
+              });
+            } else {
+              this.setState({
+                isVisibleLoading: false,
+                noDataExist: true,
+              });
             }
           } else {
-            this.setState({isVisibleLoading: false});
+            this.setState({isVisibleLoading: false, noDataExist: false});
             console.log('no data found', res.error);
             // alert(res.error);
           }
         })
         .catch(error => {
-          this.setState({isVisibleLoading: false});
+          this.setState({isVisibleLoading: false, noDataExist: false});
           console.log('error in try-catch', error.error);
+          alert('Something went wrong');
+        });
+    } catch (err) {
+      this.setState({isVisibleLoading: false, noDataExist: false});
+      console.log('another problem:', err);
+      alert('Something went wrong');
+    }
+  };
+  showDialog = async sellerId => {
+    await utility.showAlert('Do you want to unfollow seller.', () =>
+      this.unFollowSeller(sellerId),
+    );
+  };
+  unFollowSeller = async sellerId => {
+    this.setState({isVisibleLoading: true});
+    let body = {
+      isfollowed: 'false',
+      sellerId: sellerId,
+    };
+    try {
+      let response = Service.putDataApi(
+        `users/${this.state.userId}`,
+        body,
+        this.state.userToken,
+      );
+      response
+        .then(res => {
+          if (res.data) {
+            this.setState({isVisibleLoading: false});
+            alert('Unfollow successfully');
+            this.getFollowedSellers();
+          } else {
+            this.setState({isVisibleLoading: false});
+            console.log('no data found', res.error);
+          }
+        })
+        .catch(error => {
+          this.setState({isVisibleLoading: false});
+          console.log('error in try-catch', error);
           alert('Something went wrong');
         });
     } catch (err) {
@@ -110,29 +164,39 @@ export default class followedSellers extends Component {
           {!this.state.noDataExist ? (
             <View style={list_height}>
               <ScrollView>
-                {this.state.sellers.map(value => {
+                {this.state.followedSellers.map(value => {
                   return (
                     <View style={[row, between_spacing, bottom_margin]}>
                       <View style={[row]}>
                         <Image
                           resizeMode="cover"
-                          source={require('../../assets/pic.jpg')}
+                          source={{uri: value.image}}
                           style={profile_image}
                         />
                         <View style={[column, list_text_style]}>
-                          <Text style={name_heading}>Zain Imam</Text>
+                          <Text style={name_heading}>{value.name}</Text>
                           <View
                             style={[row, {justifyContent: 'space-between'}]}>
-                            <Text style={text_style}>100 followers</Text>
-                            <Text style={text_style}>40 dishes added</Text>
+                            <Text style={text_style}>
+                              {value.totalFollowers} followers
+                            </Text>
+                            <Text style={text_style}>
+                              {value.totalDishes} dishes added
+                            </Text>
                           </View>
                         </View>
                       </View>
-                      <Image
-                        resizeMode="cover"
-                        style={like_icon}
-                        source={require('../../assets/heart_fill.png')}
-                      />
+                      <TouchableOpacity
+                        activeOpacity={0.7}
+                        onPress={() => {
+                          this.showDialog(value.sellerId);
+                        }}>
+                        <Image
+                          resizeMode="cover"
+                          style={like_icon}
+                          source={require('../../assets/heart_fill.png')}
+                        />
+                      </TouchableOpacity>
                     </View>
                   );
                 })}

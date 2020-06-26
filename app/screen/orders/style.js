@@ -77,6 +77,20 @@ const styles = {
   column_between_spacing: {
     justifyContent: 'space-between',
   },
+  status_container: {
+    paddingVertical: hp(0.2),
+    paddingHorizontal: hp(0.8),
+    borderRadius: 3,
+  },
+  status_style: {
+    textTransform: 'capitalize',
+    color: 'white',
+    fontSize: fonts.FONT_NORMAL,
+  },
+  pending_style: {backgroundColor: 'green'},
+  confirmed_style: {backgroundColor: '#FED704'},
+  delivered_style: {backgroundColor: colors.primaryColor},
+  rejected_style: {backgroundColor: 'red'},
 
   inner_list_spacing: {
     marginTop: hp(0.2),
@@ -147,6 +161,31 @@ const styles = {
   },
   row_center_align: {
     alignItems: 'center',
+  },
+  filter_container: {
+    marginBottom: hp(2),
+    paddingHorizontal: wp(2),
+    width:wp(86),
+    alignSelf:'center'
+  },
+  filters: {
+    height: hp(5),
+    width: wp(24),
+    borderRadius: 30,
+    padding: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    // marginRight: wp(1.2),/
+    marginHorizontal: wp(0.7),
+  },
+  filter_text: {
+    fontSize: 14,
+  },
+  selected_color: {
+    backgroundColor: colors.gradientFirstColor,
+  },
+  unselected_color: {
+    backgroundColor: colors.unselectedFilter,
   },
 };
 export default styles;

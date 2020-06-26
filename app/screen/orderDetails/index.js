@@ -5,6 +5,7 @@ import {
   Text,
   TouchableOpacity,
   ActivityIndicator,
+  TextInput,
 } from 'react-native';
 import styles from './style';
 import LinearGradient from 'react-native-linear-gradient';
@@ -34,6 +35,15 @@ export default class orderDetails extends Component {
       isVisibleLoading: false,
       isPriceShow: true,
       id: '',
+      status: '',
+      buttonStatus: '',
+      fields: [1, 2, 3, 4],
+      firstDigit: '',
+      secondDigit: '',
+      thirdDigit: '',
+      fourthDigit: '',
+      selectedField: 0,
+      showButtons: false,
     };
   }
   componentDidMount = async () => {
@@ -48,8 +58,13 @@ export default class orderDetails extends Component {
             await this.setState({
               id: this.props.navigation.state.params.orderId,
             });
-            await this.getOrderDetail();
           }
+          if (this.props.navigation.state.params.status) {
+            await this.setState({
+              status: this.props.navigation.state.params.status,
+            });
+          }
+          await this.getOrderDetail();
         }
       }
     }
@@ -99,6 +114,7 @@ export default class orderDetails extends Component {
               totalAmount: price + deliveryPrice,
               images: res.data.images,
               isVisibleLoading: false,
+              showButtons: true,
             });
           } else {
             this.setState({isVisibleLoading: false});
@@ -145,14 +161,23 @@ export default class orderDetails extends Component {
       />
     );
   };
-  onConfirm = async () => {
-    await this.setState({isDialogVisible: true});
+  onSubmit = async from => {
+    await this.setState({isDialogVisible: true, buttonStatus: from});
   };
   onOrderConfirmation = async () => {
     this.setState({isVisibleLoading: true});
-    let body = {
-      status: 'confirmed',
-    };
+    let body;
+    if (this.state.buttonStatus == 'confirm') {
+      body = {
+        status: 'confirmed',
+      };
+    }
+    if (this.state.buttonStatus == 'reject') {
+      body = {
+        status: 'rejected',
+      };
+    }
+
     try {
       let response = Service.putDataApi(
         `orders/${this.state.id}`,
@@ -164,7 +189,13 @@ export default class orderDetails extends Component {
           if (res.data) {
             this.setState({isVisibleLoading: false});
             this.closeDialog();
-            alert('update successfully');
+            if (this.state.buttonStatus == 'reject') {
+              alert('Order rejected successfully');
+            }
+            if (this.state.buttonStatus == 'confirm') {
+              alert('Order confirmed successfully');
+            }
+            this.props.navigation.navigate('Orders');
           } else {
             this.setState({isVisibleLoading: false});
             this.closeDialog();
@@ -186,6 +217,30 @@ export default class orderDetails extends Component {
   };
   closeDialog = async () => {
     await this.setState({isDialogVisible: false});
+  };
+  onChange = async (value, item) => {
+    if (item == 1) {
+      await this.setState({firstDigit: value, selectedField: item});
+      if (value) {
+        this.refs.second.focus();
+      }
+    }
+    if (item == 2) {
+      await this.setState({secondDigit: value, selectedField: item});
+      if (value) {
+        this.refs.third.focus();
+      }
+      0;
+    }
+    if (item == 3) {
+      await this.setState({thirdDigit: value, selectedField: item});
+      if (value) {
+        this.refs.fourth.focus();
+      }
+    }
+    if (item == 4) {
+      await this.setState({fourthDigit: value, selectedField: item});
+    }
   };
   render() {
     const {
@@ -217,6 +272,12 @@ export default class orderDetails extends Component {
       langar_icon,
       id_heading,
       loader,
+      column,
+      otp_fields,
+      otp_input_box,
+      background_theme_color,
+      otp_container,
+      text_style,
     } = styles;
     return (
       <View>
@@ -280,7 +341,6 @@ export default class orderDetails extends Component {
             ) : (
               <Text style={[price, colored_text]}>Rs {this.state.price}</Text>
             )}
-            {/* <Text style={[price, colored_text]}>Rs {this.state.price}</Text> */}
             <View style={[row, {alignItems: 'center'}]}>
               <View
                 style={
@@ -312,32 +372,111 @@ export default class orderDetails extends Component {
               Rs {this.state.totalAmount}
             </Text>
           </View>
+          {!this.state.showButtons ? (
+            <View />
+          ) : (
+            <>
+              {this.state.status == 'confirmed' ? (
+                <View style={[column, otp_container]}>
+                  <View style={[row, centered_text]}>
+                    <Text style={[colored_text, text_style]}>
+                      Enter four digit OTP for confirmation.
+                    </Text>
+                  </View>
+                  <View style={[row, otp_fields, between_spacing]}>
+                    {this.state.fields.map(item => {
+                      return (
+                        <TextInput
+                          style={
+                            this.state.selectedField >= item
+                              ? [otp_input_box, background_theme_color]
+                              : otp_input_box
+                          }
+                          maxLength={1}
+                          ref={
+                            item == 1
+                              ? 'first'
+                              : item == 2
+                              ? 'second'
+                              : item == 3
+                              ? 'third'
+                              : 'fourth'
+                          }
+                          keyboardType="numeric"
+                          onChangeText={value => this.onChange(value, item)}
+                        />
+                      );
+                    })}
+                  </View>
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={this.onSubmitOtp}>
+                    <LinearGradient
+                      start={{x: 0, y: 0}}
+                      end={{x: 1, y: 0}}
+                      colors={[
+                        colors.gradientFirstColor,
+                        colors.gradientSecondColor,
+                      ]}
+                      style={[
+                        button_container,
+                        centered_text,
+                        {alignSelf: 'center'},
+                      ]}>
+                      <Text style={button_text}>Submit</Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <View style={[bottom_container, bottom_spacing]}>
+                  {this.state.from == 'confirmedNotification' ||
+                  this.state.status == 'rejected' ||
+                  this.state.status == 'delivered' ? (
+                    <View />
+                  ) : (
+                    <>
+                      <TouchableOpacity
+                        activeOpacity={0.7}
+                        onPress={() => this.onSubmit('reject')}>
+                        <LinearGradient
+                          start={{x: 0, y: 0}}
+                          end={{x: 1, y: 0}}
+                          colors={[
+                            colors.gradientFirstColor,
+                            colors.gradientSecondColor,
+                          ]}
+                          style={[button_container, centered_text]}>
+                          <Text style={button_text}>Reject</Text>
+                        </LinearGradient>
+                      </TouchableOpacity>
 
-          <View style={[bottom_container, bottom_spacing]}>
-            <Text />
-            {this.state.from == 'confirmedNotification' ? (
-              <View />
-            ) : (
-              <TouchableOpacity activeOpacity={0.7} onPress={this.onConfirm}>
-                <LinearGradient
-                  start={{x: 0, y: 0}}
-                  end={{x: 1, y: 0}}
-                  colors={[
-                    colors.gradientFirstColor,
-                    colors.gradientSecondColor,
-                  ]}
-                  style={[button_container, centered_text]}>
-                  <Text style={button_text}>Confirm</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            )}
-          </View>
+                      <TouchableOpacity
+                        activeOpacity={0.7}
+                        onPress={() => this.onSubmit('confirm')}>
+                        <LinearGradient
+                          start={{x: 0, y: 0}}
+                          end={{x: 1, y: 0}}
+                          colors={[
+                            colors.gradientFirstColor,
+                            colors.gradientSecondColor,
+                          ]}
+                          style={[button_container, centered_text]}>
+                          <Text style={button_text}>Confirm</Text>
+                        </LinearGradient>
+                      </TouchableOpacity>
+                    </>
+                  )}
+                </View>
+              )}
+            </>
+          )}
           {this.state.isDialogVisible ? (
             <ConfirmOrder
               visible={this.state.isDialogVisible}
               closeDialog={this.closeDialog}
               onOrderConfirmation={this.onOrderConfirmation}
               orderId={this.state.orderId}
+              status={this.state.buttonStatus}
             />
           ) : (
             <View />

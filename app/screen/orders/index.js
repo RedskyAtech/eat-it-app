@@ -22,22 +22,36 @@ export default class orders extends Component {
     this.state = {
       token: '',
       userId: '',
+      selectedIndex: 0,
       noDataExist: false,
       isVisibleLoading: false,
       orders: [],
+      query: '',
+      filtersList: [
+        {
+          name: 'Current',
+        },
+        {
+          name: 'Past',
+        },
+      ],
     };
   }
   componentDidMount = async () => {
     const token = await utility.getToken('token');
     const userId = await utility.getItem('userId');
-    await this.setState({userToken: token, userId: userId});
+    await this.setState({
+      userToken: token,
+      userId: userId,
+      query: `sellerId=${this.state.userId}history=false`,
+    });
     await this.getReceivedOrders();
   };
   getReceivedOrders = async () => {
     await this.setState({isVisibleLoading: true, orders: []});
     try {
       let response = Service.getDataApi(
-        `orders?sellerId=${this.state.userId}&status=pending`,
+        `orders?sellerId=${this.state.userId}`,
         this.state.userToken,
       );
       response
@@ -59,6 +73,7 @@ export default class orders extends Component {
                     time: item.cookingTime,
                     orderId: item.orderId,
                     type: item.type,
+                    status: item.status,
                   });
                 }
               }
@@ -90,11 +105,24 @@ export default class orders extends Component {
   onBack = async () => {
     await this.props.navigation.navigate('tab5');
   };
-  onOrder = async id => {
+  onOrder = async (id, status) => {
     await this.props.navigation.navigate('OrderDetails', {
       from: 'orders',
       orderId: id,
+      status: status,
     });
+  };
+  onListItem = async index => {
+    if (index == 0) {
+      await this.setState({
+        query: `sellerId=${this.state.userId}history=false`,
+      });
+    }
+    if (index == 1) {
+      await this.setState({query: `sellerId=${this.state.userId}history=true`});
+    }
+    await this.getReceivedOrders();
+    await this.setState({selectedIndex: index});
   };
   render() {
     const {
@@ -126,6 +154,17 @@ export default class orders extends Component {
       end_align,
       free_text,
       loader,
+      status_container,
+      pending_style,
+      confirmed_style,
+      delivered_style,
+      rejected_style,
+      status_style,
+      filter_container,
+      filters,
+      selected_color,
+      unselected_color,
+      filter_text,
     } = styles;
     return (
       <View style={[container, column, between_spacing]}>
@@ -144,6 +183,24 @@ export default class orders extends Component {
             </View>
           </View>
 
+          <View style={[row, filter_container, between_spacing]}>
+            {this.state.filtersList.map(item => {
+              let index = this.state.filtersList.indexOf(item);
+              return (
+                <TouchableOpacity onPress={() => this.onListItem(index)}>
+                  <View
+                    style={
+                      this.state.selectedIndex == index
+                        ? [filters, selected_color]
+                        : [filters, unselected_color]
+                    }>
+                    <Text style={filter_text}>{item.name}</Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
           {!this.state.noDataExist ? (
             <View style={list_height}>
               <ScrollView>
@@ -151,7 +208,7 @@ export default class orders extends Component {
                   return (
                     <TouchableOpacity
                       activeOpacity={0.6}
-                      onPress={() => this.onOrder(value.id)}>
+                      onPress={() => this.onOrder(value.id, value.status)}>
                       <View
                         style={[
                           row,
@@ -199,12 +256,33 @@ export default class orders extends Component {
                                     : 'Non-veg'}
                                 </Text>
                               </View>
+                              <View style={[row, row_center_align]}>
+                                <Image
+                                  resizeMode="stretch"
+                                  source={require('../../assets/clock.png')}
+                                  style={clock}
+                                />
+                                <Text style={text_style}>{value.time}</Text>
+                              </View>
                             </View>
                           </View>
                         </View>
                         <View
                           style={[column, column_between_spacing, end_align]}>
-                          <Text style={text_style}>{value.time}</Text>
+                          <View
+                            style={[
+                              status_container,
+                              ,
+                              value.status == 'pending'
+                                ? pending_style
+                                : value.status == 'confirmed'
+                                ? confirmed_style
+                                : value.status == 'delivered'
+                                ? delivered_style
+                                : rejected_style,
+                            ]}>
+                            <Text style={status_style}>{value.status}</Text>
+                          </View>
                           {value.type == 'langar' ? (
                             <View />
                           ) : value.price == 0 ? (
@@ -236,78 +314,3 @@ export default class orders extends Component {
     );
   }
 }
-
-// orders: [
-//   {
-//     image: require('../../assets/sweet.jpg'),
-//     name: 'Bolognese baked Potato',
-//     price: 50,
-//     time: '02:30 pm',
-//     orderId: '#4529874',
-//     type: 'veg',
-//   },
-//   {
-//     image: require('../../assets/burger.jpg'),
-//     name: 'Chilli Potato',
-//     price: 100,
-//     time: '03:30 pm',
-//     orderId: '#4521274',
-//     type: 'nonVeg',
-//   },
-//   {
-//     image: require('../../assets/food.jpg'),
-//     name: 'Merlin Super Jumbo',
-//     price: 0,
-//     time: '01:30 pm',
-//     orderId: '#5629874',
-//     type: 'langar',
-//   },
-//   {
-//     image: require('../../assets/sweet.jpg'),
-//     name: 'Bolognese baked Potato',
-//     price: 50,
-//     time: '02:30 pm',
-//     orderId: '#4529874',
-//     type: 'veg',
-//   },
-//   {
-//     image: require('../../assets/burger.jpg'),
-//     name: 'Chilli Potato',
-//     price: 0,
-//     time: '03:30 pm',
-//     orderId: '#4521274',
-//     type: 'nonVeg',
-//   },
-//   {
-//     image: require('../../assets/food.jpg'),
-//     name: 'Merlin Super Jumbo',
-//     price: 0,
-//     time: '01:30 pm',
-//     orderId: '#5629874',
-//     type: 'langar',
-//   },
-//   {
-//     image: require('../../assets/sweet.jpg'),
-//     name: 'Bolognese baked Potato',
-//     price: 50,
-//     time: '02:30 pm',
-//     orderId: '#4529874',
-//     type: 'veg',
-//   },
-//   {
-//     image: require('../../assets/burger.jpg'),
-//     name: 'Chilli Potato',
-//     price: 0,
-//     time: '03:30 pm',
-//     orderId: '#4521274',
-//     type: 'nonVeg',
-//   },
-//   {
-//     image: require('../../assets/food.jpg'),
-//     name: 'Merlin Super Jumbo',
-//     price: 0,
-//     time: '01:30 pm',
-//     orderId: '#5629874',
-//     type: 'langar',
-//   },
-// ],

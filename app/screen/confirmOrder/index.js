@@ -18,12 +18,11 @@ export default class confirmOrder extends Component {
 
   close = async () => {
     await this.props.closeDialog();
-    this.props.navigation.navigate('OrderDetail');
+    await this.props.navigation.navigate('OrderDetail');
   };
 
   onSubmit = async () => {
     await this.props.onOrderConfirmation();
-    this.props.navigation.navigate('Orders');
   };
 
   render() {
@@ -53,7 +52,7 @@ export default class confirmOrder extends Component {
           <View style={[dialog_container, vertical_margin, column]}>
             <View style={row}>
               <Text style={[text_style, bottom_margin]}>
-                Want to confirm order with id{' '}
+                Want to <Text>{this.props.status}</Text> order with id{' '}
               </Text>
               <Text style={[text_style, bottom_margin, colored_text]}>
                 #{this.props.orderId}

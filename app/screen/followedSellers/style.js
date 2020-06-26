@@ -95,6 +95,7 @@ const styles = {
   name_heading: {
     fontSize: fonts.FONT_TEXT,
     fontWeight: fonts.FONT_BOLD,
+    textTransform: 'capitalize',
   },
 };
 export default styles;
