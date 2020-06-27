@@ -109,6 +109,8 @@ export const putDataApi = (url, body, authToken) => {
           if (data !== null && Object.keys(data).length !== 0) {
             if (data.statusCode === 200 || data.statusCode === 303) {
               resolve(data);
+            } else {
+              reject(response);
             }
           }
         } else {
@@ -175,10 +177,10 @@ export const loginApi = async (url, body) => {
         if (res.success === true) {
           return res;
         } else if (res.success === false) {
-          console.log('ressss',res)
+          console.log('ressss', res);
           return res;
         } else {
-          console.log('ressss lastttt',res)
+          console.log('ressss lastttt', res);
           return res;
         }
       }

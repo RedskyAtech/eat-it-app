@@ -15,6 +15,7 @@ import {
 import * as colors from '../../constants/colors';
 import * as Service from '../../api/services';
 import * as utility from '../../utility/index';
+import moment from 'moment';
 
 export default class orders extends Component {
   constructor(props) {
@@ -36,6 +37,7 @@ export default class orders extends Component {
         },
       ],
     };
+    this.refersh = this.refersh.bind(this);
   }
   componentDidMount = async () => {
     const token = await utility.getToken('token');
@@ -43,15 +45,20 @@ export default class orders extends Component {
     await this.setState({
       userToken: token,
       userId: userId,
-      query: `sellerId=${this.state.userId}history=false`,
+      selectedIndex: 0,
+      query: `sellerId=${this.state.userId}&history=false`,
     });
     await this.getReceivedOrders();
+  };
+  refersh = async () => {
+    await this.setState({query: `sellerId=${this.state.userId}&history=false`});
+    await await this.getReceivedOrders();
   };
   getReceivedOrders = async () => {
     await this.setState({isVisibleLoading: true, orders: []});
     try {
       let response = Service.getDataApi(
-        `orders?sellerId=${this.state.userId}`,
+        `orders?${this.state.query}`,
         this.state.userToken,
       );
       response
@@ -59,11 +66,23 @@ export default class orders extends Component {
           if (res.data) {
             if (res.data.orders && res.data.orders.length != 0) {
               let tempOrders = [];
+              let now = moment().format('DD-MM-YYYY');
+              let timeStamp;
+              let isToday = false;
               for (let item of res.data.orders) {
                 if (item) {
                   let image;
                   if (item.images && item.images.length != 0) {
                     image = item.images[0].resize_url;
+                  }
+                  if (item.timeStamp) {
+                    timeStamp = moment(item.timeStamp).format('DD-MM-YYYY');
+                    if (now == timeStamp) {
+                      isToday = true;
+                    } else {
+                      isToday = false;
+                    }
+                    console.log('isToday', isToday);
                   }
                   tempOrders.push({
                     id: item.id,
@@ -74,6 +93,7 @@ export default class orders extends Component {
                     orderId: item.orderId,
                     type: item.type,
                     status: item.status,
+                    isToday: isToday,
                   });
                 }
               }
@@ -105,21 +125,25 @@ export default class orders extends Component {
   onBack = async () => {
     await this.props.navigation.navigate('tab5');
   };
-  onOrder = async (id, status) => {
+  onOrder = async (id, status, isToday) => {
     await this.props.navigation.navigate('OrderDetails', {
       from: 'orders',
       orderId: id,
       status: status,
+      isToday: isToday,
+      refersh: this.refersh,
     });
   };
   onListItem = async index => {
     if (index == 0) {
       await this.setState({
-        query: `sellerId=${this.state.userId}history=false`,
+        query: `sellerId=${this.state.userId}&history=false`,
       });
     }
     if (index == 1) {
-      await this.setState({query: `sellerId=${this.state.userId}history=true`});
+      await this.setState({
+        query: `sellerId=${this.state.userId}&history=true`,
+      });
     }
     await this.getReceivedOrders();
     await this.setState({selectedIndex: index});
@@ -208,7 +232,9 @@ export default class orders extends Component {
                   return (
                     <TouchableOpacity
                       activeOpacity={0.6}
-                      onPress={() => this.onOrder(value.id, value.status)}>
+                      onPress={() =>
+                        this.onOrder(value.id, value.status, value.isToday)
+                      }>
                       <View
                         style={[
                           row,

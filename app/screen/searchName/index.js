@@ -429,6 +429,7 @@ export default class searchName extends Component {
       await this.getFood();
     }
   };
+  
   onNameChange(name) {
     if (name == '') {
       this.setState({products: [], name});

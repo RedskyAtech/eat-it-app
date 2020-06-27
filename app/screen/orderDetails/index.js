@@ -10,7 +10,10 @@ import {
 import styles from './style';
 import LinearGradient from 'react-native-linear-gradient';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
-import {widthPercentageToDP as wp} from '../../utility/index';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from '../../utility/index';
 import * as colors from '../../constants/colors';
 import ConfirmOrder from '../confirmOrder';
 import * as Service from '../../api/services';
@@ -44,6 +47,7 @@ export default class orderDetails extends Component {
       fourthDigit: '',
       selectedField: 0,
       showButtons: false,
+      isToday: false,
     };
   }
   componentDidMount = async () => {
@@ -62,6 +66,11 @@ export default class orderDetails extends Component {
           if (this.props.navigation.state.params.status) {
             await this.setState({
               status: this.props.navigation.state.params.status,
+            });
+          }
+          if (this.props.navigation.state.params.isToday) {
+            await this.setState({
+              isToday: this.props.navigation.state.params.isToday,
             });
           }
           await this.getOrderDetail();
@@ -177,7 +186,6 @@ export default class orderDetails extends Component {
         status: 'rejected',
       };
     }
-
     try {
       let response = Service.putDataApi(
         `orders/${this.state.id}`,
@@ -240,6 +248,49 @@ export default class orderDetails extends Component {
     }
     if (item == 4) {
       await this.setState({fourthDigit: value, selectedField: item});
+    }
+  };
+  onSubmitOtp = async () => {
+    let body = {
+      otp:
+        this.state.firstDigit +
+        this.state.selectedField +
+        this.state.thirdDigit +
+        this.state.fourthDigit,
+    };
+    try {
+      await this.setState({isVisibleLoading: true});
+      let response = Service.putDataApi(
+        `orders/${this.state.id}`,
+        body,
+        this.state.userToken,
+      );
+      response
+        .then(res => {
+          if (res.data) {
+            this.setState({isVisibleLoading: false});
+            alert('Order delivered successfully');
+            this.props.navigation.state.params.refersh();
+            this.props.navigation.goBack();
+            // this.props.navigation.navigate('Orders',{from:'orderDetail'});
+          } else {
+            this.setState({isVisibleLoading: false});
+            console.log('no data found', res.error);
+          }
+        })
+        .catch(error => {
+          this.setState({isVisibleLoading: false});
+          console.log('error in try-catch', error.error);
+          if (error.error == 'Error: OTP_DID_NOT_MATCH') {
+            alert('Otp did not match');
+          } else {
+            alert('Something went wrong');
+          }
+        });
+    } catch (err) {
+      this.setState({isVisibleLoading: false});
+      console.log('another problem:', err);
+      alert('Something went wrong');
     }
   };
   render() {
@@ -372,7 +423,8 @@ export default class orderDetails extends Component {
               Rs {this.state.totalAmount}
             </Text>
           </View>
-          {!this.state.showButtons ? (
+
+          {!this.state.showButtons || !this.state.isToday ? (
             <View />
           ) : (
             <>
@@ -421,7 +473,7 @@ export default class orderDetails extends Component {
                       style={[
                         button_container,
                         centered_text,
-                        {alignSelf: 'center'},
+                        {alignSelf: 'center', marginTop: hp(0)},
                       ]}>
                       <Text style={button_text}>Submit</Text>
                     </LinearGradient>
@@ -470,6 +522,7 @@ export default class orderDetails extends Component {
               )}
             </>
           )}
+
           {this.state.isDialogVisible ? (
             <ConfirmOrder
               visible={this.state.isDialogVisible}
