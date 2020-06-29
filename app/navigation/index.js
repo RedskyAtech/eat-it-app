@@ -393,7 +393,7 @@ const AppStack = createStackNavigator(
     },
   },
   {
-    initialRouteName: 'Splash',
+    initialRouteName: 'Payment',
     headerMode: 'none',
     mode: 'modal',
   },
