@@ -429,7 +429,7 @@ export default class searchName extends Component {
       await this.getFood();
     }
   };
-  
+
   onNameChange(name) {
     if (name == '') {
       this.setState({products: [], name});
@@ -505,6 +505,12 @@ export default class searchName extends Component {
       });
     }
   };
+  onListItem = async foodId => {
+    await this.props.navigation.navigate('FoodDetails', {
+      foodId: foodId,
+      from: 'search',
+    });
+  };
   render() {
     const {
       container,
@@ -534,7 +540,7 @@ export default class searchName extends Component {
       search_icon,
       yellow_color,
       free_text,
-      loader
+      loader,
     } = styles;
     return (
       <View style={[container, column, between_spacing]}>
@@ -569,71 +575,77 @@ export default class searchName extends Component {
               <ScrollView>
                 {this.state.products.map(value => {
                   return (
-                    <View
-                      style={[
-                        row,
-                        column_between_spacing,
-                        top_container,
-                        inner_list_spacing,
-                      ]}>
-                      <View style={row}>
-                        <View style={list_image_continer}>
-                          <Image
-                            resizeMode="cover"
-                            source={{uri: value.image}}
-                            style={list_image}
-                          />
-                        </View>
-
-                        <View style={[column, column_between_spacing]}>
-                          <View style={{width: wp(45)}}>
-                            <View style={[row]}>
-                              <Text style={product_heading}>{value.name}</Text>
-                            </View>
-                            <Text style={address_text}>{value.address}</Text>
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={() => this.onListItem(value.id)}>
+                      <View
+                        style={[
+                          row,
+                          column_between_spacing,
+                          top_container,
+                          inner_list_spacing,
+                        ]}>
+                        <View style={row}>
+                          <View style={list_image_continer}>
+                            <Image
+                              resizeMode="cover"
+                              source={{uri: value.image}}
+                              style={list_image}
+                            />
                           </View>
 
-                          <View style={[row, between_spacing]}>
-                            <View style={[row, row_center_align]}>
-                              <View
-                                style={
-                                  value.type == 'veg'
-                                    ? [non_veg_icon, green_color]
+                          <View style={[column, column_between_spacing]}>
+                            <View style={{width: wp(45)}}>
+                              <View style={[row]}>
+                                <Text style={product_heading}>
+                                  {value.name}
+                                </Text>
+                              </View>
+                              <Text style={address_text}>{value.address}</Text>
+                            </View>
+
+                            <View style={[row, between_spacing]}>
+                              <View style={[row, row_center_align]}>
+                                <View
+                                  style={
+                                    value.type == 'veg'
+                                      ? [non_veg_icon, green_color]
+                                      : value.type == 'langar'
+                                      ? [non_veg_icon, yellow_color]
+                                      : [non_veg_icon, red_color]
+                                  }
+                                />
+                                <Text style={text_style}>
+                                  {value.type == 'veg'
+                                    ? 'Veg'
                                     : value.type == 'langar'
-                                    ? [non_veg_icon, yellow_color]
-                                    : [non_veg_icon, red_color]
-                                }
-                              />
-                              <Text style={text_style}>
-                                {value.type == 'veg'
-                                  ? 'Veg'
-                                  : value.type == 'langar'
-                                  ? 'Langar'
-                                  : 'Non-veg'}
-                              </Text>
-                            </View>
-                            <View style={[row, row_center_align]}>
-                              <Image
-                                resizeMode="stretch"
-                                source={require('../../assets/clock.png')}
-                                style={clock}
-                              />
-                              <Text style={text_style}>{value.time}</Text>
+                                    ? 'Langar'
+                                    : 'Non-veg'}
+                                </Text>
+                              </View>
+                              <View style={[row, row_center_align]}>
+                                <Image
+                                  resizeMode="stretch"
+                                  source={require('../../assets/clock.png')}
+                                  style={clock}
+                                />
+                                <Text style={text_style}>{value.time}</Text>
+                              </View>
                             </View>
                           </View>
                         </View>
-                      </View>
-                      <View style={[column, column_between_spacing]}>
-                        <View />
-                        {value.type == 'langar' ? (
+                        <View style={[column, column_between_spacing]}>
                           <View />
-                        ) : value.price == 0 ? (
-                          <Text style={free_text}>Free</Text>
-                        ) : (
-                          <Text style={price_text}>Rs {value.price}</Text>
-                        )}
+                          {value.type == 'langar' ? (
+                            <View />
+                          ) : value.price == 0 ? (
+                            <Text style={free_text}>Free</Text>
+                          ) : (
+                            <Text style={price_text}>Rs {value.price}</Text>
+                          )}
+                        </View>
                       </View>
-                    </View>
+                    </TouchableOpacity>
                   );
                 })}
               </ScrollView>

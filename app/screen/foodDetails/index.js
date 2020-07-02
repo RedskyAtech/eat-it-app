@@ -5,6 +5,7 @@ import {
   Text,
   TouchableOpacity,
   ActivityIndicator,
+  Modal,
 } from 'react-native';
 import styles from './style';
 import LinearGradient from 'react-native-linear-gradient';
@@ -14,7 +15,8 @@ import * as colors from '../../constants/colors';
 import * as Service from '../../api/services';
 import * as utility from '../../utility/index';
 import {NavigationActions, StackActions} from 'react-navigation';
-import {color} from 'react-native-reanimated';
+import {WebView} from 'react-native-webview';
+import ConfirmPayment from '../confirmPayment';
 
 export default class foodDetails extends Component {
   constructor(props) {
@@ -35,25 +37,43 @@ export default class foodDetails extends Component {
       totalAmount: 0,
       images: [],
       isVisibleLoading: false,
-      isSkipped: false,
       isPriceShow: false,
       userId: '',
       sellerId: '',
       isSeller: true,
+      // isSeller: false,
+      isSkipped: false,
+      showModal: false,
+      status: 'pending',
+      paypalToken: '',
+      paymentId: '',
+      isDialogVisible: false,
+      userToken: '',
     };
   }
   componentDidMount = async () => {
     let foodId;
+    let from;
     let isSkipped = await utility.getItem('isSkipped');
     const userId = await utility.getItem('userId');
-    await this.setState({isSkipped: isSkipped, userId: userId});
+    const token = await utility.getItem('token');
+
+    await this.setState({
+      isSkipped: isSkipped,
+      userId: userId,
+      userToken: token,
+    });
 
     if (this.props.navigation.state.params) {
-      if (this.props.navigation.state.params.from == 'home') {
+      if (
+        this.props.navigation.state.params.from == 'home' ||
+        this.props.navigation.state.params.from == 'search'
+      ) {
+        from = this.props.navigation.state.params.from;
         if (this.props.navigation.state.params.foodId) {
           foodId = this.props.navigation.state.params.foodId;
         }
-        await this.setState({foodId: foodId, from: 'home'});
+        await this.setState({foodId: foodId, from: from});
         await this.getFoodDetail();
       } else {
         await this.setState({
@@ -157,6 +177,8 @@ export default class foodDetails extends Component {
         }),
       );
       await this.props.navigation.navigate('tab1');
+    } else if (this.state.from == 'search') {
+      await this.props.navigation.navigate('SearchName');
     } else {
       this.props.navigation.navigate('Notifications');
     }
@@ -183,13 +205,167 @@ export default class foodDetails extends Component {
     );
   };
   onBuy = async () => {
-    await this.props.navigation.navigate('Payment');
+    await this.onGetToken();
+    // await this.props.navigation.navigate('Payment');
   };
   onAlert = async () => {
     await utility.showAlert('Please login or register first.', this.onLogin);
   };
   onLogin = async () => {
     await this.props.navigation.navigate('Login');
+  };
+  handelResponse = async data => {
+    if (data.title == 'success') {
+      await this.onOrderFood();
+      // await this.setState({
+      //   showModal: false,
+      //   isDialogVisible: true,
+      //   status: 'completed',
+      // });
+    } else if (data.title == 'cancel') {
+      await this.setState({showModal: false, status: 'cancelled'});
+    } else {
+      return;
+    }
+  };
+  onOrderFood = async () => {
+    await this.setState({isVisibleLoading: true});
+    try {
+      let body = {
+        foodId: this.state.foodId,
+        paymentId: this.state.paymentId,
+      };
+      let response = Service.postDataApi(`orders`, body, this.state.userToken);
+      response
+        .then(res => {
+          if (res.data) {
+            console.log('place order ::', res.data);
+            this.setState({
+              showModal: false,
+              isDialogVisible: true,
+              status: 'completed',
+              isVisibleLoading: false,
+            });
+          }
+        })
+        .catch(error => {
+          this.setState({isVisibleLoading: false});
+          console.log('try-catch error:', error.error);
+          alert('Something went wrong');
+        });
+    } catch (err) {
+      this.setState({isVisibleLoading: false});
+      console.log('another problem:', err);
+      alert('Something went wrong');
+    }
+  };
+  onGetToken = async () => {
+    await this.setState({isVisibleLoading: true});
+    try {
+      let response = Service.postPaymentDataApi(
+        'payments/token',
+        '',
+        '',
+        'token',
+      );
+      response
+        .then(res => {
+          if (res.data) {
+            if (res.isSuccess == true) {
+              this.setState({isVisibleLoading: false});
+              console.log('tokennnnnnnnnnn:', res.data.access_token);
+              this.setState({paypalToken: res.data.access_token});
+              this.onPayment();
+            }
+          } else {
+            this.setState({isVisibleLoading: false});
+            console.log('no data found', res.error);
+          }
+        })
+        .catch(error => {
+          this.setState({isVisibleLoading: false});
+          console.log('error in try-catch', error.error);
+          alert('Something went wrong');
+        });
+    } catch (err) {
+      this.setState({isVisibleLoading: false});
+      console.log('another problem:', err);
+      alert('Something went wrong');
+    }
+  };
+  onPayment = async () => {
+    await this.setState({isVisibleLoading: true});
+
+    var body = {
+      intent: 'sale',
+      payer: {
+        payment_method: 'paypal',
+      },
+      redirect_urls: {
+        return_url: `http://192.168.43.151:6600/api/payments/success?access_token=${
+          this.state.paypalToken
+        }&&userId=${this.state.userId}&&foodId=${this.state.foodId}`,
+        cancel_url: 'http://192.168.43.151:6600/api/payments/cancel',
+      },
+      transactions: [
+        {
+          item_list: {
+            items: [
+              {
+                name: this.state.name,
+                sku: 'item',
+                price: this.state.totalAmount,
+                currency: 'USD',
+                quantity: 1,
+              },
+            ],
+          },
+          amount: {
+            currency: 'USD',
+            total: this.state.totalAmount,
+          },
+          description: 'This is the payment description.',
+        },
+      ],
+    };
+    try {
+      let response = Service.postPaymentDataApi(
+        `payments/payment?access_token=${this.state.paypalToken}`,
+        body,
+        '',
+        'payment',
+      );
+      response
+        .then(res => {
+          if (res.data) {
+            if (res.isSuccess == true) {
+              this.setState({
+                paymentId: res.data.id,
+                approvalUrl: res.data.href,
+                showModal: true,
+                isVisibleLoading: false,
+              });
+              console.log('urlllll:', res.data);
+            }
+          } else {
+            this.setState({isVisibleLoading: false});
+            console.log('no data found', res.error);
+          }
+        })
+        .catch(error => {
+          this.setState({isVisibleLoading: false});
+          console.log('error in try-catch', error.error);
+          alert('Something went wrong');
+        });
+    } catch (err) {
+      this.setState({isVisibleLoading: false});
+      console.log('another problem:', err);
+      alert('Something went wrong');
+    }
+  };
+  closeDialog = async () => {
+    await this.setState({isDialogVisible: false});
+    await this.props.navigation.navigate('tab1');
   };
   render() {
     const {
@@ -326,7 +502,21 @@ export default class foodDetails extends Component {
               Rs {this.state.totalAmount}
             </Text>
           </View>
-
+          <Modal
+            visible={this.state.showModal}
+            onRequestClose={() => {
+              this.setState({showModal: false});
+            }}>
+            <WebView
+              style={{height: 400, width: 300}}
+              source={{uri: this.state.approvalUrl}}
+              onNavigationStateChange={data => this.handelResponse(data)}
+              javaScriptEnabled={true}
+              domStorageEnabled={true}
+              startInLoadingState={false}
+              style={{marginTop: 20}}
+            />
+          </Modal>
           <View style={[bottom_container, bottom_spacing]}>
             <Text />
             {!this.state.isSeller ? (
@@ -348,14 +538,21 @@ export default class foodDetails extends Component {
               <View />
             )}
           </View>
-
-          <View style={loader}>
-            <ActivityIndicator
-              animating={this.state.isVisibleLoading}
-              size="large"
-              color={colors.primaryColor}
-            />
-          </View>
+        </View>
+        {this.state.isDialogVisible ? (
+          <ConfirmPayment
+            visible={this.state.isDialogVisible}
+            closeDialog={this.closeDialog}
+          />
+        ) : (
+          <View />
+        )}
+        <View style={loader}>
+          <ActivityIndicator
+            animating={this.state.isVisibleLoading}
+            size="large"
+            color={colors.primaryColor}
+          />
         </View>
       </View>
     );

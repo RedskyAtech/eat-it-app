@@ -22,25 +22,28 @@ export default class myFood extends Component {
     this.state = {
       from: '',
       visible: false,
+      query: '',
       isDialogVisible: false,
       userId: '',
       userToken: '',
       foodId: '',
       sellerId: '',
-      dataArray: [
+      dataArray: [{id: '1', content: []}, {id: '2', content: []}],
+      filtersList: [
         {
-          content: [],
+          name: 'Current',
         },
         {
-          content: [],
+          name: 'Past',
         },
       ],
+      selectedIndex: 0,
       isSkipped: false,
     };
   }
   componentDidMount = async () => {
     let isSkipped = await utility.getItem('isSkipped');
-    await this.setState({isSkipped: isSkipped});
+    await this.setState({isSkipped: isSkipped, selectedIndex: 0});
 
     if (this.state.isSkipped == false) {
       if (this.props.navigation.state.params) {
@@ -58,15 +61,33 @@ export default class myFood extends Component {
       }
       const userId = await utility.getItem('userId');
       const userToken = await utility.getToken('token');
-      this.setState({userId: userId, userToken: userToken});
+      await this.setState({
+        userId: userId,
+        userToken: userToken,
+        query: `buyerId=${userId}&history=false`,
+      });
       await this.getPurchasedFood();
       await this.getSharedFood();
     }
   };
+  onTabItem = async index => {
+    if (index == 0) {
+      await this.setState({
+        query: `buyerId=${this.state.userId}&history=false`,
+      });
+    }
+    if (index == 1) {
+      await this.setState({
+        query: `buyerId=${this.state.userId}&history=true`,
+      });
+    }
+    await this.getPurchasedFood();
+    await this.setState({selectedIndex: index});
+  };
   getPurchasedFood = async () => {
     try {
       let response = Service.getDataApi(
-        `orders?buyerId=${this.state.userId}&status=delivered`,
+        `orders?${this.state.query}`,
         this.state.userToken,
       );
       response
@@ -74,14 +95,7 @@ export default class myFood extends Component {
           if (res.data) {
             if (res.data.orders) {
               if (res.data.orders.length != 0) {
-                let shared = [
-                  {
-                    content: [],
-                  },
-                  {
-                    content: [],
-                  },
-                ];
+                let shared = [{id: '1', content: []}, {id: '2', content: []}];
                 let tempContent = [];
                 for (let i = 0; i < res.data.orders.length; i++) {
                   let image;
@@ -98,6 +112,7 @@ export default class myFood extends Component {
                     image: image,
                     isLiked: res.data.orders[i].favoriteType,
                     type: res.data.orders[i].type,
+                    status: res.data.orders[i].status,
                   });
                 }
                 shared[0].content = tempContent;
@@ -119,7 +134,6 @@ export default class myFood extends Component {
       alert('Something went wrong');
     }
   };
-
   getSharedFood = async () => {
     try {
       let response = Service.getDataApi(
@@ -130,15 +144,7 @@ export default class myFood extends Component {
         .then(res => {
           if (res.data) {
             if (res.data.length != 0) {
-              // console.log('datattatatata:', res.data);
-              let shared = [
-                {
-                  content: [],
-                },
-                {
-                  content: [],
-                },
-              ];
+              let shared = [{id: '1', content: []}, {id: '2', content: []}];
               let tempContent = [];
               for (let i = 0; i < res.data.length; i++) {
                 let image;
@@ -156,6 +162,7 @@ export default class myFood extends Component {
                   isLiked: 'none',
                   type: res.data[i].type,
                   isVeg: true,
+                  status: 'null',
                 });
               }
               shared[0].content = this.state.dataArray[0].content;
@@ -176,7 +183,6 @@ export default class myFood extends Component {
       alert('Something went wrong');
     }
   };
-
   showDialog = async (foodId, sellerId, type) => {
     if (type == 'none') {
       await this.setState({
@@ -217,6 +223,7 @@ export default class myFood extends Component {
       </View>
     );
   };
+
   renderContent = item => {
     let index;
     if (this.state && this.state.dataArray) {
@@ -224,14 +231,40 @@ export default class myFood extends Component {
     }
     return (
       <>
-        <View style={styles.list_height}>
+        <View style={styles.list_height} key={item.id}>
+          {index == 0 ? (
+            <View
+              style={[
+                styles.row,
+                styles.filter_container,
+                styles.between_spacing,
+              ]}>
+              {this.state.filtersList.map(item => {
+                let index = this.state.filtersList.indexOf(item);
+                return (
+                  <TouchableOpacity onPress={() => this.onTabItem(index)}>
+                    <View
+                      style={
+                        this.state.selectedIndex == index
+                          ? [styles.filters, styles.selected_color]
+                          : [styles.filters, styles.unselected_color]
+                      }>
+                      <Text style={styles.filter_text}>{item.name}</Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          ) : (
+            <View />
+          )}
           {item.content.length != 0 ? (
             <ScrollView>
               {item.content.map(value => {
                 return (
                   <TouchableOpacity
                     onPress={
-                      index == 0
+                      index == 0 && value.status == 'delivered'
                         ? () =>
                             this.showDialog(
                               value.foodId,
@@ -309,21 +342,47 @@ export default class myFood extends Component {
                       </View>
                       <View
                         style={[styles.column, styles.column_between_spaceing]}>
-                        {value.isLiked == 'none' ? (
-                          <View />
+                        {index == 0 ? (
+                          <>
+                            {value.status != 'delivered' ? (
+                              <View
+                                style={[
+                                  styles.status_container,
+                                  value.status == 'pending'
+                                    ? styles.pending_style
+                                    : value.status == 'confirmed'
+                                    ? styles.confirmed_style
+                                    : // : value.status == 'delivered'
+                                      // ? styles.delivered_style
+                                      styles.rejected_style,
+                                ]}>
+                                <Text style={styles.status_style}>
+                                  {value.status}
+                                </Text>
+                              </View>
+                            ) : (
+                              <>
+                                {value.isLiked == 'none' ? (
+                                  <View />
+                                ) : (
+                                  <Image
+                                    resizeMode="stretch"
+                                    source={
+                                      value.isLiked == 'like'
+                                        ? require('../../assets/like.png')
+                                        : require('../../assets/dislike.png')
+                                    }
+                                    style={[
+                                      styles.like_dislike_icon,
+                                      {alignSelf: 'flex-end'},
+                                    ]}
+                                  />
+                                )}
+                              </>
+                            )}
+                          </>
                         ) : (
-                          <Image
-                            resizeMode="stretch"
-                            source={
-                              value.isLiked == 'like'
-                                ? require('../../assets/like.png')
-                                : require('../../assets/dislike.png')
-                            }
-                            style={[
-                              styles.like_dislike_icon,
-                              {alignSelf: 'flex-end'},
-                            ]}
-                          />
+                          <View />
                         )}
                         {value.type == 'langar' ? (
                           <View />
@@ -334,7 +393,6 @@ export default class myFood extends Component {
                             Rs {value.price}
                           </Text>
                         )}
-                        {/* <Text style={styles.price_text}>Rs {value.price}</Text> */}
                       </View>
                     </View>
                   </TouchableOpacity>

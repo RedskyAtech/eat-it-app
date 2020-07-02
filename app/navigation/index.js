@@ -36,6 +36,8 @@ import Notifications from '../screen/notifications';
 import Communication from '../screen/communication';
 import About from '../screen/about';
 import CustomerCare from '../screen/customerCare';
+import ConfirmPayment from '../screen/confirmPayment';
+import AddAddress from '../screen/addAddress';
 
 import Header from '../components/header';
 
@@ -385,6 +387,18 @@ const AppStack = createStackNavigator(
         headerShown: false,
       },
     },
+    ConfirmPayment: {
+      screen: ConfirmPayment,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
+    AddAddress: {
+      screen: AddAddress,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
     BottomTab: {
       screen: TabNavigator,
       navigationOptions: {
@@ -393,7 +407,7 @@ const AppStack = createStackNavigator(
     },
   },
   {
-    initialRouteName: 'Payment',
+    initialRouteName: 'Splash',
     headerMode: 'none',
     mode: 'modal',
   },

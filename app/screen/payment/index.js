@@ -6,9 +6,12 @@ import {
   Image,
   TextInput,
   Modal,
+  ActivityIndicator,
 } from 'react-native';
 import {WebView} from 'react-native-webview';
-
+import * as Service from '../../api/services';
+import * as utility from '../../utility/index';
+import * as Url from '../../constants/urls';
 import styles from './style';
 import {RadioButton} from 'react-native-paper';
 import * as colors from '../../constants/colors';
@@ -28,6 +31,8 @@ export default class payment extends Component {
       month: '',
       showModal: false,
       status: 'pending',
+      paypalToken: '',
+      paymentId: '',
     };
   }
   onBack = async () => {
@@ -52,6 +57,133 @@ export default class payment extends Component {
       return;
     }
   };
+  onGetToken = async () => {
+    try {
+      let response = Service.postPaymentDataApi(
+        'payments/token',
+        '',
+        '',
+        'token',
+      );
+      response
+        .then(res => {
+          if (res.data) {
+            if (res.isSuccess == true) {
+              console.log('tokennnnnnnnnnn:', res.data.access_token);
+              this.setState({paypalToken: res.data.access_token});
+              this.onPayment();
+            }
+          } else {
+            console.log('no data found', res.error);
+          }
+        })
+        .catch(error => {
+          console.log('error in try-catch', error.error);
+          alert('Something went wrong');
+        });
+    } catch (err) {
+      console.log('another problem:', err);
+      alert('Something went wrong');
+    }
+  };
+  onPayment = async () => {
+    var body = {
+      intent: 'sale',
+      payer: {
+        payment_method: 'paypal',
+      },
+      redirect_urls: {
+        return_url: 'http://192.168.43.151:6600/payments/success',
+        cancel_url: 'http://192.168.43.151:6600/payments/cancel',
+      },
+      transactions: [
+        {
+          item_list: {
+            items: [
+              {
+                name: 'item',
+                sku: 'item',
+                price: '1.00',
+                currency: 'USD',
+                quantity: 1,
+              },
+            ],
+          },
+          amount: {
+            currency: 'USD',
+            total: '1.00',
+          },
+          description: 'This is the payment description.',
+        },
+      ],
+    };
+    try {
+      let response = Service.postPaymentDataApi(
+        `payments/payment?access_token=${this.state.paypalToken}`,
+        body,
+        '',
+        'payment',
+      );
+      response
+        .then(res => {
+          if (res.data) {
+            if (res.isSuccess == true) {
+              this.setState({
+                paymentId: res.data.id,
+                approvalUrl: res.data.href,
+                showModal: true,
+              });
+              console.log('urlllll:', res.data);
+            }
+          } else {
+            console.log('no data found', res.error);
+          }
+        })
+        .catch(error => {
+          console.log('error in try-catch', error.error);
+          alert('Something went wrong');
+        });
+    } catch (err) {
+      console.log('another problem:', err);
+      alert('Something went wrong');
+    }
+  };
+  // _onNavigationStateChange = async webViewState => {
+  //   if (webViewState.url.includes('https://www.sandbox.paypal.com/')) {
+  //     await this.setState({approvalUrl: null});
+  //     console.log('webbbbbbb"', webViewState.url);
+  //     const {PayerID, paymentId} = webViewState.url;
+  //     let body = {
+  //       paymentId: this.state.paymentId,
+  //       PayerID: PayerID,
+  //     };
+  //     try {
+  //       let response = Service.postPaymentDataApi(
+  //         `payments/execute?access_token=${this.state.paypalToken}`,
+  //         body,
+  //         '',
+  //         'payment',
+  //       );
+  //       response
+  //         .then(res => {
+  //           if (res.data) {
+  //             if (res.isSuccess == true) {
+  //               console.log('urlllll:', res);
+  //             }
+  //           } else {
+  //             console.log('no data found', res.error);
+  //           }
+  //         })
+  //         .catch(error => {
+  //           console.log('error in try-catch', error.error);
+  //           alert('Something went wrong');
+  //         });
+  //     } catch (err) {
+  //       console.log('another problem:', err);
+  //       alert('Something went wrong');
+  //     }
+  //   }
+  // };
   render() {
     const {
       container,
@@ -85,26 +217,52 @@ export default class payment extends Component {
       year_input,
     } = styles;
     return (
-      <View style={{marginTop: 100}}>
-        <Modal
-          visible={this.state.showModal}
-          onRequestClose={() => {
-            this.setState({showModal: false});
-          }}>
-          <WebView
-            source={{uri: 'http://192.168.43.151:6600'}}
-            onNavigationStateChange={data => this.handelResponse(data)}
-            injectedJavaScript={`document.f1.submit()`}
-          />
-        </Modal>
-        <TouchableOpacity
-          style={{height: 100}}
-          onPress={() => {
-            this.setState({showModal: true});
-          }}>
-          <Text>Pay with paypal</Text>
-        </TouchableOpacity>
-        <Text>Status:{this.state.status}</Text>
+      <View style={[container, centered_text]}>
+        <View style={[column, centered_text]}>
+          {/* <Modal
+            visible={this.state.showModal}
+            onRequestClose={() => {
+              this.setState({showModal: false});
+            }}>
+            <WebView
+              source={{uri: 'http://192.168.43.151:6600'}}
+              onNavigationStateChange={data => this.handelResponse(data)}
+              injectedJavaScript={`document.f1.submit()`}
+            />
+          </Modal> */}
+          <Modal
+            visible={this.state.showModal}
+            onRequestClose={() => {
+              this.setState({showModal: false});
+            }}>
+            <WebView
+              style={{height: 400, width: 300}}
+              source={{uri: this.state.approvalUrl}}
+              onNavigationStateChange={data => this.handelResponse(data)}
+              javaScriptEnabled={true}
+              domStorageEnabled={true}
+              startInLoadingState={false}
+              style={{marginTop: 20}}
+            />
+          </Modal>
+          <TouchableOpacity
+            style={{
+              alignSelf: 'center',
+              backgroundColor: 'orange',
+              padding: 10,
+              paddingHorizontal: 20,
+              borderRadius: 20,
+              margin: 20,
+            }}
+            onPress={this.onGetToken}
+            // onPress={() => {
+            //   this.setState({showModal: true});
+            // }}
+          >
+            <Text>Pay with paypal</Text>
+          </TouchableOpacity>
+          <Text>Status: {this.state.status}</Text>
+        </View>
       </View>
 
       // <View style={[container]}>

@@ -203,7 +203,8 @@ export default class orderDetails extends Component {
             if (this.state.buttonStatus == 'confirm') {
               alert('Order confirmed successfully');
             }
-            this.props.navigation.navigate('Orders');
+            this.props.navigation.state.params.refersh();
+            this.props.navigation.goBack();
           } else {
             this.setState({isVisibleLoading: false});
             this.closeDialog();
@@ -272,7 +273,6 @@ export default class orderDetails extends Component {
             alert('Order delivered successfully');
             this.props.navigation.state.params.refersh();
             this.props.navigation.goBack();
-            // this.props.navigation.navigate('Orders',{from:'orderDetail'});
           } else {
             this.setState({isVisibleLoading: false});
             console.log('no data found', res.error);
@@ -293,25 +293,7 @@ export default class orderDetails extends Component {
       alert('Something went wrong');
     }
   };
-  onPaypal = async () => {
-    axios
-      .post(
-        'https://api.sandbox.paypal.com/v1/oauth2/token',
-        {grant_type: 'client_credentials'},
-        {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            Authorization: ` `, // your Authorization value you get from postman api hit
-          },
-        },
-      )
-      .then(response => {
-        console.log(response.data.access_token);
-      })
-      .catch(err => {
-        console.log({...err});
-      });
-  };
+
   render() {
     const {
       inner_container,

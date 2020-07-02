@@ -46,15 +46,16 @@ export default class orders extends Component {
       userToken: token,
       userId: userId,
       selectedIndex: 0,
-      query: `sellerId=${this.state.userId}&history=false`,
+      query: `sellerId=${userId}&history=false`,
     });
     await this.getReceivedOrders();
   };
   refersh = async () => {
     await this.setState({query: `sellerId=${this.state.userId}&history=false`});
-    await await this.getReceivedOrders();
+    await this.getReceivedOrders();
   };
   getReceivedOrders = async () => {
+    console.log('queryyyyyy::',this.state.query)
     await this.setState({isVisibleLoading: true, orders: []});
     try {
       let response = Service.getDataApi(
@@ -65,6 +66,7 @@ export default class orders extends Component {
         .then(res => {
           if (res.data) {
             if (res.data.orders && res.data.orders.length != 0) {
+              // console.log('orderssssss:', res.data.orders);
               let tempOrders = [];
               let now = moment().format('DD-MM-YYYY');
               let timeStamp;
@@ -82,7 +84,6 @@ export default class orders extends Component {
                     } else {
                       isToday = false;
                     }
-                    console.log('isToday', isToday);
                   }
                   tempOrders.push({
                     id: item.id,
@@ -135,6 +136,8 @@ export default class orders extends Component {
     });
   };
   onListItem = async index => {
+    await this.setState({selectedIndex: index});
+
     if (index == 0) {
       await this.setState({
         query: `sellerId=${this.state.userId}&history=false`,
@@ -146,7 +149,6 @@ export default class orders extends Component {
       });
     }
     await this.getReceivedOrders();
-    await this.setState({selectedIndex: index});
   };
   render() {
     const {
@@ -298,7 +300,6 @@ export default class orders extends Component {
                           <View
                             style={[
                               status_container,
-                              ,
                               value.status == 'pending'
                                 ? pending_style
                                 : value.status == 'confirmed'

@@ -204,7 +204,7 @@ export default class followedSellers extends Component {
             </View>
           ) : (
             <View style={[list_height, column, centered_text]}>
-              <Text style={{textAlign: 'center'}}>No food found</Text>
+              <Text style={{textAlign: 'center'}}>No seller found</Text>
             </View>
           )}
           <View style={loader}>

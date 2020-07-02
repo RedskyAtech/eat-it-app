@@ -190,3 +190,81 @@ export const loginApi = async (url, body) => {
     console.log('post::errerrerrerrerrerrerrerrerrerr', err);
   }
 };
+
+export const postPaymentDataApi = (url, body, token, from) => {
+  let headers;
+  let completeUrl = Url.BASE_URL + url;
+  let data;
+  if (token == null || token == undefined || token == '') {
+    headers = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    };
+  }
+  if (from == 'token') {
+    data = body;
+  } else {
+    data = JSON.stringify(body);
+  }
+  return new Promise((resolve, reject) => {
+    fetch(completeUrl, {
+      method: 'POST',
+      headers,
+      body: data,
+    })
+      .then(response => response.json())
+      .then(response => {
+        console.log('Post response:', response);
+        if (response != null) {
+          if (response != null && Object.keys(response).length !== 0) {
+            if (response.statusCode === 200) {
+              resolve(response);
+            } else {
+              reject(response);
+            }
+          }
+        } else {
+          reject(response);
+        }
+      })
+      .catch(error => {
+        reject(error);
+        console.log('postAPIError', error);
+      });
+  });
+};
+
+export const getPaymentDataApi = (url, token) => {
+  let headers;
+  let completeUrl = Url.BASE_URL + url;
+
+  if (token == null || token == undefined || token == '') {
+    headers = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    };
+  }
+  return new Promise((resolve, reject) => {
+    fetch(completeUrl, {
+      method: 'GET',
+      headers,
+    })
+      .then(response => response.json())
+      .then(response => {
+        if (response !== null) {
+          let data = response;
+          if (data !== null && Object.keys(data).length !== 0) {
+            if (data.statusCode === 200) {
+              resolve(data);
+            }
+          }
+        } else {
+          reject(data);
+        }
+      })
+      .catch(error => {
+        reject(error);
+        console.log('Get Api data error', error);
+      });
+  });
+};
