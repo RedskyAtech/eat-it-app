@@ -12,11 +12,8 @@ import styles from './style';
 import * as Service from '../../api/services';
 import * as Url from '../../constants/urls';
 import * as colors from '../../constants/colors';
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from '../../utility/index';
-
+import {widthPercentageToDP as wp} from '../../utility/index';
+import * as utility from '../../utility/index';
 export default class searchName extends Component {
   constructor(props) {
     super(props);
@@ -45,7 +42,7 @@ export default class searchName extends Component {
         if (name != '') {
           await this.setState({name: name});
           this.setState({query: `name=${this.state.name}&searchType=food`});
-          await this.getFood();
+          // await this.getFood();
         }
       } else if (this.props.navigation.state.params.from == 'search') {
         if (this.props.navigation.state.params.cuisineId) {
@@ -58,15 +55,17 @@ export default class searchName extends Component {
         await this.setState({
           query: `cuisineId=${this.state.cuisineId}&searchType=food`,
         });
-        await this.getFood();
+        // await this.getFood();
       } else if (this.props.navigation.state.params.from == 'langar') {
         await this.setState({
           isLangar: true,
           name: 'Langar',
           query: `type=langar&searchType=food`,
         });
-        await this.getFood();
+        // await this.getFood();
       }
+      await this.getFood();
+      await utility.setItem('lastSearchQuery', this.state.query);
     }
   };
 
@@ -430,15 +429,16 @@ export default class searchName extends Component {
     }
   };
 
-  onNameChange(name) {
+  onNameChange = async name => {
     if (name == '') {
-      this.setState({products: [], name});
+      await this.setState({products: [], name});
     } else {
-      this.setState({name});
-      this.setState({query: `name=${this.state.name}&searchType=food`});
-      this.getFood();
+      await this.setState({name});
+      await this.setState({query: `name=${this.state.name}&searchType=food`});
+      await utility.setItem('lastSearchQuery', this.state.query);
+      await this.getFood();
     }
-  }
+  };
 
   getFood = async () => {
     await this.setState({products: [], isVisibleLoading: true});

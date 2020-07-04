@@ -129,18 +129,15 @@ export default class home extends Component {
 
     this.state = {
       query: '',
+      userId: '',
       filtersList: [
+        {name: 'Near you'},
         {
           name: 'For you',
         },
-        {
-          name: 'Free',
-        },
+        {name: 'Free'},
         {
           name: 'Last search',
-        },
-        {
-          name: 'Near you',
         },
         {
           name: 'Follow',
@@ -155,13 +152,26 @@ export default class home extends Component {
       ),
     };
   }
+  componentDidMount = async () => {
+    const token = await utility.getToken('userId');
+    await this.setState({userId: userId});
+  };
   onListItem = async index => {
     if (index == 0) {
       await this.setState({query: ''});
       await this.getFood();
     }
-    if (index == 1) {
+    if (index == 2) {
       await this.setState({query: 'isFoodFree=true&&searchType=food'});
+      await this.getFood();
+    }
+    if (index == 3) {
+      let lastSearchQuery = await utility.getItem('lastSearchQuery');
+      await this.setState({query: lastSearchQuery});
+      await this.getFood();
+    }
+    if (index == 4) {
+      await this.setState({query: `isfollow=true&userId=${this.state.userId}`});
       await this.getFood();
     }
     await this.setState({selectedIndex: index});
@@ -272,7 +282,6 @@ export default class home extends Component {
 
   onBack = async () => {
     const rembemberMe = await utility.getItem('rembemberMe');
-    console.log('meeeeeeeeeeeeeeeee:', rembemberMe);
     if (rembemberMe == false) {
       await utility.removeAuthKey('token');
       await utility.removeAuthKey('userId');
@@ -292,6 +301,9 @@ export default class home extends Component {
   };
   onNotification = async () => {
     await this.props.navigation.navigate('Notifications', {from: 'home'});
+  };
+  onMap = async () => {
+    await this.props.navigation.navigate('Map');
   };
   render() {
     const {
@@ -325,11 +337,13 @@ export default class home extends Component {
           <View style={top_container}>
             <View>
               <View style={[row, between_spacing, container_width]}>
-                <Image
-                  resizeMode="contain"
-                  source={require('../../assets/location.png')}
-                  style={icons}
-                />
+                <TouchableOpacity activeOpacity={0.7} onPress={this.onMap}>
+                  <Image
+                    resizeMode="contain"
+                    source={require('../../assets/location.png')}
+                    style={icons}
+                  />
+                </TouchableOpacity>
                 <TouchableOpacity onPress={this.onSearch}>
                   <View style={[search_container, row, around_spacing]}>
                     <Image

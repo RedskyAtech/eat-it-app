@@ -60,7 +60,7 @@ const styles = {
     backgroundColor: '#ECECEC',
   },
   list_height: {
-    height: hp(86),
+    height: hp(82),
   },
   search_icon: {
     width: wp(6),

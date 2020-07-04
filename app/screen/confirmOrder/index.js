@@ -18,7 +18,9 @@ export default class confirmOrder extends Component {
 
   close = async () => {
     await this.props.closeDialog();
-    await this.props.navigation.navigate('OrderDetail');
+    if (this.props.status != 'purchase') {
+      await this.props.navigation.navigate('OrderDetail');
+    }
   };
 
   onSubmit = async () => {
@@ -51,12 +53,20 @@ export default class confirmOrder extends Component {
         <View style={[container, column, around_spacing]}>
           <View style={[dialog_container, vertical_margin, column]}>
             <View style={row}>
-              <Text style={[text_style, bottom_margin]}>
-                Want to <Text>{this.props.status}</Text> order with id{' '}
-              </Text>
-              <Text style={[text_style, bottom_margin, colored_text]}>
-                #{this.props.orderId}
-              </Text>
+              {this.props.status == 'purchase' ? (
+                <Text style={[text_style, bottom_margin]}>
+                  Do you really want to place order
+                </Text>
+              ) : (
+                <>
+                  <Text style={[text_style, bottom_margin]}>
+                    Want to <Text>{this.props.status}</Text> order with id{' '}
+                  </Text>
+                  <Text style={[text_style, bottom_margin, colored_text]}>
+                    #{this.props.orderId}
+                  </Text>
+                </>
+              )}
             </View>
             <View style={[row, button_container]}>
               <TouchableOpacity onPress={() => this.close()}>

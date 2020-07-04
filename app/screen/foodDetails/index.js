@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import styles from './style';
 import LinearGradient from 'react-native-linear-gradient';
+
 import Carousel, {Pagination} from 'react-native-snap-carousel';
 import {widthPercentageToDP as wp} from '../../utility/index';
 import * as colors from '../../constants/colors';
@@ -17,6 +18,7 @@ import * as utility from '../../utility/index';
 import {NavigationActions, StackActions} from 'react-navigation';
 import {WebView} from 'react-native-webview';
 import ConfirmPayment from '../confirmPayment';
+import ConfirmOrder from '../confirmOrder';
 
 export default class foodDetails extends Component {
   constructor(props) {
@@ -49,6 +51,8 @@ export default class foodDetails extends Component {
       paymentId: '',
       isDialogVisible: false,
       userToken: '',
+      isFreeFoodDialogVisible: false,
+      buttonStatus: '',
     };
   }
   componentDidMount = async () => {
@@ -216,45 +220,56 @@ export default class foodDetails extends Component {
   };
   handelResponse = async data => {
     if (data.title == 'success') {
-      await this.onOrderFood();
-      // await this.setState({
-      //   showModal: false,
-      //   isDialogVisible: true,
-      //   status: 'completed',
-      // });
+      await this.onOrderFood('paid');
     } else if (data.title == 'cancel') {
       await this.setState({showModal: false, status: 'cancelled'});
     } else {
       return;
     }
   };
-  onOrderFood = async () => {
+  onOrderFood = async from => {
     await this.setState({isVisibleLoading: true});
     try {
-      let body = {
-        foodId: this.state.foodId,
-        paymentId: this.state.paymentId,
-      };
+      let body;
+      if (from == 'paid') {
+        body = {
+          from: from,
+          foodId: this.state.foodId,
+          paymentId: this.state.paymentId,
+        };
+      } else {
+        body = {
+          from: from,
+          foodId: this.state.foodId,
+        };
+      }
       let response = Service.postDataApi(`orders`, body, this.state.userToken);
       response
         .then(res => {
           if (res.data) {
-            console.log('place order ::', res.data);
-            this.setState({
-              showModal: false,
-              isDialogVisible: true,
-              status: 'completed',
-              isVisibleLoading: false,
-            });
+            if (from == 'paid') {
+              this.setState({
+                showModal: false,
+                isDialogVisible: true,
+                status: 'completed',
+              });
+            } else {
+              this.closeFreeFoodDialog();
+              alert('Order placed successfully');
+              this.props.navigation.navigate('tab1');
+            }
+            this.setState({isVisibleLoading: false});
           }
         })
         .catch(error => {
           this.setState({isVisibleLoading: false});
+          this.closeFreeFoodDialog();
           console.log('try-catch error:', error.error);
           alert('Something went wrong');
         });
     } catch (err) {
       this.setState({isVisibleLoading: false});
+      this.closeFreeFoodDialog();
       console.log('another problem:', err);
       alert('Something went wrong');
     }
@@ -302,10 +317,10 @@ export default class foodDetails extends Component {
         payment_method: 'paypal',
       },
       redirect_urls: {
-        return_url: `http://192.168.43.151:6600/api/payments/success?access_token=${
+        return_url: `http://18.139.111.3:6600/api/payments/success?access_token=${
           this.state.paypalToken
         }&&userId=${this.state.userId}&&foodId=${this.state.foodId}`,
-        cancel_url: 'http://192.168.43.151:6600/api/payments/cancel',
+        cancel_url: 'http://18.139.111.3:6600/api/payments/cancel',
       },
       transactions: [
         {
@@ -359,6 +374,49 @@ export default class foodDetails extends Component {
         });
     } catch (err) {
       this.setState({isVisibleLoading: false});
+      console.log('another problem:', err);
+      alert('Something went wrong');
+    }
+  };
+  onBuyFreeFood = async () => {
+    await this.setState({
+      isFreeFoodDialogVisible: true,
+      buttonStatus: 'purchase',
+    });
+  };
+  closeFreeFoodDialog = async () => {
+    await this.setState({isFreeFoodDialogVisible: false});
+  };
+  onPlaceOrder = async () => {
+    this.setState({isVisibleLoading: true});
+    let body = {
+      from: 'free',
+      foodId: this.state.foodId,
+    };
+    try {
+      let response = Service.postDataApi(`orders`, body, this.state.userToken);
+      response
+        .then(res => {
+          if (res.data) {
+            this.setState({isVisibleLoading: false});
+            this.closeFreeFoodDialog();
+            alert('Order placed successfully');
+            this.props.navigation.navigate('tab1');
+          } else {
+            this.setState({isVisibleLoading: false});
+            this.closeFreeFoodDialog();
+            console.log('no data found', res.error);
+          }
+        })
+        .catch(error => {
+          this.setState({isVisibleLoading: false});
+          this.closeFreeFoodDialog();
+          console.log('error in try-catch', error);
+          alert('Something went wrong');
+        });
+    } catch (err) {
+      this.setState({isVisibleLoading: false});
+      this.closeFreeFoodDialog();
       console.log('another problem:', err);
       alert('Something went wrong');
     }
@@ -522,7 +580,13 @@ export default class foodDetails extends Component {
             {!this.state.isSeller ? (
               <TouchableOpacity
                 activeOpacity={0.7}
-                onPress={!this.state.isSkipped ? this.onBuy : this.onAlert}>
+                onPress={
+                  !this.state.isSkipped
+                    ? this.state.totalAmount == 0 || this.state.type == 'langar'
+                      ? this.onBuyFreeFood
+                      : this.onBuy
+                    : this.onAlert
+                }>
                 <LinearGradient
                   start={{x: 0, y: 0}}
                   end={{x: 1, y: 0}}
@@ -543,6 +607,18 @@ export default class foodDetails extends Component {
           <ConfirmPayment
             visible={this.state.isDialogVisible}
             closeDialog={this.closeDialog}
+          />
+        ) : (
+          <View />
+        )}
+        {this.state.isFreeFoodDialogVisible ? (
+          <ConfirmOrder
+            visible={this.state.isFreeFoodDialogVisible}
+            closeDialog={this.closeFreeFoodDialog}
+            onOrderConfirmation={() => {
+              this.onOrderFood('free');
+            }}
+            status={this.state.buttonStatus}
           />
         ) : (
           <View />

@@ -279,6 +279,9 @@ export default class addFood extends Component {
       ) {
         alert('All fields are required');
         return;
+      } else if (this.state.price == 0 && this.state.deliveryPrice != 0) {
+        alert('If food price is 0 then there should be no delivery charges');
+        return;
       } else if (
         this.state.selectedLists &&
         this.state.selectedLists.length == 0

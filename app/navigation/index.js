@@ -37,7 +37,7 @@ import Communication from '../screen/communication';
 import About from '../screen/about';
 import CustomerCare from '../screen/customerCare';
 import ConfirmPayment from '../screen/confirmPayment';
-import AddAddress from '../screen/addAddress';
+import Map from '../screen/map';
 
 import Header from '../components/header';
 
@@ -393,8 +393,8 @@ const AppStack = createStackNavigator(
         headerShown: false,
       },
     },
-    AddAddress: {
-      screen: AddAddress,
+    Map: {
+      screen: Map,
       navigationOptions: {
         headerShown: false,
       },
