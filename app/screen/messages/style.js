@@ -14,6 +14,10 @@ const styles = {
     width: wp(96),
     alignSelf: 'center',
   },
+  list_container: {
+    width: wp(78),
+    alignSelf: 'center',
+  },
   arrow: {
     height: hp(4.5),
     width: hp(4.5),
@@ -53,26 +57,31 @@ const styles = {
     borderColor: '#B5B5B5',
     width: wp(100),
   },
-  list_heading:{
-      fontSize:fonts.FONT_TEXT,
-      fontWeight:fonts.FONT_BOLD
+  list_heading: {
+    fontSize: fonts.FONT_TEXT,
+    fontWeight: fonts.FONT_BOLD,
   },
-  code_style:{
-      color:colors.primaryColor,
-      marginRight:wp(1.8)
+  code_style: {
+    color: colors.primaryColor,
+    marginRight: wp(1.8),
   },
-  message_style:{
-      fontSize:12,
-      fontWeight:fonts.FONT_BOLD,
-      color:colors.greyText
+  message_style: {
+    fontSize: 12,
+    fontWeight: fonts.FONT_BOLD,
+    color: colors.greyText,
   },
-  time_style:{
-    fontSize:fonts.FONT_NORMAL,
-    color:colors.greyText ,
-    marginRight:wp(1.8)
+  time_style: {
+    fontSize: fonts.FONT_NORMAL,
+    color: colors.greyText,
+    marginRight: wp(1.8),
   },
-  list_padding:{
-      paddingVertical:hp(1.2)
-  }
+  list_padding: {
+    paddingVertical: hp(1.2),
+  },
+  phone_icon: {
+    height: hp(3),
+    width: hp(3),
+    marginLeft: wp(3),
+  },
 };
 export default styles;

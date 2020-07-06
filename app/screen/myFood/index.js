@@ -102,6 +102,11 @@ export default class myFood extends Component {
                   if (res.data.orders[i].images) {
                     image = res.data.orders[i].images[0].url;
                   }
+                  console.log(
+                    'islikedddssssss:',
+                    res.data.orders[i].favoriteType,
+                  );
+
                   tempContent.push({
                     id: res.data.orders[i].id,
                     foodId: res.data.orders[i].foodId,

@@ -153,12 +153,16 @@ export default class home extends Component {
     };
   }
   componentDidMount = async () => {
-    const token = await utility.getToken('userId');
+    const userId = await utility.getItem('userId');
     await this.setState({userId: userId});
   };
   onListItem = async index => {
     if (index == 0) {
       await this.setState({query: ''});
+      await this.getFood();
+    }
+    if (index == 1) {
+      await this.setState({query: `forYou=true&userId=${this.state.userId}`});
       await this.getFood();
     }
     if (index == 2) {

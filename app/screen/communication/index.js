@@ -4,6 +4,9 @@ import styles from './style';
 import Modal from 'react-native-modal';
 import * as colors from '../../constants/colors';
 import LinearGradient from 'react-native-linear-gradient';
+import * as Service from '../../api/services';
+import * as utility from '../../utility/index';
+import * as Url from '../../constants/urls';
 
 export default class confirmOrder extends Component {
   constructor(props) {
@@ -11,21 +14,72 @@ export default class confirmOrder extends Component {
     this.state = {
       isVisible: false,
       isCallEnabled: false,
-      isSmsEnabled: false,
+      isSmsEnabled: true,
+      userToken: '',
+      userId: '',
     };
   }
   componentDidMount = async () => {
-    await this.setState({isVisible: this.props.visible});
+    const token = await utility.getToken('token');
+    const userId = await utility.getItem('userId');
+    await this.setState({
+      userToken: token,
+      userId: userId,
+      isVisible: this.props.visible,
+    });
+
+    if (this.props.communicationMode == 'phone') {
+      await this.setState({isCallEnabled: true, isSmsEnabled: false});
+    }
+    if (this.props.communicationMode == 'sms') {
+      await this.setState({isCallEnabled: false, isSmsEnabled: true});
+    }
   };
 
   close = async () => {
     await this.props.closeDialog();
-    this.props.navigation.navigate('OrderDetail');
   };
-
   onSubmit = async () => {
-    await this.props.closeDialog();
-    this.props.navigation.navigate('OrderDetail');
+    this.setState({isVisibleLoading: true});
+    let body;
+    if (this.state.isCallEnabled == true) {
+      body = {
+        communicationMode: 'phone',
+      };
+    }
+    if (this.state.isSmsEnabled == true) {
+      body = {
+        communicationMode: 'sms',
+      };
+    }
+
+    try {
+      let response = Service.putDataApi(
+        `users/${this.state.userId}`,
+        body,
+        this.state.userToken,
+      );
+      response
+        .then(res => {
+          if (res.data) {
+            this.setState({isVisibleLoading: false});
+            alert('Mode update successfully');
+            this.close();
+          } else {
+            this.setState({isVisibleLoading: false});
+            console.log('no data found', res.error);
+          }
+        })
+        .catch(error => {
+          this.setState({isVisibleLoading: false});
+          console.log('error in try-catch', error);
+          alert('Something went wrong');
+        });
+    } catch (err) {
+      this.setState({isVisibleLoading: false});
+      console.log('another problem:', err);
+      alert('Something went wrong');
+    }
   };
 
   render() {

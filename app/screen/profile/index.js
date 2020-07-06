@@ -73,6 +73,7 @@ export default class profile extends Component {
   };
   closeDialog = async () => {
     await this.setState({isDialogVisible: false});
+    await this.getUser();
   };
 
   getUser = async () => {
@@ -98,6 +99,7 @@ export default class profile extends Component {
               email: res.data.email,
               phone: res.data.phone,
               image: res.data.image,
+              communicationMode: res.data.communicationMode,
               // profileImage: image,
             });
             this.setState({isVisibleLoading: false});
@@ -261,6 +263,7 @@ export default class profile extends Component {
   };
   editProfile = async () => {
     this.setState({isVisibleLoading: true});
+
     let body = {
       firstName: this.state.firstName,
       lastName: this.state.lastName,
@@ -268,6 +271,7 @@ export default class profile extends Component {
       phone: this.state.phone,
       image: this.state.image,
     };
+
     try {
       let response = Service.putDataApi(
         `users/${this.state.userId}`,
@@ -888,6 +892,7 @@ export default class profile extends Component {
               <Communication
                 visible={this.state.isDialogVisible}
                 closeDialog={this.closeDialog}
+                communicationMode={this.state.communicationMode}
               />
             ) : (
               <View />
