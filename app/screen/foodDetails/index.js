@@ -210,10 +210,9 @@ export default class foodDetails extends Component {
   };
   onBuy = async () => {
     await this.onGetToken();
-    // await this.props.navigation.navigate('Payment');
   };
   onAlert = async () => {
-    await utility.showAlert('Please login or register first.', this.onLogin);
+    await utility.showAlert('Please login first.', this.onLogin);
   };
   onLogin = async () => {
     await this.props.navigation.navigate('Login');
@@ -317,10 +316,10 @@ export default class foodDetails extends Component {
         payment_method: 'paypal',
       },
       redirect_urls: {
-        return_url: `http://18.139.111.3:6600/api/payments/success?access_token=${
+        return_url: `http://18.139.111.3:6800/api/payments/success?access_token=${
           this.state.paypalToken
         }&&userId=${this.state.userId}&&foodId=${this.state.foodId}`,
-        cancel_url: 'http://18.139.111.3:6600/api/payments/cancel',
+        cancel_url: 'http://18.139.111.3:6800/api/payments/cancel',
       },
       transactions: [
         {

@@ -15,6 +15,7 @@ import * as Service from '../../api/services';
 import * as utility from '../../utility/index';
 import {widthPercentageToDP} from 'react-native-responsive-screen';
 import {NavigationActions, StackActions} from 'react-navigation';
+import moment from 'moment';
 
 export default class myFood extends Component {
   constructor(props) {
@@ -84,6 +85,10 @@ export default class myFood extends Component {
     await this.getPurchasedFood();
     await this.setState({selectedIndex: index});
   };
+  onRefersh = async () => {
+    await this.setState({query: `buyerId=${this.state.userId}&history=true`});
+    await this.getPurchasedFood();
+  };
   getPurchasedFood = async () => {
     try {
       let response = Service.getDataApi(
@@ -97,16 +102,24 @@ export default class myFood extends Component {
               if (res.data.orders.length != 0) {
                 let shared = [{id: '1', content: []}, {id: '2', content: []}];
                 let tempContent = [];
+                let now = moment().format('DD-MM-YYYY');
+                let timeStamp;
+                let isToday = false;
                 for (let i = 0; i < res.data.orders.length; i++) {
                   let image;
                   if (res.data.orders[i].images) {
                     image = res.data.orders[i].images[0].url;
                   }
-                  console.log(
-                    'islikedddssssss:',
-                    res.data.orders[i].favoriteType,
-                  );
-
+                  if (res.data.orders[i].timeStamp) {
+                    timeStamp = moment(res.data.orders[i].timeStamp).format(
+                      'DD-MM-YYYY',
+                    );
+                    if (now == timeStamp) {
+                      isToday = true;
+                    } else {
+                      isToday = false;
+                    }
+                  }
                   tempContent.push({
                     id: res.data.orders[i].id,
                     foodId: res.data.orders[i].foodId,
@@ -118,6 +131,7 @@ export default class myFood extends Component {
                     isLiked: res.data.orders[i].favoriteType,
                     type: res.data.orders[i].type,
                     status: res.data.orders[i].status,
+                    isToday: isToday,
                   });
                 }
                 shared[0].content = tempContent;
@@ -168,6 +182,7 @@ export default class myFood extends Component {
                   type: res.data[i].type,
                   isVeg: true,
                   status: 'null',
+                  isToday: false,
                 });
               }
               shared[0].content = this.state.dataArray[0].content;
@@ -188,18 +203,28 @@ export default class myFood extends Component {
       alert('Something went wrong');
     }
   };
-  showDialog = async (foodId, sellerId, type) => {
-    if (type == 'none') {
-      await this.setState({
-        isDialogVisible: true,
-        foodId: foodId,
-        sellerId: sellerId,
-      });
-    }
-  };
-  closeDialog = async () => {
-    this.setState({isDialogVisible: false});
-    await this.getPurchasedFood();
+  // showDialog = async (foodId, sellerId, type) => {
+  //   if (type == 'none') {
+  //     await this.setState({
+  //       isDialogVisible: true,
+  //       foodId: foodId,
+  //       sellerId: sellerId,
+  //     });
+  //   }
+  // };
+  // closeDialog = async () => {
+  //   this.setState({isDialogVisible: false});
+  //   // await this.getPurchasedFood();
+  // };
+  onOrderDetail = async (orderId, status, isToday, isLiked) => {
+    await this.props.navigation.navigate('OrderDetails', {
+      from: 'myFood',
+      status: status,
+      orderId: orderId,
+      isToday: isToday,
+      isLiked: isLiked,
+      onRefersh: this.onRefersh,
+    });
   };
   renderHeader = (item, expanded) => {
     let index;
@@ -266,18 +291,38 @@ export default class myFood extends Component {
           {item.content.length != 0 ? (
             <ScrollView>
               {item.content.map(value => {
+                console.log('islikedddd:::::',value.isLiked)
                 return (
                   <TouchableOpacity
                     onPress={
-                      index == 0 && value.status == 'delivered'
-                        ? () =>
-                            this.showDialog(
-                              value.foodId,
-                              value.sellerId,
+                      index == 0
+                        ? () => {
+                            this.onOrderDetail(
+                              value.id,
+                              value.status,
+                              value.isToday,
                               value.isLiked,
-                            )
+                            );
+                          }
                         : () => {}
-                    }>
+                    }
+                    // onPress={
+                    //   index == 0 && value.status == 'delivered'
+                    //     ? () =>
+                    //         this.showDialog(
+                    //           value.foodId,
+                    //           value.sellerId,
+                    //           value.isLiked,
+                    //         )
+                    //     : () => {
+                    //         this.onOrderDetail(
+                    //           value.id,
+                    //           value.status,
+                    //           value.isToday,
+                    //         );
+                    //       }
+                    // }
+                  >
                     <View
                       style={[
                         styles.row,
@@ -349,7 +394,7 @@ export default class myFood extends Component {
                         style={[styles.column, styles.column_between_spaceing]}>
                         {index == 0 ? (
                           <>
-                            {value.status != 'delivered' ? (
+                            {value.isLiked == 'none' ? (
                               <View
                                 style={[
                                   styles.status_container,
@@ -357,33 +402,33 @@ export default class myFood extends Component {
                                     ? styles.pending_style
                                     : value.status == 'confirmed'
                                     ? styles.confirmed_style
-                                    : // : value.status == 'delivered'
-                                      // ? styles.delivered_style
-                                      styles.rejected_style,
+                                    : value.status == 'delivered'
+                                    ? styles.delivered_style
+                                    : styles.rejected_style,
                                 ]}>
                                 <Text style={styles.status_style}>
                                   {value.status}
                                 </Text>
                               </View>
                             ) : (
-                              <>
-                                {value.isLiked == 'none' ? (
-                                  <View />
-                                ) : (
-                                  <Image
-                                    resizeMode="stretch"
-                                    source={
-                                      value.isLiked == 'like'
-                                        ? require('../../assets/like.png')
-                                        : require('../../assets/dislike.png')
-                                    }
-                                    style={[
-                                      styles.like_dislike_icon,
-                                      {alignSelf: 'flex-end'},
-                                    ]}
-                                  />
-                                )}
-                              </>
+                              // <>
+                              //   {value.isLiked == 'none' ? (
+                              //     <View />
+                              //   ) : (
+                              <Image
+                                resizeMode="stretch"
+                                source={
+                                  value.isLiked == 'like'
+                                    ? require('../../assets/like.png')
+                                    : require('../../assets/dislike.png')
+                                }
+                                style={[
+                                  styles.like_dislike_icon,
+                                  {alignSelf: 'flex-end'},
+                                ]}
+                              />
+                              //   )}
+                              // </>
                             )}
                           </>
                         ) : (

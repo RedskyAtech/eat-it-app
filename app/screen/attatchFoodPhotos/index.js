@@ -33,7 +33,7 @@ export default class attatchFoodPhotos extends Component {
 
     if (isSkipped == true) {
       await this.setState({isDialogVisible: false});
-      await utility.showAlert('Please login or register first.', this.onLogin);
+      await utility.showAlert('Please login first.', this.onLogin);
       await this.props.navigation.navigate('tab1');
       return;
     } else {

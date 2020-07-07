@@ -23,6 +23,7 @@ export default class likeDislikeFood extends Component {
       starFour: false,
       starFive: false,
       foodId: '',
+      orderId: '',
       userToken: '',
       rating: false,
       sellerId: '',
@@ -47,6 +48,7 @@ export default class likeDislikeFood extends Component {
     await this.setState({
       isVisible: this.props.visible,
       foodId: this.props.foodId,
+      orderId: this.props.orderId,
       userToken: userToken,
       sellerId: this.props.sellerId,
     });
@@ -61,12 +63,14 @@ export default class likeDislikeFood extends Component {
       if (this.state.selectedRating == 0) {
         body = {
           foodId: this.state.foodId,
+          orderId: this.state.orderId,
           type: 'like',
           status: status,
         };
       } else {
         body = {
           foodId: this.state.foodId,
+          orderId: this.state.orderId,
           type: 'like',
           status: status,
           ratingNo: this.state.selectedRating,
@@ -77,6 +81,7 @@ export default class likeDislikeFood extends Component {
     if (this.state.dislike) {
       body = {
         foodId: this.state.foodId,
+        orderId: this.state.orderId,
         type: 'dislike',
       };
     }

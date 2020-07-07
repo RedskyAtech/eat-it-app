@@ -177,11 +177,31 @@ const styles = {
     justifyContent: 'space-around',
     alignItems: 'center',
   },
-  otp_container:{
-    marginVertical:hp(1)
+  otp_container: {
+    marginVertical: hp(1),
   },
-  text_style:{
+  text_style: {
     fontSize: fonts.FONT_TEXT,
+  },
+  otp_card: {
+    height: hp(12),
+    width: wp(86),
+    borderRadius: 20,
+    alignSelf: 'center',
+    marginTop:hp(2)
+  },
+  otp_text: {
+    color: 'white',
+    textAlign:'center',
+    paddingHorizontal:wp(6),
+  },
+  rating_button_container:{
+    height: hp(5.4),
+    width: wp(45),
+    borderRadius: 20,
+    marginTop: hp(2),
+    alignSelf: 'flex-end',
+    elevation: 4,
   }
 };
 export default styles;

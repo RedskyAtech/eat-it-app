@@ -375,7 +375,11 @@ export default class login extends Component {
         this.setState({isVisibleLoading: false});
         console.log('no data found:', res.error);
         if (res.error == 'Error: USER_NOT_FOUND') {
-          alert('User not found');
+          // alert('User not found');
+          await utility.showAlert(
+            'Please register first.',
+            this.onRegisterDialog,
+          );
         } else if (res.error == 'Error: PASSWORD_MISMATCH') {
           alert('Password mismatch');
         } else {
@@ -383,6 +387,14 @@ export default class login extends Component {
         }
       }
     }
+  };
+  onRegisterDialog = async () => {
+    await this.setState({
+      isLogin: false,
+      email: '',
+      password: '',
+      checked: false,
+    });
   };
   render() {
     const {
@@ -519,16 +531,16 @@ export default class login extends Component {
                     </View>
 
                     <View style={social_container}>
-                      <View style={[row, between_spacing]}>
-                        <Image
-                          source={require('../../assets/facebook.png')}
-                          style={social_icons}
-                        />
-                        <Image
+                      {/* <View style={[row,{justifyContent:'center'}]}> */}
+                      <Image
+                        source={require('../../assets/facebook.png')}
+                        style={social_icons}
+                      />
+                      {/* <Image
                           source={require('../../assets/twitter.png')}
                           style={social_icons}
-                        />
-                      </View>
+                        /> */}
+                      {/* </View> */}
                     </View>
                   </View>
                 ) : (

@@ -18,6 +18,7 @@ import * as colors from '../../constants/colors';
 import ConfirmOrder from '../confirmOrder';
 import * as Service from '../../api/services';
 import * as utility from '../../utility/index';
+import LikeDislikeFood from '../likeDislikeFood';
 
 export default class orderDetails extends Component {
   constructor(props) {
@@ -34,6 +35,9 @@ export default class orderDetails extends Component {
       deliveryPrice: 0,
       totalAmount: 0,
       isDialogVisible: false,
+      isLikeDislikeDialogVisible: false,
+      isLiked: '',
+      sellerId: '',
       images: [],
       isVisibleLoading: false,
       isPriceShow: true,
@@ -48,6 +52,7 @@ export default class orderDetails extends Component {
       selectedField: 0,
       showButtons: false,
       isToday: false,
+      otp: '',
     };
   }
   componentDidMount = async () => {
@@ -57,7 +62,7 @@ export default class orderDetails extends Component {
     if (this.props.navigation.state.params) {
       if (this.props.navigation.state.params.from) {
         await this.setState({from: this.props.navigation.state.params.from});
-        if (this.state.from == 'orders') {
+        if (this.state.from == 'orders' || this.state.from == 'myFood') {
           if (this.props.navigation.state.params.orderId) {
             await this.setState({
               id: this.props.navigation.state.params.orderId,
@@ -75,13 +80,19 @@ export default class orderDetails extends Component {
           }
           await this.getOrderDetail();
         }
+        if (this.state.from == 'myFood') {
+          if (this.props.navigation.state.params.isLiked) {
+            await this.setState({
+              isLiked: this.props.navigation.state.params.isLiked,
+            });
+          }
+        }
       }
     }
   };
 
   getOrderDetail = async () => {
     await this.setState({isVisibleLoading: true});
-
     try {
       let response = Service.getDataApi(
         `orders/${this.state.id}`,
@@ -114,6 +125,8 @@ export default class orderDetails extends Component {
               price = res.data.price;
             }
             this.setState({
+              foodId: res.data.foodId,
+              sellerId: res.data.sellerId,
               name: res.data.name,
               address: res.data.address,
               price: price,
@@ -124,6 +137,7 @@ export default class orderDetails extends Component {
               images: res.data.images,
               isVisibleLoading: false,
               showButtons: true,
+              otp: res.data.otp,
             });
           } else {
             this.setState({isVisibleLoading: false});
@@ -141,13 +155,20 @@ export default class orderDetails extends Component {
       alert('Something went wrong');
     }
   };
-
-  onBack = async () => {
-    if (this.state.from == 'orders') {
-      this.props.navigation.navigate('Orders');
-    } else {
-      this.props.navigation.navigate('Notifications');
+  showLikeDisLikeDialog = async () => {
+    if (this.state.isLiked == 'none') {
+      await this.setState({
+        isLikeDislikeDialogVisible: true,
+      });
     }
+  };
+  closeLikeDislikeDialog = async () => {
+    this.setState({isLikeDislikeDialogVisible: false});
+    this.props.navigation.state.params.onRefersh();
+    this.props.navigation.goBack();
+  };
+  onBack = async () => {
+    this.props.navigation.goBack();
   };
   get pagination() {
     const {activeSlide} = this.state;
@@ -255,7 +276,7 @@ export default class orderDetails extends Component {
     let body = {
       otp:
         this.state.firstDigit +
-        this.state.selectedField +
+        this.state.secondDigit +
         this.state.thirdDigit +
         this.state.fourthDigit,
     };
@@ -330,6 +351,9 @@ export default class orderDetails extends Component {
       background_theme_color,
       otp_container,
       text_style,
+      otp_card,
+      otp_text,
+      rating_button_container,
     } = styles;
     return (
       <View>
@@ -408,6 +432,7 @@ export default class orderDetails extends Component {
               <Text style={type_text}>{this.state.type}</Text>
             </View>
           </View>
+
           <View style={[row, bottom_spacing]}>
             <Text style={timing_heading_style}>Delivery Charges : </Text>
             <Text style={address_style}>
@@ -418,6 +443,7 @@ export default class orderDetails extends Component {
                 : this.state.deliveryPrice}
             </Text>
           </View>
+
           <View style={[row, bottom_spacing]}>
             <Text style={timing_heading_style}>Total payable amount : </Text>
             <Text style={[address_style, colored_text]}>
@@ -425,45 +451,131 @@ export default class orderDetails extends Component {
             </Text>
           </View>
 
-          {!this.state.showButtons || !this.state.isToday ? (
-            <View />
-          ) : (
-            <>
-              {this.state.status == 'confirmed' ? (
-                <View style={[column, otp_container]}>
-                  <View style={[row, centered_text]}>
-                    <Text style={[colored_text, text_style]}>
-                      Enter four digit OTP for confirmation.
-                    </Text>
+          {this.state.from == 'orders' ? (
+            !this.state.showButtons || !this.state.isToday ? (
+              <View />
+            ) : (
+              <>
+                {this.state.status == 'confirmed' ? (
+                  <View style={[column, otp_container]}>
+                    <View style={[row, centered_text]}>
+                      <Text style={[colored_text, text_style]}>
+                        Enter four digit OTP for confirmation.
+                      </Text>
+                    </View>
+                    <View style={[row, otp_fields, between_spacing]}>
+                      {this.state.fields.map(item => {
+                        return (
+                          <TextInput
+                            style={
+                              this.state.selectedField >= item
+                                ? [otp_input_box, background_theme_color]
+                                : otp_input_box
+                            }
+                            maxLength={1}
+                            ref={
+                              item == 1
+                                ? 'first'
+                                : item == 2
+                                ? 'second'
+                                : item == 3
+                                ? 'third'
+                                : 'fourth'
+                            }
+                            keyboardType="numeric"
+                            onChangeText={value => this.onChange(value, item)}
+                          />
+                        );
+                      })}
+                    </View>
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={this.onSubmitOtp}>
+                      <LinearGradient
+                        start={{x: 0, y: 0}}
+                        end={{x: 1, y: 0}}
+                        colors={[
+                          colors.gradientFirstColor,
+                          colors.gradientSecondColor,
+                        ]}
+                        style={[
+                          button_container,
+                          centered_text,
+                          {alignSelf: 'center', marginTop: hp(0)},
+                        ]}>
+                        <Text style={button_text}>Submit</Text>
+                      </LinearGradient>
+                    </TouchableOpacity>
                   </View>
-                  <View style={[row, otp_fields, between_spacing]}>
-                    {this.state.fields.map(item => {
-                      return (
-                        <TextInput
-                          style={
-                            this.state.selectedField >= item
-                              ? [otp_input_box, background_theme_color]
-                              : otp_input_box
-                          }
-                          maxLength={1}
-                          ref={
-                            item == 1
-                              ? 'first'
-                              : item == 2
-                              ? 'second'
-                              : item == 3
-                              ? 'third'
-                              : 'fourth'
-                          }
-                          keyboardType="numeric"
-                          onChangeText={value => this.onChange(value, item)}
-                        />
-                      );
-                    })}
+                ) : (
+                  <View style={[bottom_container, bottom_spacing]}>
+                    {this.state.status == 'rejected' ||
+                    this.state.status == 'delivered' ? (
+                      <View />
+                    ) : (
+                      <>
+                        <TouchableOpacity
+                          activeOpacity={0.7}
+                          onPress={() => this.onSubmit('reject')}>
+                          <LinearGradient
+                            start={{x: 0, y: 0}}
+                            end={{x: 1, y: 0}}
+                            colors={[
+                              colors.gradientFirstColor,
+                              colors.gradientSecondColor,
+                            ]}
+                            style={[button_container, centered_text]}>
+                            <Text style={button_text}>Reject</Text>
+                          </LinearGradient>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          activeOpacity={0.7}
+                          onPress={() => this.onSubmit('confirm')}>
+                          <LinearGradient
+                            start={{x: 0, y: 0}}
+                            end={{x: 1, y: 0}}
+                            colors={[
+                              colors.gradientFirstColor,
+                              colors.gradientSecondColor,
+                            ]}
+                            style={[button_container, centered_text]}>
+                            <Text style={button_text}>Confirm</Text>
+                          </LinearGradient>
+                        </TouchableOpacity>
+                      </>
+                    )}
                   </View>
+                )}
+              </>
+            )
+          ) : this.state.from == 'myFood' ? (
+            !this.state.showButtons ? (
+              <View />
+            ) : (
+              <>
+                {this.state.status == 'confirmed' ? (
+                  this.state.isToday ? (
+                    <LinearGradient
+                      start={this.state.isProfile ? {x: 0, y: 1} : {x: 0, y: 0}}
+                      end={this.state.isProfile ? {x: 0, y: 0} : {x: 1, y: 0}}
+                      colors={[
+                        colors.gradientFirstColor,
+                        colors.gradientSecondColor,
+                      ]}
+                      style={[otp_card, centered_text]}>
+                      <Text style={otp_text}>
+                        Your confirmation otp is {this.state.otp}
+                      </Text>
+                    </LinearGradient>
+                  ) : (
+                    <View />
+                  )
+                ) : this.state.status == 'delivered' &&
+                  this.state.isLiked == 'none' ? (
                   <TouchableOpacity
                     activeOpacity={0.7}
-                    onPress={this.onSubmitOtp}>
+                    onPress={this.showLikeDisLikeDialog}>
                     <LinearGradient
                       start={{x: 0, y: 0}}
                       end={{x: 1, y: 0}}
@@ -471,59 +583,18 @@ export default class orderDetails extends Component {
                         colors.gradientFirstColor,
                         colors.gradientSecondColor,
                       ]}
-                      style={[
-                        button_container,
-                        centered_text,
-                        {alignSelf: 'center', marginTop: hp(0)},
-                      ]}>
-                      <Text style={button_text}>Submit</Text>
+                      style={[rating_button_container, centered_text]}>
+                      <Text style={button_text}>Rate your experience</Text>
                     </LinearGradient>
                   </TouchableOpacity>
-                </View>
-              ) : (
-                <View style={[bottom_container, bottom_spacing]}>
-                  {this.state.from == 'confirmedNotification' ||
-                  this.state.status == 'rejected' ||
-                  this.state.status == 'delivered' ? (
-                    <View />
-                  ) : (
-                    <>
-                      <TouchableOpacity
-                        activeOpacity={0.7}
-                        onPress={() => this.onSubmit('reject')}>
-                        <LinearGradient
-                          start={{x: 0, y: 0}}
-                          end={{x: 1, y: 0}}
-                          colors={[
-                            colors.gradientFirstColor,
-                            colors.gradientSecondColor,
-                          ]}
-                          style={[button_container, centered_text]}>
-                          <Text style={button_text}>Reject</Text>
-                        </LinearGradient>
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        activeOpacity={0.7}
-                        onPress={() => this.onSubmit('confirm')}>
-                        <LinearGradient
-                          start={{x: 0, y: 0}}
-                          end={{x: 1, y: 0}}
-                          colors={[
-                            colors.gradientFirstColor,
-                            colors.gradientSecondColor,
-                          ]}
-                          style={[button_container, centered_text]}>
-                          <Text style={button_text}>Confirm</Text>
-                        </LinearGradient>
-                      </TouchableOpacity>
-                    </>
-                  )}
-                </View>
-              )}
-            </>
+                ) : (
+                  <View />
+                )}
+              </>
+            )
+          ) : (
+            <View />
           )}
-
           {this.state.isDialogVisible ? (
             <ConfirmOrder
               visible={this.state.isDialogVisible}
@@ -543,6 +614,17 @@ export default class orderDetails extends Component {
             />
           </View>
         </View>
+        {this.state.isLikeDislikeDialogVisible ? (
+          <LikeDislikeFood
+            visible={this.state.isLikeDislikeDialogVisible}
+            closeDialog={this.closeLikeDislikeDialog}
+            orderId={this.state.id}
+            foodId={this.state.foodId}
+            sellerId={this.state.sellerId}
+          />
+        ) : (
+          <View />
+        )}
       </View>
     );
   }

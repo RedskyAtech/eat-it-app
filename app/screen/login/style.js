@@ -106,6 +106,7 @@ const styles = {
   social_icons: {
     height: hp(5.8),
     width: hp(5.8),
+    alignSelf: 'center',
   },
   bottom_container: {
     flexDirection: 'row',

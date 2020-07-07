@@ -66,7 +66,7 @@ export default class orders extends Component {
         .then(res => {
           if (res.data) {
             if (res.data.orders && res.data.orders.length != 0) {
-              // console.log('orderssssss:', res.data.orders);
+              console.log('orderssssss:', res.data.orders);
               let tempOrders = [];
               let now = moment().format('DD-MM-YYYY');
               let timeStamp;

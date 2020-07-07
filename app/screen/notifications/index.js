@@ -112,9 +112,9 @@ export default class notifications extends Component {
         from: 'receivedNotification',
       });
     } else {
-      await this.props.navigation.navigate('OrderDetails', {
-        from: 'confirmedNotification',
-      });
+      // await this.props.navigation.navigate('OrderDetails', {
+      //   from: 'confirmedNotification',
+      // });
     }
   };
 
