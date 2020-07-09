@@ -1,4 +1,5 @@
-package com.reactnativestructure;
+// package com.reactnativestructure;
+package com.eatit;
 
 import com.facebook.react.ReactActivity;
 
@@ -10,6 +11,7 @@ public class MainActivity extends ReactActivity {
    */
   @Override
   protected String getMainComponentName() {
-    return "ReactNativeStructure";
+    // return "ReactNativeStructure";
+    return "EatIt";
   }
 }

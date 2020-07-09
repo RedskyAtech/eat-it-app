@@ -21,6 +21,7 @@ import * as colors from '../../constants/colors';
 import ImagePicker from 'react-native-image-picker';
 import {TextInputMask} from 'react-native-masked-text';
 import {NavigationActions, StackActions} from 'react-navigation';
+import {LoginButton, AccessToken, LoginManager} from 'react-native-fbsdk';
 
 export default class login extends Component {
   constructor(props) {
@@ -110,24 +111,62 @@ export default class login extends Component {
       await this.setState({isLogin: true});
     }
   };
-  onRegistrationValidations = async () => {
-    await this.setState({isVisibleLoading: true});
+  onFbLogin = async res => {
+    await utility.setToken('token', res.data.token);
+    await utility.setItem('userId', res.data._id);
+    await utility.setItem('isSkipped', false);
 
-    let body = {
-      loginType: 'app',
-      firstName: this.state.firstName,
-      lastName: this.state.lastName,
-      email: this.state.email,
-      phone: this.state.phone,
-      password: this.state.password,
-      image: this.state.image,
-    };
+    await this.props.navigation.dispatch(
+      StackActions.reset({
+        index: 0,
+        actions: [NavigationActions.navigate({routeName: 'BottomTab'})],
+      }),
+    );
+
+    await this.props.navigation.navigate('tab1');
+  };
+  onRegistrationValidations = async (from, data, token) => {
+    await this.setState({isVisibleLoading: true});
+    let body;
+    if (from == 'app') {
+      body = {
+        loginType: 'app',
+        firstName: this.state.firstName,
+        lastName: this.state.lastName,
+        email: this.state.email,
+        phone: this.state.phone,
+        password: this.state.password,
+        image: this.state.image,
+      };
+    } else {
+      let image = {
+        url:'',
+        resize_url: data.picture.data.url,
+        thumbnail:'',
+        resize_thumbnail:''
+      };
+      body = {
+        loginType: 'facebook',
+        uId: data.id,
+        tempToken: token,
+        firstName: data.first_name,
+        lastName: data.last_name,
+        email: data.email,
+        password: '',
+        image: image,
+      };
+    }
     try {
       let response = Service.postDataApi(Url.REGISTRATION_URL, body, '');
       response
         .then(res => {
           if (res.data) {
-            alert('Registered successfully');
+            console.log('user register data:::', res.data);
+            if (from == 'app') {
+              alert('Registered successfully');
+            } else {
+              this.onFbLogin(res);
+            }
             this.setState({
               isVisibleLoading: false,
               isLogin: true,
@@ -155,7 +194,6 @@ export default class login extends Component {
           } else {
             this.setState({isVisibleLoading: false});
             console.log('no data found:', res.error);
-            // alert(res.error);
           }
         })
         .catch(error => {
@@ -209,7 +247,7 @@ export default class login extends Component {
                     resize_thumbnail: res.data.image.resize_thumbnail,
                   },
                 });
-                this.onRegistrationValidations();
+                this.onRegistrationValidations('app', '', '');
                 this.setState({isVisibleLoading: false});
               }
             }
@@ -396,6 +434,50 @@ export default class login extends Component {
       checked: false,
     });
   };
+  onFacebookLogin = async () => {
+    try {
+      const result = await LoginManager.logInWithPermissions([
+        'public_profile',
+        'email',
+      ]);
+      if (result.isCancelled) {
+        throw new Error('User cancelled request');
+      }
+      // get the access token
+      const data = await AccessToken.getCurrentAccessToken();
+      if (!data) {
+        throw new Error(
+          'Something went wrong obtaining the users access token',
+        );
+      }
+      console.log('facebook data::::', data);
+
+      if (data && data.accessToken) {
+        let response = await fetch(
+          `https://graph.facebook.com/v7.0/${
+            data.userID
+          }/?fields=picture,email,first_name,last_name&access_token=${
+            data.accessToken
+          }`,
+        );
+        let res = await response.json();
+        if (res !== null) {
+          if (res !== null && Object.keys(res).length !== 0) {
+            console.log('ressss not nullll lastttt', res);
+            await this.onRegistrationValidations(
+              'facebook',
+              res,
+              data.accessToken,
+            );
+          } else {
+            console.log('ressss nullllll lastttt', res);
+          }
+        }
+      }
+    } catch (err) {
+      console.log('`Facebook Login Error:', err);
+    }
+  };
   render() {
     const {
       back_container,
@@ -531,17 +613,20 @@ export default class login extends Component {
                     </View>
 
                     <View style={social_container}>
-                      {/* <View style={[row,{justifyContent:'center'}]}> */}
-                      <Image
-                        source={require('../../assets/facebook.png')}
-                        style={social_icons}
-                      />
-                      {/* <Image
-                          source={require('../../assets/twitter.png')}
+                      <View style={[row, between_spacing]}>
+                        <TouchableOpacity onPress={this.onFacebookLogin}>
+                          <Image
+                            source={require('../../assets/facebook.png')}
+                            style={social_icons}
+                          />
+                        </TouchableOpacity>
+                        <Image
+                          source={require('../../assets/google.png')}
                           style={social_icons}
-                        /> */}
-                      {/* </View> */}
+                        />
+                      </View>
                     </View>
+                    
                   </View>
                 ) : (
                   <View>

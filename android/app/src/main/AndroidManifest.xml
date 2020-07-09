@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.reactnativestructure">
-  
+  package="com.eatit">
+  <!-- package="com.eatit" -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
@@ -36,10 +36,30 @@
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
       </activity>
+
       <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
+
+<!-- facebook activity and meta data -->
+      <activity android:name="com.facebook.FacebookActivity"
+        android:configChanges=
+                "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+        android:label="@string/app_name" />
+    <activity
+        android:name="com.facebook.CustomTabActivity"
+        android:exported="true">
+        <intent-filter>
+            <action android:name="andr
+            oid.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="@string/fb_login_protocol_scheme" />
+        </intent-filter>
+    </activity>
+    <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+<!--end facebook activity and meta data -->
       <meta-data
-   android:name="com.google.android.geo.API_KEY"
-   android:value="AIzaSyAr_cT485DGoQBlnD9K2qDhLl2u0CXET2Y"/>
+        android:name="com.google.android.geo.API_KEY"
+        android:value="AIzaSyAr_cT485DGoQBlnD9K2qDhLl2u0CXET2Y"/>
     </application>
 
 </manifest>

@@ -69,7 +69,18 @@ export default class myFood extends Component {
       });
       await this.getPurchasedFood();
       await this.getSharedFood();
+    } else {
+      await utility.showAlert('Please login first.', this.onLogin);
+      await this.props.navigation.dispatch(
+        StackActions.reset({
+          index: 0,
+          actions: [NavigationActions.navigate({routeName: 'BottomTab'})],
+        }),
+      );
     }
+  };
+  onLogin = async () => {
+    await this.props.navigation.navigate('Login');
   };
   onTabItem = async index => {
     if (index == 0) {
@@ -291,7 +302,7 @@ export default class myFood extends Component {
           {item.content.length != 0 ? (
             <ScrollView>
               {item.content.map(value => {
-                console.log('islikedddd:::::',value.isLiked)
+                console.log('islikedddd:::::', value.isLiked);
                 return (
                   <TouchableOpacity
                     onPress={

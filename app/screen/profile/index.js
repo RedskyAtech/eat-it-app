@@ -20,6 +20,7 @@ import Communication from '../communication';
 import {NavigationActions, StackActions} from 'react-navigation';
 import {Badge} from 'react-native-elements';
 import ImagePicker from 'react-native-image-picker';
+import {LoginManager} from 'react-native-fbsdk';
 
 export default class profile extends Component {
   constructor(props) {
@@ -62,11 +63,24 @@ export default class profile extends Component {
     await this.setState({isSkipped: isSkipped});
 
     if (this.state.isSkipped == false) {
+      console.log('meeeeeeeeeeeeeeeee')
       const token = await utility.getToken('token');
       const userId = await utility.getItem('userId');
+      console.log('tokemnnnnnnnnnnnnnnnnnn',token)
       await this.setState({userToken: token, userId: userId});
       await this.getUser();
+    } else {
+      await utility.showAlert('Please login first.', this.onLogin);
+      await this.props.navigation.dispatch(
+        StackActions.reset({
+          index: 0,
+          actions: [NavigationActions.navigate({routeName: 'BottomTab'})],
+        }),
+      );
     }
+  };
+  onLogin = async () => {
+    await this.props.navigation.navigate('Login');
   };
   onOpenDialog = async () => {
     await this.setState({isDialogVisible: true});
@@ -373,6 +387,7 @@ export default class profile extends Component {
       image: {},
       file: '',
     });
+    await LoginManager.logOut();
     await this.props.navigation.navigate('Login');
     await this.closeMenu();
   };
